@@ -1,0 +1,23 @@
+# Excel lock / temp files created while the workbook is open
+~$*
+*.tmp
+*.temp
+
+# OS junk
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Editor / local tooling
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Secrets and local env (never commit)
+.env
+.env.*
+!.env.example
+secrets/
+*.pem
+*.key
