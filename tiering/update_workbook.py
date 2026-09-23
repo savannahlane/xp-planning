@@ -155,9 +155,15 @@ def main():
 
     # ---------------------------------------------------------------- Read Me
     rm = wb["Read Me"]
+    marker = "Growth tiering (added)"
+    existing = next((r for r in range(1, rm.max_row + 1)
+                     if rm.cell(row=r, column=1).value == marker), None)
+    if existing:
+        # Re-runs replace the block rather than stacking another copy underneath it.
+        rm.delete_rows(existing - 1, rm.max_row - existing + 2)
     start = rm.max_row + 2
     notes = [
-        "Growth tiering (added)",
+        marker,
         "",
         "Each account carries a growth tier on Assignments columns X to AE. The tier crosses growth",
         "potential - 60% the territory score, 40% the capability whitespace left in the account -",

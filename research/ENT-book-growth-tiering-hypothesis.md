@@ -17,7 +17,8 @@ evidence. But the line does not fall where it was drawn. **Growth potential does
 by state. It separates by which side of the house you are selling into inside that state.**
 
 In 32 of 51 jurisdictions the state-agency motion and the 100k-plus local motion land in
-different tiers, and several of the disagreements are two full tiers wide. Texas is the only
+different tiers — 24 of the 39 states this book actually touches — and several of the
+disagreements are two full tiers wide. Texas is the only
 territory in the book that is unambiguously top-tier on both sides. California is the reverse
 of how it is usually described: its state-agency estate is the most penetrated book we have
 sitting inside a distressed budget, while its 112 large counties and cities are the single
@@ -136,7 +137,8 @@ of only $9.8M general fund.
 Two exceptions are worth treating as falsifiable claims rather than conclusions:
 
 - **Idaho** scores local A at 60. It is the second-fastest-growing state in the country at
-  +1.44% with +9.8 net domestic migrants per 1,000, and we hold one account there.
+  +1.44% with +9.8 net domestic migrants per 1,000. The book holds one Idaho account, the
+  Labor Department, and no locals at all.
 - **Utah** scores local A at 67 on similar logic, with 11 jurisdictions over 100k and none held.
 
 Both have low or medium research confidence and thin grant environments. If the team's
