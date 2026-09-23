@@ -10,16 +10,18 @@ that landed on main and changes only the proposed assignment (`newxp`):
 * Displaced Local SMG accounts move as whole AE groups to an XP who already
   works with that AE. This removes an XP↔AE edge instead of creating one.
 * Carolina Prieto is labelled Team Lead, not Manager. She keeps the Kentucky
-  and North Dakota enterprise agreements (two customers), takes three other
-  Kentucky state accounts for consolidation, and releases scattered locals.
-* Non-SAM special districts move to Local SMG. SAM special districts stay
-  Enterprise (GLAVCD remains with Colleen).
+  and North Dakota enterprise agreements (two customers).
+
+Per-account moves live in account_overrides.csv, which is the file to edit when
+an XP changes. It also carries segment changes and removals.
 
 The current-assignment (`cur`) field is historical and is not rewritten.
 """
 
 from __future__ import annotations
 
+import csv
+import io
 import json
 import re
 from collections import defaultdict
@@ -28,6 +30,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 HTML = ROOT / "index.html"
+OVERRIDES = Path(__file__).resolve().parent / "account_overrides.csv"
 
 NO_BOOK = {
     "Jake Sager",
@@ -72,44 +75,30 @@ EA_PARENTS = {
     "North Dakota Information Technology Department",
 }
 
-KENTUCKY_CONSOLIDATION = {
-    "Kentucky Cabinet for Health & Family Services (CHFS)",
-    "Kentucky Office of Homeland Security",
-    "Kentucky Transportation Cabinet",
-}
+ENTERPRISE_SEGMENTS = {"State", "Local ENT"}
 
-CAROLINA_COUNTABLE = EA_PARENTS | KENTUCKY_CONSOLIDATION
 
-# Non-SAM special districts leave Local ENT. SAM-territory districts stay.
-# Destinations are SMG XPs who already cover that geography, except Luke
-# Mulvaney's three accounts which collapse onto one eligible XP so Halena (and
-# the other Enterprise XPs) no longer pair with that vertical.
-SPECIAL_DISTRICT_SMG = {
-    "Health Care District of Palm Beach County - FL": "Natalia Sanchez",
-    "North Collier Fire Control and Rescue District": "Natalia Sanchez",
-    "Housing Authority of the City of Pittsburgh": "Carlos Torres",
-    "Los Angeles County Sanitation District": "Eduardo Ruiz",
-    "Metropolitan Water District of Southern California": "Eduardo Ruiz",
-    "North Central Texas Council of Governments": "Carlos Torres",
-    "North Jersey Transportation Planning Authority": "Carlos Torres",
-    "Tri-County Metropolitan Transportation District of Oregon (TriMet)": "Carlos Torres",
-}
-
-# Carolina keeps KY + ND. Each scatter account moves to an XP who already
-# works with that AE, except Glendale AZ (Conrad Taylor has no other book).
-CAROLINA_SCATTER = {
-    "Nashville-Davidson County TN": "Andy O'Brien",
-    "Oakland, CA": "Colleen Moran",
-    "Aurora, IL": "Marcy Castro",
-    "Glendale, AZ": "Colleen Moran",
-    "Allegheny County Treasurer Office": "Halena Martin",
-    "Outagamie County, WI": "Brooke Minichino",
-}
-
-# Brooke is at the 17-account cap. Outagamie is a Tyler Carlson add; Ocala
-# is a Local SMG FL row Natalia already covers, so moving it frees the slot
-# without a new AE relationship.
-BROOKE_CAPACITY_MOVE = "Ocala, FL"
+def load_overrides(path: Path) -> dict[str, dict]:
+    """Read the per-account override table, ignoring the comment header."""
+    body = "\n".join(
+        line for line in path.read_text().splitlines() if not line.startswith("#")
+    )
+    overrides: dict[str, dict] = {}
+    for record in csv.DictReader(io.StringIO(body)):
+        account = (record["account"] or "").strip()
+        if not account:
+            continue
+        if account in overrides:
+            raise RuntimeError(f"Duplicate override row for {account!r}")
+        segment = (record["new_segment"] or "").strip()
+        if segment and segment not in ENTERPRISE_SEGMENTS | {"Local SMG"}:
+            raise RuntimeError(f"Unknown segment {segment!r} for {account!r}")
+        overrides[account] = {
+            "xp": (record["new_xp"] or "").strip(),
+            "segment": segment,
+            "remove": (record["remove"] or "").strip().lower() in {"yes", "true", "1"},
+        }
+    return overrides
 
 
 def extract_page(source: str) -> tuple[dict, int, int]:
@@ -122,9 +111,14 @@ def proposed_edges(rows: list[dict]) -> set[tuple[str, str]]:
     return {(r["newxp"], r["person"]) for r in rows if r.get("newxp")}
 
 
-def apply_assignments(page: dict) -> dict:
+def apply_assignments(page: dict, overrides: dict[str, dict]) -> dict:
     rows = page["rows"]
     before_edges = proposed_edges(rows)
+    carolina_countable = EA_PARENTS | {
+        account
+        for account, override in overrides.items()
+        if override["xp"] == "Carolina Prieto"
+    }
 
     # The open Pacific XP is an Ashley report. That preserves the coherent,
     # single-XP California State AE groups while satisfying the reporting rule.
@@ -132,6 +126,7 @@ def apply_assignments(page: dict) -> dict:
     page["meta"]["Carolina Prieto"] = ["—", "—", "Team Lead", "Not specified"]
 
     moved = []
+    matched = set()
     for row in rows:
         old = row["newxp"]
 
@@ -143,36 +138,46 @@ def apply_assignments(page: dict) -> dict:
                     f"No destination for displaced AE group {row['person']!r}"
                 ) from exc
 
-        # This is the one Ashley Enterprise account that main sent outside her
-        # reporting line. Halena keeps the other 39 Stephanie DelSignore rows;
-        # the hold on the broader Connecticut estate is otherwise unchanged.
-        if row["acct"] == "Connecticut Public Utilities Regulatory Authority [PURA],":
-            row["newxp"] = "Steffany Amador"
-
-        if row["acct"] in SPECIAL_DISTRICT_SMG:
-            row["segment"] = "Local SMG"
-            row["ent"] = False
-            row["newxp"] = SPECIAL_DISTRICT_SMG[row["acct"]]
-
-        if row["acct"] in KENTUCKY_CONSOLIDATION:
-            row["newxp"] = "Carolina Prieto"
-
         if old == "Nathan Williamson":
             row["newxp"] = "Jr Wycinsky"
 
-        if old == "Carolina Prieto" or row["newxp"] == "Carolina Prieto":
-            if row["acct"] in CAROLINA_SCATTER:
-                row["newxp"] = CAROLINA_SCATTER[row["acct"]]
-            elif row["state"] in {"KY", "ND"}:
-                row["newxp"] = "Carolina Prieto"
-                if row["acct"] not in CAROLINA_COUNTABLE:
-                    row["alloc"] = True
+        override = overrides.get(row["acct"])
+        if override:
+            matched.add(row["acct"])
+            if override["segment"]:
+                row["segment"] = override["segment"]
+                row["ent"] = override["segment"] in ENTERPRISE_SEGMENTS
+            if override["xp"]:
+                row["newxp"] = override["xp"]
 
-        if row["acct"] == BROOKE_CAPACITY_MOVE and row["newxp"] == "Brooke Minichino":
-            row["newxp"] = "Natalia Sanchez"
+        # Kentucky and North Dakota are statewide enterprise agreements, so the
+        # sister agencies travel with the billed parent instead of consuming a
+        # countable slot of their own.
+        if row["state"] in {"KY", "ND"} and (
+            old == "Carolina Prieto" or row["newxp"] == "Carolina Prieto"
+        ):
+            row["newxp"] = "Carolina Prieto"
+            if row["acct"] not in carolina_countable:
+                row["alloc"] = True
 
         if row["newxp"] != old:
             moved.append((row["acct"], old, row["newxp"], row["person"]))
+
+    # Removals are exempt: once an account is gone, a re-run finds nothing.
+    unmatched = sorted(
+        account
+        for account, override in overrides.items()
+        if account not in matched and not override["remove"]
+    )
+    if unmatched:
+        raise RuntimeError(
+            "Override accounts not found in the map (check the exact name): "
+            + ", ".join(unmatched)
+        )
+
+    removed = [r["acct"] for r in rows if overrides.get(r["acct"], {}).get("remove")]
+    rows = [r for r in rows if not overrides.get(r["acct"], {}).get("remove")]
+    page["rows"] = rows
 
     # Hard validations: fail loudly instead of publishing a subtly wrong map.
     for xp in NO_BOOK:
@@ -191,18 +196,18 @@ def apply_assignments(page: dict) -> dict:
         )
 
     carolina = [r for r in rows if r["newxp"] == "Carolina Prieto"]
-    carolina_countable = [r for r in carolina if not r["alloc"]]
+    carolina_rows = [r for r in carolina if not r["alloc"]]
     extra = [
         r["acct"]
-        for r in carolina_countable
-        if r["acct"] not in CAROLINA_COUNTABLE
+        for r in carolina_rows
+        if r["acct"] not in carolina_countable
     ]
     if extra:
         raise RuntimeError(
             "Carolina Prieto has unexpected countable accounts: "
             + ", ".join(extra)
         )
-    missing = CAROLINA_COUNTABLE - {r["acct"] for r in carolina_countable}
+    missing = carolina_countable - {r["acct"] for r in carolina_rows}
     if missing:
         raise RuntimeError(f"Carolina is missing consolidated accounts: {sorted(missing)}")
 
@@ -227,10 +232,11 @@ def apply_assignments(page: dict) -> dict:
     after_edges = proposed_edges(rows)
     return {
         "moved": moved,
+        "removed": removed,
         "before_edges": before_edges,
         "after_edges": after_edges,
         "ashley_enterprise": ashley_enterprise,
-        "carolina_countable": carolina_countable,
+        "carolina_countable": carolina_rows,
     }
 
 
@@ -355,7 +361,7 @@ def update_markup(source: str) -> str:
 def main() -> None:
     source = HTML.read_text()
     page, start, end = extract_page(source)
-    result = apply_assignments(page)
+    result = apply_assignments(page, load_overrides(OVERRIDES))
 
     source = source[:start] + json.dumps(page, separators=(", ", ": ")) + source[end:]
     source = update_markup(source)
@@ -363,6 +369,8 @@ def main() -> None:
 
     moved = result["moved"]
     print(f"moved {len(moved)} proposed account records")
+    if result["removed"]:
+        print("removed from the map: " + ", ".join(sorted(result["removed"])))
     print(
         "XP↔AE edges: "
         f"{len(result['before_edges'])} → {len(result['after_edges'])} "

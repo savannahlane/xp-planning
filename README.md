@@ -9,6 +9,26 @@ Internal and confidential. Contains account names, ARR and staffing. Keep this r
 - `research/`: the sourced research behind the tiering, plus the tiering hypothesis itself.
 - `tiering/`: the scoring model and its outputs.
 
+## Changing who owns an account
+
+Edit **`tiering/account_overrides.csv`**, then run `python3 tiering/update_whole_team_map.py`.
+That is the only file to touch for a per-account change; `index.html` is generated and should
+not be hand-edited.
+
+One row per account, with these columns:
+
+| Column | What it does |
+|---|---|
+| `account` | Must match the account name in `index.html` exactly. An unmatched name fails the run rather than silently doing nothing. |
+| `new_xp` | The proposed XP. Blank keeps whatever the base map proposed. |
+| `new_segment` | `State`, `Local ENT` or `Local SMG`. `Local SMG` moves the account to midmarket and clears the Enterprise flag. Blank keeps the segment. |
+| `remove` | `yes` drops the account from the map entirely. |
+| `note` | Why. Free text, not parsed. |
+
+Rules that are not per-account stay in `tiering/update_whole_team_map.py`: who cannot hold
+accounts at all, where a displaced AE group goes, and the Kentucky and North Dakota
+enterprise-agreement rollup.
+
 ## Whole-team proposed assignment
 
 The proposed view in `index.html` applies these staffing rules:
@@ -28,9 +48,12 @@ The proposed view in `index.html` applies these staffing rules:
 - Nathan's three federal accounts consolidate with Jr Wycinsky. Jake's Local SMG groups move
   by AE: Emery Herrschel to Kerrian Dailey, Kimberley Steelmann to Andrés Pérez, and Luke
   Mulvaney to Carlos Torres.
+- The three Nevada state agencies sit with Cody Nichols, who already works with Cameron
+  Chadsey on Arizona and New Mexico. Virginia Department of General Services is removed from
+  the map.
 - When those three books were removed, each displaced Local SMG AE group moved intact to an XP
   who already worked with that AE. Together with the Carolina rebalance and special-district
-  moves, proposed XP↔AE relationships fell from 161 to 133.
+  moves, proposed XP↔AE relationships fell from 161 to 131.
 - Connecticut PURA is the necessary exception to the no-new-relationship rule. Ashley's
   reporting-line constraint moves it from Halena to Steffany while Halena retains the broader
   Connecticut estate, so Stephanie DelSignore works with two XPs rather than one.
@@ -65,8 +88,11 @@ capability whitespace) against ARR:
 ```
 python3 tiering/build_tiering.py      # score territories and accounts
 python3 tiering/update_workbook.py    # refresh the xlsx
-python3 tiering/update_whole_team_map.py  # reapply whole-team assignment rules to index.html
+python3 tiering/update_whole_team_map.py  # reapply assignment rules and account_overrides.csv
 ```
+
+`tiering/account_overrides.csv` is the per-account assignment table described above. The update
+script is idempotent, so running it twice changes nothing the second time.
 
 `tiering/inject_html.py` targets the earlier Enterprise-only page payload. Do not run it against
 the whole-team `PAGE` payload in the current `index.html`.
