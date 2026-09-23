@@ -469,3 +469,65 @@ Scores by state (highest first): South Carolina 9.25, North Carolina 9.00, Idaho
 
 - **Kansas does not belong on the property-tax-squeeze list** as of September 2026. Both 2026 vehicles failed (HB 2745 vetoed, SCR 1616 died, HCR 5008 amendment rejected 59-62). The premise in the brief appears to have been based on proposed rather than enacted law. Montana, North Dakota, Colorado and Nebraska did enact measures, but I could not find quantified local revenue impact estimates for any of those four.
 - **Connecticut, Massachusetts and Rhode Island county counts in the >100k column are misleading.** Connecticut's eight entries are COG planning regions, Massachusetts abolished eight of fourteen county governments, and Rhode Island counties have no government at all. Adjusted for this, Connecticut's real enterprise account pool is closer to 5 (the cities), Massachusetts closer to 9–12, and Rhode Island 1.
+
+---
+
+## 11. Machine-readable base series
+
+All 50 states plus DC, sorted alphabetically. Population is Census Vintage 2025 (NST-EST2025), July 1 2025, with percent change measured July 1 2024 to July 1 2025. Migration components are Vintage 2025 for the same period; the per-1,000 rate uses the July 1 2025 population as the denominator. Permits are total permitted housing units (1-unit + 2-unit + 3-4 unit + 5+ unit) from the Census Building Permits Survey state files, the same figures behind section 4: CY2024 from st2412y.txt, CY2025 from st2512y.txt, YTD-through-July 2025 from st2507y.txt, and YTD-through-July 2026 from st2607y.txt. Jurisdictions over 100k counts counties or county equivalents plus incorporated places with July 1 2025 population of 100,000 or more, deduplicated so Virginia independent cities and DC are counted once.
+
+Percent change is a decimal number. Negative values carry a leading minus. No value in this table is estimated or interpolated.
+
+| State | Pop 7/1/2025 | Pop % chg 2024-25 | Net domestic migration | Net domestic migration per 1k | Intl migration | Permits CY2025 | Permits CY2024 | Permits YTD Jul 2026 | Permits YTD Jul 2025 | Jurisdictions over 100k |
+|---|---|---|---|---|---|---|---|---|---|---|
+| Alabama | 5193088 | 0.58 | 23358 | 4.50 | 8946 | 18837 | 20615 | 12515 | 10314 | 19 |
+| Alaska | 737270 | 0.10 | -4525 | -6.14 | 1959 | 848 | 989 | 461 | 506 | 3 |
+| Arizona | 7623818 | 0.89 | 31107 | 4.08 | 28219 | 50983 | 59306 | 25542 | 31595 | 23 |
+| Arkansas | 3114791 | 0.60 | 14475 | 4.65 | 5470 | 15471 | 13527 | 8708 | 8666 | 9 |
+| California | 39355309 | -0.02 | -229077 | -5.82 | 109278 | 104626 | 99959 | 64673 | 58776 | 112 |
+| Colorado | 6012561 | 0.40 | -12100 | -2.01 | 15356 | 33624 | 32202 | 19809 | 18921 | 24 |
+| Connecticut | 3688496 | 0.38 | -5945 | -1.61 | 17534 | 7009 | 6499 | 3464 | 3617 | 13 |
+| Delaware | 1059952 | 0.94 | 6855 | 6.47 | 3473 | 6465 | 6922 | 3986 | 4163 | 3 |
+| District of Columbia | 693645 | 0.34 | -4128 | -5.95 | 3915 | 1591 | 1737 | 1264 | 620 | 1 |
+| Florida | 23462518 | 0.85 | 22517 | 0.96 | 178674 | 175204 | 173163 | 94940 | 109681 | 63 |
+| Georgia | 11302748 | 0.88 | 27333 | 2.42 | 42579 | 60430 | 67877 | 37291 | 37182 | 36 |
+| Hawaii | 1432820 | -0.15 | -8876 | -6.19 | 4768 | 3708 | 3667 | 2122 | 2394 | 4 |
+| Idaho | 2029733 | 1.44 | 19915 | 9.81 | 2148 | 17796 | 17616 | 11127 | 10867 | 7 |
+| Illinois | 12719141 | 0.13 | -40017 | -3.15 | 44752 | 18664 | 19825 | 11602 | 11440 | 27 |
+| Indiana | 6973333 | 0.56 | 12197 | 1.75 | 17852 | 29683 | 26465 | 16570 | 18174 | 24 |
+| Iowa | 3238387 | 0.25 | -970 | -0.30 | 5903 | 13389 | 12229 | 7611 | 7792 | 11 |
+| Kansas | 2977220 | 0.40 | -519 | -0.17 | 7440 | 9995 | 9215 | 8190 | 6209 | 10 |
+| Kentucky | 4606864 | 0.50 | 7269 | 1.58 | 15709 | 14357 | 15712 | 8377 | 8396 | 11 |
+| Louisiana | 4618189 | 0.07 | -14387 | -3.12 | 14900 | 14380 | 14536 | 7973 | 8343 | 18 |
+| Maine | 1414874 | 0.46 | 7406 | 5.23 | 4040 | 6733 | 5991 | 4407 | 4078 | 5 |
+| Maryland | 6265347 | 0.32 | -12127 | -1.94 | 20503 | 13233 | 17048 | 8440 | 8528 | 15 |
+| Massachusetts | 7154084 | 0.22 | -33340 | -4.66 | 40240 | 12096 | 14212 | 8621 | 6766 | 20 |
+| Michigan | 10127884 | 0.28 | 1796 | 0.18 | 30706 | 23401 | 21443 | 12630 | 13062 | 27 |
+| Minnesota | 5830405 | 0.57 | 8300 | 1.42 | 12486 | 20686 | 21728 | 13677 | 11556 | 15 |
+| Mississippi | 2954160 | 0.14 | -917 | -0.31 | 7451 | 8348 | 7684 | 5129 | 4671 | 7 |
+| Missouri | 6270541 | 0.43 | 14028 | 2.24 | 12665 | 17164 | 17896 | 10800 | 9494 | 18 |
+| Montana | 1144694 | 0.63 | 6348 | 5.55 | 899 | 5198 | 5253 | 3183 | 2530 | 5 |
+| Nebraska | 2018006 | 0.62 | -366 | -0.18 | 6599 | 10543 | 10577 | 6449 | 6633 | 5 |
+| Nevada | 3282188 | 0.88 | 14914 | 4.54 | 10551 | 18518 | 19984 | 7986 | 11796 | 7 |
+| New Hampshire | 1415342 | 0.48 | 6554 | 4.63 | 2403 | 5061 | 5092 | 2842 | 2592 | 5 |
+| New Jersey | 9548215 | 0.44 | -37428 | -3.92 | 53064 | 32021 | 36596 | 17603 | 18692 | 23 |
+| New Mexico | 2125498 | -0.06 | -2267 | -1.07 | 2879 | 7683 | 7588 | 4658 | 4690 | 8 |
+| New York | 20002427 | 0.01 | -137586 | -6.88 | 95634 | 37885 | 45688 | 26865 | 17853 | 34 |
+| North Carolina | 11197968 | 1.32 | 84064 | 7.51 | 46890 | 85916 | 94595 | 57119 | 54291 | 39 |
+| North Dakota | 799358 | 0.75 | 512 | 0.64 | 2810 | 2394 | 2272 | 1325 | 1459 | 3 |
+| Ohio | 11900510 | 0.34 | 11926 | 1.00 | 28505 | 33084 | 30450 | 18972 | 20184 | 32 |
+| Oklahoma | 4123288 | 0.62 | 14492 | 3.51 | 8420 | 15118 | 12862 | 8606 | 9277 | 11 |
+| Oregon | 4273586 | 0.19 | 2228 | 0.52 | 9636 | 14981 | 14270 | 8697 | 8239 | 16 |
+| Pennsylvania | 13059432 | 0.10 | -2936 | -0.22 | 26921 | 25917 | 23988 | 15068 | 14554 | 34 |
+| Rhode Island | 1114521 | 0.37 | -1551 | -1.39 | 5923 | 1722 | 1681 | 1334 | 907 | 4 |
+| South Carolina | 5570274 | 1.46 | 66622 | 11.96 | 12930 | 45564 | 47220 | 30154 | 28515 | 19 |
+| South Dakota | 935094 | 0.86 | 2169 | 2.32 | 3183 | 5371 | 5987 | 3760 | 3080 | 3 |
+| Tennessee | 7315076 | 0.88 | 42389 | 5.79 | 17990 | 43127 | 45033 | 25182 | 26623 | 23 |
+| Texas | 31709821 | 1.25 | 67299 | 2.12 | 167475 | 208175 | 225601 | 119521 | 130469 | 87 |
+| Utah | 3538904 | 1.03 | 3343 | 0.94 | 7501 | 26881 | 24249 | 14270 | 14318 | 11 |
+| Vermont | 644663 | -0.29 | -726 | -1.13 | 623 | 2455 | 2572 | 956 | 1128 | 1 |
+| Virginia | 8880107 | 0.69 | 6268 | 0.71 | 40436 | 33223 | 34251 | 24290 | 21206 | 18 |
+| Washington | 8001020 | 0.92 | 9238 | 1.15 | 46202 | 34912 | 37535 | 24991 | 19527 | 23 |
+| West Virginia | 1766147 | -0.07 | 6408 | 3.63 | 244 | 4150 | 4095 | 2469 | 2446 | 3 |
+| Wisconsin | 5972787 | 0.26 | 6984 | 1.17 | 7260 | 25362 | 23727 | 14376 | 14049 | 19 |
+| Wyoming | 588753 | 0.35 | 1474 | 2.50 | 258 | 2184 | 2138 | 1097 | 1175 | 1 |
