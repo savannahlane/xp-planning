@@ -39,29 +39,9 @@ The proposed view in `index.html` applies these staffing rules:
   proposed accounts.
 - Ashley's current Enterprise accounts route only to her direct reports. The open Pacific XP
   reports to Ashley.
-- Carolina Prieto is a Team Lead, not a manager. She keeps the Kentucky and North Dakota
-  statewide enterprise agreements (two customers; sister agencies count as allocated children)
-  plus Kentucky CHFS, Homeland Security and Transportation for state-book consolidation. She
-  does not keep the scattered local accounts (Nashville, Oakland, Aurora, Glendale, Allegheny
-  County Treasurer, Outagamie County, and the Pittsburgh Housing Authority).
-- Non-SAM special districts are Local SMG. SAM special districts stay Enterprise: GLAVCD
-  remains with Colleen. Luke Mulvaney's three districts sit with Carlos Torres so Halena is not
-  paired with that vertical.
-- Enterprise and Local SMG are separate books. No Enterprise XP carries a Local SMG account.
-  Marcy Castro, Cody Nichols and Alejandro Solano moved to Enterprise and offloaded their
-  Local SMG books; Brooke Minichino, Carolina Cambronero and Paige Wendle offloaded theirs
-  too. Each Local SMG AE group moved whole to a dedicated Local SMG XP, so 62 accounts moved
-  and proposed XP↔AE relationships fell from 131 to 100.
-- Nathan's three federal accounts consolidate with Jr Wycinsky.
-- The three Nevada state agencies sit with Cody Nichols, who already works with Cameron
-  Chadsey on Arizona and New Mexico. Virginia Department of General Services is removed from
-  the map.
-- When those three books were removed, each displaced Local SMG AE group moved intact to an XP
-  who already worked with that AE. Together with the Carolina rebalance and special-district
-  moves, proposed XP↔AE relationships fell from 161 to 131.
-- Connecticut PURA is the necessary exception to the no-new-relationship rule. Ashley's
-  reporting-line constraint moves it from Halena to Steffany while Halena retains the broader
-  Connecticut estate, so Stephanie DelSignore works with two XPs rather than one.
+- Non-SAM special districts are Local SMG. SAM special districts stay Enterprise.
+- Enterprise and Local SMG are separate books. No Enterprise XP carries a Local SMG
+  account.
 
 The `Current assignment` view is historical and still shows Savannah, Kristen and Ashley's
 current books.
