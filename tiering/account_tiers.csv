@@ -1,0 +1,279 @@
+account,state,side,ae,xp_new,xp_wip,arr,countable,ncap,capability_data,territory_tier,territory_score,account_whitespace,growth_potential,tier,tier_label
+New York State Department of Labor,NY,State,Stephanie DelSignore,Halena Martin,Halena Martin,1601204.0,True,3,reported,B,57.0,0.625,0.592,1,Growth engine
+Connecticut Department of Administrative Services,CT,State,Stephanie DelSignore,Halena Martin,Halena Martin,605766.08,True,1,reported,C,40.5,0.875,0.593,1,Growth engine
+Harris County TX - Universal Services,TX,Local ENT,Pete Redondo,Carolina Cambronero,Taylor Roman,589580.62,True,2,reported,A,63.1,0.75,0.6786,1,Growth engine
+California Department of Healthcare Services (DHCS),CA,State,State AE – CA/HI,Open XP2 (PT),Colleen Moran,556584.96,True,2,reported,B,54.4,0.75,0.6264,1,Growth engine
+"Virginia Beach, VA",VA,Local ENT,Josh Gondwe,Andy O'Brien,Andy O'Brien,502421.63,True,3,reported,A,63.9,0.625,0.6334,1,Growth engine
+California Department of Corrections and Rehabilitation (CDCR),CA,State,State AE – CA/HI,Open XP2 (PT),Colleen Moran,489275.93,True,2,reported,B,54.4,0.75,0.6264,1,Growth engine
+Dallas Area Rapid Transit (DART),TX,Local ENT,Dallas SAM (open),Alejandro Solano,(not in WIP),464655.03,True,3,reported,A,63.1,0.625,0.6286,1,Growth engine
+Sonoma County CA,CA,Local ENT,Jason Spanier,Colleen Moran,Colleen Moran,352515.34,True,3,reported,A,62.3,0.625,0.6238,1,Growth engine
+Texas Department of Motor Vehicles,TX,State,No State AE shown (TX),Steffany Amador,Taylor Roman,330981.51,True,2,reported,A,82.4,0.75,0.7944,1,Growth engine
+Prince William County VA,VA,Local ENT,Josh Gondwe,Andy O'Brien,Andy O'Brien,328705.07,True,4,reported,A,63.9,0.5,0.5834,1,Growth engine
+Texas Department of Transportation (TXDOT),TX,State,No State AE shown (TX),Steffany Amador,Taylor Roman,321374.86,True,3,reported,A,82.4,0.625,0.7444,1,Growth engine
+"Los Angeles County CA, Board of Supervisors",CA,Local ENT,Jeff Gaisford,Colleen Moran,Colleen Moran,304952.83,True,3,reported,A,62.3,0.625,0.6238,1,Growth engine
+"DeKalb County, GA",GA,Local ENT,Spencer Ferrell,Taylor Roman,Andy O'Brien,276832.45,True,3,reported,A,61.3,0.625,0.6178,1,Growth engine
+Texas Department of Insurance,TX,State,No State AE shown (TX),Steffany Amador,Taylor Roman,259573.23,True,2,reported,A,82.4,0.75,0.7944,1,Growth engine
+Tennessee General Assembly,TN,State,State AE – KY/TN/AR,Andy O'Brien,(not in WIP),244499.75,True,1,reported,B,47.9,0.875,0.6374,1,Growth engine
+Texas Department of Licensing and Regulation,TX,State,No State AE shown (TX),Steffany Amador,Taylor Roman,226136.4,True,2,reported,A,82.4,0.75,0.7944,1,Growth engine
+Texas Workforce Commission,TX,State,No State AE shown (TX),Steffany Amador,Taylor Roman,225902.6,True,5,reported,A,82.4,0.375,0.6444,1,Growth engine
+"Superior Court of California, County of San Francisco",CA,State,State AE – CA/HI,Open XP2 (PT),Colleen Moran,216759.24,True,1,reported,B,54.4,0.875,0.6764,1,Growth engine
+Riverside County CA,CA,Local ENT,Jason Spanier,Colleen Moran,Colleen Moran,216678.09,True,2,reported,A,62.3,0.75,0.6738,1,Growth engine
+Massachusetts Department of Transportation,MA,State,Stephanie DelSignore,Halena Martin,Halena Martin,214643.91,True,2,reported,A,61.8,0.75,0.6708,1,Growth engine
+Metropolitan Water District of Southern California,CA,Local ENT,Jeff Gaisford,Colleen Moran,(not in WIP),207314.67,True,2,reported,A,62.3,0.75,0.6738,1,Growth engine
+California Department of Public Health,CA,State,State AE – CA/HI,Open XP2 (PT),Colleen Moran,184370.67,True,2,reported,B,54.4,0.75,0.6264,1,Growth engine
+Ramsey County MN,MN,Local ENT,Tyler Carlson,Brooke Minichino,Brooke Minichino,177558.91,True,3,reported,A,58.5,0.625,0.601,1,Growth engine
+Texas Health & Human Services Commission,TX,State,No State AE shown (TX),Steffany Amador,Taylor Roman,174839.04,True,4,reported,A,82.4,0.5,0.6944,1,Growth engine
+Palm Beach County FL Sheriff’s Office,FL,Local ENT,Bill Marshall,Taylor Roman,Carolina Cambronero,155536.32,True,1,reported,B,57.8,0.875,0.6968,1,Growth engine
+Ohio Workers' Compensation Bureau,OH,State,Bettsy Desjarlais,Marcy Castro,Steffany Amador,155215.0,True,3,reported,A,74.7,0.625,0.6982,1,Growth engine
+Placer County CA,CA,Local ENT,Jason Spanier,Colleen Moran,Colleen Moran,151092.02,True,2,reported,A,62.3,0.75,0.6738,1,Growth engine
+California Department of Housing & Community Development,CA,State,State AE – CA/HI,Open XP2 (PT),Colleen Moran,144766.94,True,2,reported,B,54.4,0.75,0.6264,1,Growth engine
+Arizona Department of Transportation,AZ,State,Cameron Chadsey,Cody Nichols,Cody Nichols,140546.46,True,2,reported,C,46.6,0.75,0.5796,1,Growth engine
+"Kansas City, MO, Police Department",MO,Local ENT,David Cliff,Marcy Castro,Marcy Castro,139405.59,True,1,reported,C,41.9,0.875,0.6014,1,Growth engine
+"Palm Beach County, FL",FL,Local ENT,Bill Marshall,Taylor Roman,Carolina Cambronero,138945.81,True,1,reported,B,57.8,0.875,0.6968,1,Growth engine
+Texas Department of Public Safety,TX,State,No State AE shown (TX),Steffany Amador,Taylor Roman,138858.92,True,1,reported,A,82.4,0.875,0.8444,1,Growth engine
+California Judicial Council of California,CA,State,State AE – CA/HI,Open XP2 (PT),Colleen Moran,138774.03,True,2,reported,B,54.4,0.75,0.6264,1,Growth engine
+Houston Independent School District,TX,Local ENT,Pete Redondo,Carolina Cambronero,(not in WIP),133796.16,True,3,reported,A,63.1,0.625,0.6286,1,Growth engine
+Pedernales Electric Cooperative,TX,Local ENT,Cedric Simpkins,Steffany Amador,(not in WIP),131088.1,True,2,reported,A,63.1,0.75,0.6786,1,Growth engine
+Cobb County GA,GA,Local ENT,Spencer Ferrell,Taylor Roman,Andy O'Brien,130026.55,True,1,reported,A,61.3,0.875,0.7178,1,Growth engine
+Frederick County MD,MD,Local ENT,Josh Gondwe,Andy O'Brien,Andy O'Brien,129966.96,True,2,reported,B,56.3,0.75,0.6378,1,Growth engine
+Georgia Department of Natural Resources,GA,State,Sarah Duncan,Taylor Roman,Andy O'Brien,129709.97,True,3,reported,A,77.5,0.625,0.715,1,Growth engine
+Shelby County TN,TN,Local ENT,Carter Bradford,Andy O'Brien,Marcy Castro,128490.97,True,2,reported,B,48.7,0.75,0.5922,1,Growth engine
+Howard County MD,MD,Local ENT,Josh Gondwe,Andy O'Brien,Andy O'Brien,126987.37,True,2,reported,B,56.3,0.75,0.6378,1,Growth engine
+Miami-Dade County FL,FL,Local ENT,Bill Marshall,Taylor Roman,Carolina Cambronero,124583.45,True,2,reported,B,57.8,0.75,0.6468,1,Growth engine
+Texas Commission on Law Enforcement,TX,State,No State AE shown (TX),Steffany Amador,Taylor Roman,120991.86,True,4,reported,A,82.4,0.5,0.6944,1,Growth engine
+New Mexico Department of Public Safety,NM,State,Cameron Chadsey,Cody Nichols,Cody Nichols,119725.38,True,1,reported,A,67.0,0.875,0.752,1,Growth engine
+California Department of General Services,CA,State,State AE – CA/HI,Open XP2 (PT),Colleen Moran,110539.87,True,3,reported,B,54.4,0.625,0.5764,1,Growth engine
+Arizona Department of Gaming,AZ,State,Cameron Chadsey,Cody Nichols,Cody Nichols,109403.15,True,2,reported,C,46.6,0.75,0.5796,1,Growth engine
+California Department of State Hospitals,CA,State,State AE – CA/HI,Open XP2 (PT),(not in WIP),105630.03,True,1,reported,B,54.4,0.875,0.6764,1,Growth engine
+Los Angeles County Sanitation District,CA,Local ENT,Jeff Gaisford,Colleen Moran,(not in WIP),101490.55,True,3,reported,A,62.3,0.625,0.6238,1,Growth engine
+VIA Metropolitan Transit,TX,Local ENT,Cedric Simpkins,Steffany Amador,(not in WIP),98314.78,True,1,reported,A,63.1,0.875,0.7286,1,Growth engine
+Jefferson Parish - LA,LA,Local ENT,Austin Goodman,Alejandro Solano,Alejandro Solano,96551.4,True,1,reported,C,40.6,0.875,0.5936,2,Expansion
+Utah Department of Corrections,UT,State,Che Bustos,Alejandro Solano,Paige Wendle,95340.39,True,1,reported,B,57.5,0.875,0.695,2,Expansion
+Florida Department of Corrections - Public Records,FL,State,Demi Washington,Carolina Cambronero,Carolina Cambronero,90628.87,True,0,imputed,A,62.0,0.75,0.672,2,Expansion
+"Albuquerque, NM",NM,Local ENT,Stephen Allen,Cody Nichols,Cody Nichols,90042.24,True,1,reported,B,53.4,0.875,0.6704,2,Expansion
+Texas Higher Education Coordinating Board,TX,State,No State AE shown (TX),Steffany Amador,Taylor Roman,89925.24,True,2,reported,A,82.4,0.75,0.7944,2,Expansion
+California Department of Developmental Services,CA,State,State AE – CA/HI,Open XP2 (PT),Colleen Moran,89556.96,True,1,reported,B,54.4,0.875,0.6764,2,Expansion
+California Energy Commission,CA,State,State AE – CA/HI,Open XP2 (PT),Colleen Moran,89258.56,True,2,reported,B,54.4,0.75,0.6264,2,Expansion
+Arizona Department of Economic Security,AZ,State,Cameron Chadsey,Cody Nichols,Cody Nichols,87743.48,True,1,reported,C,46.6,0.875,0.6296,2,Expansion
+Dutchess County NY,NY,Local ENT,Territory 4a (open),Halena Martin,Halena Martin,85735.25,True,2,reported,A,64.9,0.75,0.6894,2,Expansion
+North Central Texas Council of Governments,TX,Local ENT,Dallas SAM (open),Alejandro Solano,(not in WIP),83278.41,True,1,reported,A,63.1,0.875,0.7286,2,Expansion
+Virginia Department of General Services,VA,State,Grant Samson,Andy O'Brien,Andy O'Brien,82353.81,True,3,reported,A,78.8,0.625,0.7228,2,Expansion
+"Rochester, NY",NY,Local ENT,Territory 4a (open),Halena Martin,Halena Martin,80946.15,True,1,reported,A,64.9,0.875,0.7394,2,Expansion
+"Arizona Department of Corrections, Rehabilitation & Reentry",AZ,State,Cameron Chadsey,Cody Nichols,Cody Nichols,78444.3,True,1,reported,C,46.6,0.875,0.6296,2,Expansion
+"Philadelphia, PA",PA,Local ENT,Andrew Wyzkoski,Halena Martin,Halena Martin,77439.1,True,1,reported,B,57.9,0.875,0.6974,2,Expansion
+California Alcoholic Beverage Control Department,CA,State,State AE – CA/HI,Open XP2 (PT),Colleen Moran,76547.55,True,1,reported,B,54.4,0.875,0.6764,2,Expansion
+Lake County IN,IN,Local ENT,Kent Hartsfield,Marcy Castro,Brooke Minichino,70971.57,True,2,reported,A,63.7,0.75,0.6822,2,Expansion
+Georgia Office of the Commissioner of Insurance and Safety Fire,GA,State,Sarah Duncan,Taylor Roman,Andy O'Brien,70482.44,True,1,reported,A,77.5,0.875,0.815,2,Expansion
+Webb County TX,TX,Local ENT,Pete Redondo,Carolina Cambronero,Taylor Roman,70011.83,True,2,reported,A,63.1,0.75,0.6786,2,Expansion
+"New Mexico Energy, Minerals & Natural Resources Department",NM,State,Cameron Chadsey,Cody Nichols,Cody Nichols,68159.85,True,2,reported,A,67.0,0.75,0.702,2,Expansion
+Kansas Highway Patrol,KS,State,Matt Russell,Alejandro Solano,Alejandro Solano,66197.8,True,1,reported,C,44.1,0.875,0.6146,2,Expansion
+Nevada Department of Human Services,NV,State,Cameron Chadsey,Colleen Moran,Cody Nichols,64059.6,True,1,reported,B,49.1,0.875,0.6446,2,Expansion
+Georgia Bureau of Investigation,GA,State,Sarah Duncan,Taylor Roman,Andy O'Brien,62864.56,True,1,reported,A,77.5,0.875,0.815,2,Expansion
+Hillsborough County FL,FL,Local ENT,Desmond Davis,Carolina Cambronero,Carolina Cambronero,60043.14,True,1,reported,B,57.8,0.875,0.6968,2,Expansion
+"Dutchess County NY, District Attorney’s Office",NY,Local ENT,Territory 4a (open),Halena Martin,Halena Martin,60027.61,True,2,reported,A,64.9,0.75,0.6894,2,Expansion
+California Department of Forestry and Fire Protection,CA,State,State AE – CA/HI,Open XP2 (PT),Colleen Moran,60005.9,True,1,reported,B,54.4,0.875,0.6764,2,Expansion
+"Oklahoma Dept of Agriculture, Food and Forestry",OK,State,Matt Russell,Alejandro Solano,Alejandro Solano,55382.73,True,2,reported,B,57.6,0.75,0.6456,2,Expansion
+Nevada Health Authority,NV,State,Cameron Chadsey,Colleen Moran,Cody Nichols,51688.96,True,1,reported,B,49.1,0.875,0.6446,2,Expansion
+Minnesota Public Utilities Commission,MN,State,Joe Spair,Brooke Minichino,Brooke Minichino,51463.55,True,0,imputed,A,67.4,0.75,0.7044,2,Expansion
+Ohio Department of Natural Resources,OH,State,Bettsy Desjarlais,Marcy Castro,Steffany Amador,50554.39,True,2,reported,A,74.7,0.75,0.7482,2,Expansion
+Louisiana Department of Health,LA,State,Demi Washington,Carolina Cambronero,Alejandro Solano,50147.46,True,1,reported,C,45.9,0.875,0.6254,2,Expansion
+Arizona Corporation Commission,AZ,State,Cameron Chadsey,Cody Nichols,Cody Nichols,49215.0,True,1,reported,C,46.6,0.875,0.6296,2,Expansion
+New Mexico Regulation & Licensing Department,NM,State,Cameron Chadsey,Cody Nichols,Cody Nichols,47966.91,True,3,reported,A,67.0,0.625,0.652,2,Expansion
+Nevada Department of Motor Vehicles,NV,State,Cameron Chadsey,Colleen Moran,Cody Nichols,47919.55,True,1,reported,B,49.1,0.875,0.6446,2,Expansion
+Onslow County NC,NC,Local ENT,Joel Parris,Andy O'Brien,Andy O'Brien,46254.87,True,1,reported,A,64.9,0.875,0.7394,2,Expansion
+New Mexico Environment Department,NM,State,Cameron Chadsey,Cody Nichols,Cody Nichols,45471.89,True,3,reported,A,67.0,0.625,0.652,2,Expansion
+New Mexico Early Childhood Education & Care Department,NM,State,Cameron Chadsey,Cody Nichols,Cody Nichols,42743.1,True,1,reported,A,67.0,0.875,0.752,2,Expansion
+Texas Division of Emergency Management,TX,State,No State AE shown (TX),Steffany Amador,Taylor Roman,40762.17,True,2,reported,A,82.4,0.75,0.7944,2,Expansion
+"Connecticut Public Utilities Regulatory Authority [PURA],",CT,State,Stephanie DelSignore,Halena Martin,Halena Martin,40636.87,True,1,reported,C,40.5,0.875,0.593,2,Expansion
+Georgia Department of Community Affairs,GA,State,Sarah Duncan,Taylor Roman,Andy O'Brien,40228.62,True,1,reported,A,77.5,0.875,0.815,2,Expansion
+"Minnesota Department of Children, Youth, and Families",MN,State,Joe Spair,Brooke Minichino,Brooke Minichino,37261.94,True,1,reported,A,67.4,0.875,0.7544,2,Expansion
+New Mexico Health Care Authority,NM,State,Cameron Chadsey,Cody Nichols,Cody Nichols,36674.93,True,1,reported,A,67.0,0.875,0.752,2,Expansion
+New York Office of the Inspector General,NY,State,Stephanie DelSignore,Halena Martin,(not in WIP),31328.33,True,1,reported,B,57.0,0.875,0.692,2,Expansion
+Connecticut Department of Emergency Services and Public Protection,CT,State,Stephanie DelSignore,Halena Martin,Halena Martin,29568.49,True,1,reported,C,40.5,0.875,0.593,2,Expansion
+Texas Ethics Commission,TX,State,No State AE shown (TX),Steffany Amador,Taylor Roman,29497.5,True,1,reported,A,82.4,0.875,0.8444,2,Expansion
+Texas Lottery Commission,TX,State,No State AE shown (TX),Steffany Amador,Taylor Roman,28897.72,True,0,imputed,A,82.4,0.75,0.7944,2,Expansion
+DOTComm (Douglas Omaha Technology Commission),NE,Local ENT,David Cliff,Marcy Castro,(not in WIP),28683.16,True,1,reported,C,42.8,0.875,0.6068,2,Expansion
+California Board of State & Community Corrections,CA,State,State AE – CA/HI,Open XP2 (PT),Colleen Moran,27130.91,True,1,reported,B,54.4,0.875,0.6764,2,Expansion
+Wisconsin Court System,WI,State,Joe Spair,Brooke Minichino,Brooke Minichino,26810.58,True,3,reported,B,57.8,0.625,0.5968,2,Expansion
+Wisconsin Department of Public Instruction,WI,State,Joe Spair,Brooke Minichino,Brooke Minichino,26733.86,True,3,reported,B,57.8,0.625,0.5968,2,Expansion
+Texas Board of Nursing,TX,State,No State AE shown (TX),Steffany Amador,Taylor Roman,25883.03,True,5,reported,A,82.4,0.375,0.6444,2,Expansion
+Minnesota Attorney General,MN,State,Joe Spair,Brooke Minichino,Brooke Minichino,25748.88,True,3,reported,A,67.4,0.625,0.6544,2,Expansion
+Georgia Environmental Protection Division,GA,State,Sarah Duncan,Taylor Roman,Andy O'Brien,24946.5,True,3,reported,A,77.5,0.625,0.715,2,Expansion
+Oklahoma Public Employees Retirement System,OK,State,Matt Russell,Alejandro Solano,Alejandro Solano,23970.87,True,3,reported,B,57.6,0.625,0.5956,2,Expansion
+Arizona State Schools for the Deaf & the Blind,AZ,State,Cameron Chadsey,Cody Nichols,Cody Nichols,22991.98,True,0,imputed,C,46.6,0.75,0.5796,2,Expansion
+New Mexico Department of Justice,NM,State,Cameron Chadsey,Cody Nichols,Cody Nichols,22951.04,True,3,reported,A,67.0,0.625,0.652,2,Expansion
+Minnesota State Auditor's Office,MN,State,Joe Spair,Brooke Minichino,Brooke Minichino,22471.75,True,3,reported,A,67.4,0.625,0.6544,2,Expansion
+Texas Charitable Bingo,TX,State,No State AE shown (TX),Steffany Amador,Taylor Roman,0.0,False,0,imputed,A,82.4,0.75,0.7944,2,Expansion
+Florida Department of Corrections,FL,State,Demi Washington,Carolina Cambronero,Carolina Cambronero,0.0,True,0,imputed,A,62.0,0.75,0.672,2,Expansion
+"Los Angeles, CA",CA,Local ENT,Jeff Gaisford,Colleen Moran,Colleen Moran,1766256.38,True,6,reported,A,62.3,0.25,0.4738,3,Defend
+"Cook County, IL",IL,Local ENT,Kent Hartsfield,Marcy Castro,Steffany Amador,1110948.16,True,3,reported,C,40.0,0.625,0.49,3,Defend
+Orange County FL,FL,Local ENT,Desmond Davis,Carolina Cambronero,Carolina Cambronero,973617.97,True,5,reported,B,57.8,0.375,0.4968,3,Defend
+Columbus OH,OH,Local ENT,Kent Hartsfield,Marcy Castro,Steffany Amador,870256.4,True,9,reported,B,47.0,0.0,0.282,3,Defend
+"San Antonio, TX",TX,Local ENT,Cedric Simpkins,Steffany Amador,Steffany Amador,756412.27,True,6,reported,A,63.1,0.25,0.4786,3,Defend
+District of Columbia,DC,Neither map,Not on either map,Paige Wendle,Paige Wendle,725132.5,True,4,reported,B,51.7,0.5,0.5102,3,Defend
+Franklin County OH,OH,Local ENT,Kent Hartsfield,Marcy Castro,Steffany Amador,619425.92,True,8,reported,B,47.0,0.0,0.282,3,Defend
+California Secretary of State,CA,State,State AE – CA/HI,Open XP2 (PT),(not in WIP),596661.43,True,4,reported,B,54.4,0.5,0.5264,3,Defend
+Nashville-Davidson County TN,TN,Local ENT,Carter Bradford,Carolina Prieto,Marcy Castro,538906.86,True,7,reported,B,48.7,0.125,0.3422,3,Defend
+Jackson County MO,MO,Local ENT,David Cliff,Marcy Castro,Marcy Castro,521351.74,True,9,reported,C,41.9,0.0,0.2514,3,Defend
+Iowa Division of Information Technology,IA,State,No State AE shown (IA),Brooke Minichino,Steffany Amador,511994.99,True,3,reported,C,42.3,0.625,0.5038,3,Defend
+Wayne County MI,MI,Local ENT,Tyler Carlson,Brooke Minichino,Brooke Minichino,489446.2,True,8,reported,B,49.5,0.0,0.297,3,Defend
+New Orleans LA,LA,Local ENT,Austin Goodman,Alejandro Solano,Alejandro Solano,423673.87,True,3,reported,C,40.6,0.625,0.4936,3,Defend
+"Oakland, CA",CA,Local ENT,Jason Spanier,Carolina Prieto,Colleen Moran,417352.67,True,5,reported,A,62.3,0.375,0.5238,3,Defend
+Kentucky Commonwealth Office of Technology,KY,State,State AE – KY/TN/AR,Carolina Prieto,Marcy Castro,393182.5,True,3,reported,D,34.7,0.625,0.4582,3,Defend
+Kentucky Cabinet for Health & Family Services (CHFS),KY,State,State AE – KY/TN/AR,Andy O'Brien,Marcy Castro,376479.91,True,4,reported,D,34.7,0.5,0.4082,3,Defend
+"Denver City and County, CO",CO,Local ENT,David Cliff,Paige Wendle,Steffany Amador,370850.21,True,4,reported,B,50.1,0.5,0.5006,3,Defend
+North Dakota Information Technology Department,ND,State,Scott Mark,Carolina Prieto,Brooke Minichino,360241.9,True,3,reported,D,34.7,0.625,0.4582,3,Defend
+Arapahoe County CO,CO,Local ENT,David Cliff,Paige Wendle,Steffany Amador,331546.29,True,7,reported,B,50.1,0.125,0.3506,3,Defend
+Miami FL,FL,Local ENT,Bill Marshall,Taylor Roman,Taylor Roman,305300.64,True,4,reported,B,57.8,0.5,0.5468,3,Defend
+Washington Department of Transportation,WA,State,Todd Bowers,Paige Wendle,Paige Wendle,301828.73,True,4,reported,D,33.6,0.5,0.4016,3,Defend
+Oklahoma City OK,OK,Local ENT,Austin Goodman,Alejandro Solano,Alejandro Solano,300030.96,True,7,reported,B,52.0,0.125,0.362,3,Defend
+Washington State Department of Health,WA,State,Todd Bowers,Paige Wendle,Paige Wendle,296031.42,True,2,reported,D,33.6,0.75,0.5016,3,Defend
+"Cleveland, OH",OH,Local ENT,Kent Hartsfield,Marcy Castro,Steffany Amador,292462.82,True,3,reported,B,47.0,0.625,0.532,3,Defend
+Maine,ME,State,No State AE shown (ME),Halena Martin,Halena Martin,289386.97,True,3,reported,D,26.9,0.625,0.4114,3,Defend
+"Corpus Christi, TX",TX,Local ENT,Pete Redondo,Carolina Cambronero,Taylor Roman,288093.36,True,6,reported,A,63.1,0.25,0.4786,3,Defend
+"Aurora, IL",IL,Local ENT,Kent Hartsfield,Carolina Prieto,Steffany Amador,278289.25,True,9,reported,C,40.0,0.0,0.24,3,Defend
+Florida Department of Health,FL,State,Demi Washington,Carolina Cambronero,Carolina Cambronero,249098.5,True,4,reported,A,62.0,0.5,0.572,3,Defend
+Richland County SC,SC,Local ENT,Joel Parris,Andy O'Brien,Andy O'Brien,237874.31,True,7,reported,B,51.3,0.125,0.3578,3,Defend
+Washington County OR,OR,Local ENT,Carrie Breedlove,Paige Wendle,Paige Wendle,229991.53,True,6,reported,C,46.0,0.25,0.376,3,Defend
+St. Paul MN,MN,Local ENT,Tyler Carlson,Brooke Minichino,Brooke Minichino,225711.22,True,4,reported,A,58.5,0.5,0.551,3,Defend
+California State Teachers' Retirement System,CA,State,State AE – CA/HI,Open XP2 (PT),Colleen Moran,222944.53,True,4,reported,B,54.4,0.5,0.5264,3,Defend
+Greater Los Angeles County Vector Control District CA,CA,Local ENT,Jeff Gaisford,Colleen Moran,Colleen Moran,219254.95,True,4,reported,A,62.3,0.5,0.5738,3,Defend
+Washington State Patrol,WA,State,Todd Bowers,Paige Wendle,Paige Wendle,209512.36,True,3,reported,D,33.6,0.625,0.4516,3,Defend
+"Laredo, TX",TX,Local ENT,Pete Redondo,Carolina Cambronero,Taylor Roman,207802.91,True,9,reported,A,63.1,0.0,0.3786,3,Defend
+Collier County FL,FL,Local ENT,Bill Marshall,Taylor Roman,Carolina Cambronero,199447.53,True,6,reported,B,57.8,0.25,0.4468,3,Defend
+California Department of Justice,CA,State,State AE – CA/HI,Open XP2 (PT),Colleen Moran,194651.69,True,4,reported,B,54.4,0.5,0.5264,3,Defend
+Kansas Department for Children & Families,KS,State,Matt Russell,Alejandro Solano,Alejandro Solano,188566.9,True,3,reported,C,44.1,0.625,0.5146,3,Defend
+Lake County IL,IL,Local ENT,Kent Hartsfield,Marcy Castro,Steffany Amador,185771.15,True,5,reported,C,40.0,0.375,0.39,3,Defend
+"Glendale, AZ",AZ,Local ENT,Conrad Taylor,Carolina Prieto,Cody Nichols,184265.76,True,7,reported,B,57.3,0.125,0.3938,3,Defend
+Milwaukee County WI,WI,Local ENT,Tyler Carlson,Brooke Minichino,Brooke Minichino,183209.4,True,4,reported,C,44.7,0.5,0.4682,3,Defend
+"Orlando, FL",FL,Local ENT,Desmond Davis,Carolina Cambronero,Carolina Cambronero,181350.02,True,5,reported,B,57.8,0.375,0.4968,3,Defend
+Tri-County Metropolitan Transportation District of Oregon (TriMet),OR,Local ENT,Carrie Breedlove,Paige Wendle,(not in WIP),180702.45,True,2,reported,C,46.0,0.75,0.576,3,Defend
+"Fort Lauderdale, FL",FL,Local ENT,Bill Marshall,Taylor Roman,Carolina Cambronero,174734.87,True,6,reported,B,57.8,0.25,0.4468,3,Defend
+"Milwaukee, WI",WI,Local ENT,Tyler Carlson,Brooke Minichino,Brooke Minichino,171842.49,True,5,reported,C,44.7,0.375,0.4182,3,Defend
+"Glendale, CA",CA,Local ENT,Jeff Gaisford,Colleen Moran,Colleen Moran,170762.0,True,6,reported,A,62.3,0.25,0.4738,3,Defend
+Florida Department of Law Enforcement,FL,State,Demi Washington,Carolina Cambronero,Carolina Cambronero,165620.79,True,5,reported,A,62.0,0.375,0.522,3,Defend
+"Fayetteville, NC",NC,Local ENT,Joel Parris,Andy O'Brien,Andy O'Brien,156226.41,True,7,reported,A,64.9,0.125,0.4394,3,Defend
+Yavapai County AZ,AZ,Local ENT,Stephen Allen,Cody Nichols,Cody Nichols,143594.99,True,6,reported,B,57.3,0.25,0.4438,3,Defend
+Kentucky Transportation Cabinet,KY,State,State AE – KY/TN/AR,Andy O'Brien,Marcy Castro,141520.44,True,3,reported,D,34.7,0.625,0.4582,3,Defend
+Washington Department of Corrections,WA,State,Todd Bowers,Paige Wendle,Paige Wendle,139794.28,True,1,reported,D,33.6,0.875,0.5516,3,Defend
+Health Care District of Palm Beach County - FL,FL,Local ENT,Bill Marshall,Taylor Roman,(not in WIP),125000.0,True,5,reported,B,57.8,0.375,0.4968,3,Defend
+New Jersey Department of Children and Families,NJ,State,Stephanie DelSignore,Halena Martin,Halena Martin,122505.28,True,4,reported,C,42.5,0.5,0.455,3,Defend
+Housing Authority of the City of Pittsburgh,PA,Local ENT,Andrew Wyzkoski,Carolina Prieto,(not in WIP),121248.64,True,6,reported,B,57.9,0.25,0.4474,3,Defend
+Colorado Department of Regulatory Agencies,CO,State,Che Bustos,Alejandro Solano,Alejandro Solano,114064.65,True,3,reported,C,42.5,0.625,0.505,3,Defend
+Arizona Department of Environmental Quality,AZ,State,Cameron Chadsey,Cody Nichols,Cody Nichols,110102.21,True,4,reported,C,46.6,0.5,0.4796,3,Defend
+New Jersey Cybersecurity and Communications Integration Cell,NJ,State,Stephanie DelSignore,Halena Martin,Halena Martin,105400.87,True,3,reported,C,42.5,0.625,0.505,3,Defend
+Chicago Metropolitan Agency for Planning,IL,Local ENT,Kent Hartsfield,Marcy Castro,Steffany Amador,91016.97,True,4,reported,C,40.0,0.5,0.44,4,Maintain
+Des Moines IA,IA,Local ENT,Tyler Carlson,Brooke Minichino,Steffany Amador,89731.12,True,5,reported,B,50.3,0.375,0.4518,4,Maintain
+Idaho Labor Department,ID,State,Scott Mark,Paige Wendle,Paige Wendle,88765.39,True,3,reported,C,42.3,0.625,0.5038,4,Maintain
+Kansas Insurance Department,KS,State,Matt Russell,Alejandro Solano,Alejandro Solano,88403.55,True,6,reported,C,44.1,0.25,0.3646,4,Maintain
+Allegheny County Treasurer Office,PA,Local ENT,Andrew Wyzkoski,Carolina Prieto,Halena Martin,87337.71,True,5,reported,B,57.9,0.375,0.4974,4,Maintain
+Colorado Department of Natural Resources,CO,State,Che Bustos,Alejandro Solano,Alejandro Solano,86432.01,True,2,reported,C,42.5,0.75,0.555,4,Maintain
+Louisiana Governor's Office of Homeland Security & Emergency Preparedness,LA,State,Demi Washington,Carolina Cambronero,Alejandro Solano,86134.27,True,3,reported,C,45.9,0.625,0.5254,4,Maintain
+Illinois Department of Financial and Professional Regulation,IL,State,Bill Pintsak,Marcy Castro,Steffany Amador,76183.63,True,3,reported,B,52.2,0.625,0.5632,4,Maintain
+Alabama Department of Education,AL,State,Sarah Duncan,Taylor Roman,Carolina Cambronero,75086.02,True,4,reported,A,58.4,0.5,0.5504,4,Maintain
+"Outagamie County, WI",WI,Local ENT,Tyler Carlson,Carolina Prieto,Brooke Minichino,74934.23,True,6,reported,C,44.7,0.25,0.3682,4,Maintain
+Oregon Department of Corrections,OR,State,Todd Bowers,Paige Wendle,Paige Wendle,72622.0,True,4,reported,C,42.0,0.5,0.452,4,Maintain
+Jefferson County KY,KY,Local ENT,Carter Bradford,Andy O'Brien,Marcy Castro,72050.22,True,6,reported,B,49.1,0.25,0.3946,4,Maintain
+Missouri Department of Elementary and Secondary Education,MO,State,Bill Pintsak,Marcy Castro,Marcy Castro,71337.62,True,3,reported,C,42.3,0.625,0.5038,4,Maintain
+Connecticut Workers' Compensation Commission,CT,State,Stephanie DelSignore,Halena Martin,Halena Martin,69192.83,True,2,reported,C,40.5,0.75,0.543,4,Maintain
+Maine Department of Health & Human Services,ME,State,No State AE shown (ME),Halena Martin,Halena Martin,67000.0,True,1,reported,D,26.9,0.875,0.5114,4,Maintain
+Oregon Housing and Community Services,OR,State,Todd Bowers,Paige Wendle,Paige Wendle,64326.23,True,2,reported,C,42.0,0.75,0.552,4,Maintain
+Kansas State Department of Education,KS,State,Matt Russell,Alejandro Solano,Alejandro Solano,59686.87,True,3,reported,C,44.1,0.625,0.5146,4,Maintain
+"Montgomery, AL",AL,Local ENT,Spencer Ferrell,Taylor Roman,Carolina Cambronero,57779.94,True,5,reported,B,55.1,0.375,0.4806,4,Maintain
+Sarasota County/Clerk of the Circuit Court - FL,FL,Local ENT,Desmond Davis,Carolina Cambronero,(not in WIP),57302.25,True,5,reported,B,57.8,0.375,0.4968,4,Maintain
+Colorado Department of Labor and Employment,CO,State,Che Bustos,Alejandro Solano,Alejandro Solano,56832.3,True,3,reported,C,42.5,0.625,0.505,4,Maintain
+Oregon Public Utility Commission,OR,State,Todd Bowers,Paige Wendle,Paige Wendle,52502.57,True,2,reported,C,42.0,0.75,0.552,4,Maintain
+Colorado Department of Corrections,CO,State,Che Bustos,Alejandro Solano,Alejandro Solano,50310.23,True,3,reported,C,42.5,0.625,0.505,4,Maintain
+Calcasieu Parish LA,LA,Local ENT,Austin Goodman,Alejandro Solano,Alejandro Solano,49551.43,True,3,reported,C,40.6,0.625,0.4936,4,Maintain
+Washington Military Department,WA,State,Todd Bowers,Paige Wendle,Paige Wendle,46846.63,True,2,reported,D,33.6,0.75,0.5016,4,Maintain
+North Collier Fire Control and Rescue District,FL,Local ENT,Bill Marshall,Taylor Roman,(not in WIP),43219.0,True,5,reported,B,57.8,0.375,0.4968,4,Maintain
+Oregon Teacher Standards and Practices Commission,OR,State,Todd Bowers,Paige Wendle,Paige Wendle,42446.25,True,4,reported,C,42.0,0.5,0.452,4,Maintain
+Yuma County AZ,AZ,Local ENT,Stephen Allen,Cody Nichols,Cody Nichols,38369.12,True,5,reported,B,57.3,0.375,0.4938,4,Maintain
+Missouri State Treasurer,MO,State,Bill Pintsak,Marcy Castro,Marcy Castro,28547.35,True,3,reported,C,42.3,0.625,0.5038,4,Maintain
+"Hillsborough County FL, Environmental Protection Commission",FL,Local ENT,Desmond Davis,Carolina Cambronero,(not in WIP),28371.0,True,5,reported,B,57.8,0.375,0.4968,4,Maintain
+Missouri Public Service Commission,MO,State,Bill Pintsak,Marcy Castro,Marcy Castro,26823.83,True,3,reported,C,42.3,0.625,0.5038,4,Maintain
+Kentucky Office of Homeland Security,KY,State,State AE – KY/TN/AR,Andy O'Brien,Marcy Castro,25761.6,True,3,reported,D,34.7,0.625,0.4582,4,Maintain
+North Jersey Transportation Planning Authority,NJ,Local ENT,Andrew Wyzkoski,Halena Martin,(not in WIP),23334.06,True,3,reported,B,54.0,0.625,0.574,4,Maintain
+Louisiana Attorney General (Justice Department),LA,State,Demi Washington,Carolina Cambronero,Alejandro Solano,22628.95,True,0,imputed,C,45.9,0.75,0.5754,4,Maintain
+North Dakota Workforce Safety & Insurance,ND,State,Scott Mark,Carolina Prieto,Brooke Minichino,18961.02,True,1,reported,D,34.7,0.875,0.5582,4,Maintain
+North Dakota Department of Health and Human Services,ND,State,Scott Mark,Carolina Prieto,Brooke Minichino,11496.65,True,1,reported,D,34.7,0.875,0.5582,4,Maintain
+North Dakota Department of Commerce,ND,State,Scott Mark,Carolina Prieto,Brooke Minichino,4134.38,True,1,reported,D,34.7,0.875,0.5582,4,Maintain
+North Dakota Retirement and Investment Office,ND,State,Scott Mark,Carolina Prieto,Brooke Minichino,3750.0,True,1,reported,D,34.7,0.875,0.5582,4,Maintain
+Connecticut Office of the Healthcare Advocate,CT,State,Stephanie DelSignore,Halena Martin,Halena Martin,0.0,False,0,imputed,C,40.5,0.75,0.543,4,Maintain
+Connecticut Office of the Chief Medical Examiner,CT,State,Stephanie DelSignore,Halena Martin,Halena Martin,0.0,False,0,imputed,C,40.5,0.75,0.543,4,Maintain
+Connecticut Office of the Governor,CT,State,Stephanie DelSignore,Halena Martin,Halena Martin,0.0,False,0,imputed,C,40.5,0.75,0.543,4,Maintain
+Connecticut Office of Lieutenant Governor,CT,State,Stephanie DelSignore,Halena Martin,Halena Martin,0.0,False,0,imputed,C,40.5,0.75,0.543,4,Maintain
+Connecticut Office of the Attorney General,CT,State,Stephanie DelSignore,Halena Martin,Halena Martin,0.0,False,0,imputed,C,40.5,0.75,0.543,4,Maintain
+Connecticut Criminal Justice Division,CT,State,Stephanie DelSignore,Halena Martin,Halena Martin,0.0,False,0,imputed,C,40.5,0.75,0.543,4,Maintain
+Connecticut Contracting Standards Board,CT,State,Stephanie DelSignore,Halena Martin,Halena Martin,0.0,False,0,imputed,C,40.5,0.75,0.543,4,Maintain
+Connecticut Connecticut Technical Education and Career System,CT,State,Stephanie DelSignore,Halena Martin,Halena Martin,0.0,False,0,imputed,C,40.5,0.75,0.543,4,Maintain
+Connecticut Department of Aging and Disability Services,CT,State,Stephanie DelSignore,Halena Martin,Halena Martin,0.0,False,0,imputed,C,40.5,0.75,0.543,4,Maintain
+Connecticut Connecticut State Colleges and Universities,CT,State,Stephanie DelSignore,Halena Martin,Halena Martin,0.0,False,0,imputed,C,40.5,0.75,0.543,4,Maintain
+Connecticut Department of Consumer Protection,CT,State,Stephanie DelSignore,Halena Martin,Halena Martin,0.0,False,0,imputed,C,40.5,0.75,0.543,4,Maintain
+Connecticut Department of Banking,CT,State,Stephanie DelSignore,Halena Martin,Halena Martin,0.0,False,0,imputed,C,40.5,0.75,0.543,4,Maintain
+Connecticut Department of Correction,CT,State,Stephanie DelSignore,Halena Martin,Halena Martin,0.0,False,0,imputed,C,40.5,0.75,0.543,4,Maintain
+Connecticut Department of Agriculture,CT,State,Stephanie DelSignore,Halena Martin,Halena Martin,0.0,False,0,imputed,C,40.5,0.75,0.543,4,Maintain
+Connecticut Department of Children and Families,CT,State,Stephanie DelSignore,Halena Martin,Halena Martin,0.0,False,0,imputed,C,40.5,0.75,0.543,4,Maintain
+Connecticut Department of Labor,CT,State,Stephanie DelSignore,Halena Martin,Halena Martin,0.0,False,0,imputed,C,40.5,0.75,0.543,4,Maintain
+Connecticut Department of Energy and Environmental Protection (DEEP),CT,State,Stephanie DelSignore,Halena Martin,Halena Martin,0.0,False,0,imputed,C,40.5,0.75,0.543,4,Maintain
+Connecticut Department of Economic & Community Development,CT,State,Stephanie DelSignore,Halena Martin,Halena Martin,0.0,False,0,imputed,C,40.5,0.75,0.543,4,Maintain
+Connecticut Department of Housing,CT,State,Stephanie DelSignore,Halena Martin,Halena Martin,0.0,False,0,imputed,C,40.5,0.75,0.543,4,Maintain
+Connecticut Insurance Department,CT,State,Stephanie DelSignore,Halena Martin,Halena Martin,0.0,False,0,imputed,C,40.5,0.75,0.543,4,Maintain
+Connecticut Developmental Services Department,CT,State,Stephanie DelSignore,Halena Martin,Halena Martin,0.0,False,0,imputed,C,40.5,0.75,0.543,4,Maintain
+Connecticut Office of Early Childhood,CT,State,Stephanie DelSignore,Halena Martin,Halena Martin,0.0,False,0,imputed,C,40.5,0.75,0.543,4,Maintain
+Connecticut Office of Health Strategy,CT,State,Stephanie DelSignore,Halena Martin,Halena Martin,0.0,False,0,imputed,C,40.5,0.75,0.543,4,Maintain
+Connecticut Office of Higher Education,CT,State,Stephanie DelSignore,Halena Martin,Halena Martin,0.0,False,0,imputed,C,40.5,0.75,0.543,4,Maintain
+Connecticut State Library,CT,State,Stephanie DelSignore,Halena Martin,Halena Martin,0.0,False,0,imputed,C,40.5,0.75,0.543,4,Maintain
+Connecticut State Department of Education,CT,State,Stephanie DelSignore,Halena Martin,Halena Martin,0.0,False,0,imputed,C,40.5,0.75,0.543,4,Maintain
+Connecticut Office of the State Comptroller,CT,State,Stephanie DelSignore,Halena Martin,Halena Martin,0.0,False,0,imputed,C,40.5,0.75,0.543,4,Maintain
+Connecticut Public Health Department,CT,State,Stephanie DelSignore,Halena Martin,Halena Martin,0.0,False,0,imputed,C,40.5,0.75,0.543,4,Maintain
+Connecticut Office of the Secretary of State,CT,State,Stephanie DelSignore,Halena Martin,Halena Martin,0.0,False,0,imputed,C,40.5,0.75,0.543,4,Maintain
+Connecticut Department of Mental Health & Addiction Services,CT,State,Stephanie DelSignore,Halena Martin,Halena Martin,0.0,False,0,imputed,C,40.5,0.75,0.543,4,Maintain
+Connecticut Department of Social Services,CT,State,Stephanie DelSignore,Halena Martin,Halena Martin,0.0,False,0,imputed,C,40.5,0.75,0.543,4,Maintain
+Connecticut Department of Revenue Services,CT,State,Stephanie DelSignore,Halena Martin,Halena Martin,0.0,False,0,imputed,C,40.5,0.75,0.543,4,Maintain
+Connecticut Department of Motor Vehicles,CT,State,Stephanie DelSignore,Halena Martin,Halena Martin,0.0,False,0,imputed,C,40.5,0.75,0.543,4,Maintain
+Connecticut Department of Transportation,CT,State,Stephanie DelSignore,Halena Martin,Halena Martin,0.0,False,0,imputed,C,40.5,0.75,0.543,4,Maintain
+Maine Department of Environmental Protection,ME,State,No State AE shown (ME),Halena Martin,Halena Martin,0.0,False,0,imputed,D,26.9,0.75,0.4614,4,Maintain
+Maine Department of Economic & Community Development,ME,State,No State AE shown (ME),Halena Martin,Halena Martin,0.0,False,0,imputed,D,26.9,0.75,0.4614,4,Maintain
+Maine Bureau of Insurance,ME,State,No State AE shown (ME),Halena Martin,Halena Martin,0.0,False,0,imputed,D,26.9,0.75,0.4614,4,Maintain
+Maine Attorney General,ME,State,No State AE shown (ME),Halena Martin,Halena Martin,0.0,False,0,imputed,D,26.9,0.75,0.4614,4,Maintain
+"Maine Department of Agriculture, Conservation and Forestry",ME,State,No State AE shown (ME),Halena Martin,Halena Martin,0.0,False,0,imputed,D,26.9,0.75,0.4614,4,Maintain
+Maine Department of Transportation,ME,State,No State AE shown (ME),Halena Martin,Halena Martin,0.0,False,0,imputed,D,26.9,0.75,0.4614,4,Maintain
+Maine Department of Inland Fisheries & Wildlife,ME,State,No State AE shown (ME),Halena Martin,Halena Martin,0.0,False,0,imputed,D,26.9,0.75,0.4614,4,Maintain
+Maine Department of Marine Resources,ME,State,No State AE shown (ME),Halena Martin,Halena Martin,0.0,False,0,imputed,D,26.9,0.75,0.4614,4,Maintain
+Maine Department of General Services,ME,State,No State AE shown (ME),Halena Martin,Halena Martin,0.0,False,0,imputed,D,26.9,0.75,0.4614,4,Maintain
+Maine Treasurers Office,ME,State,No State AE shown (ME),Halena Martin,Halena Martin,0.0,False,0,imputed,D,26.9,0.75,0.4614,4,Maintain
+Maine Public Safety Department,ME,State,No State AE shown (ME),Halena Martin,Halena Martin,0.0,False,0,imputed,D,26.9,0.75,0.4614,4,Maintain
+The Independent Commission to Investigate the Facts of the Lewiston Tragedy,ME,State,No State AE shown (ME),Halena Martin,Halena Martin,0.0,False,0,imputed,D,26.9,0.75,0.4614,4,Maintain
+Maine Office of the Governor,ME,State,No State AE shown (ME),Halena Martin,Halena Martin,0.0,False,0,imputed,D,26.9,0.75,0.4614,4,Maintain
+Maine Office of Professional and Occupational Regulation,ME,State,No State AE shown (ME),Halena Martin,Halena Martin,0.0,False,0,imputed,D,26.9,0.75,0.4614,4,Maintain
+Maine Emergency Management Agency,ME,State,No State AE shown (ME),Halena Martin,Halena Martin,0.0,False,0,imputed,D,26.9,0.75,0.4614,4,Maintain
+Maine House Republicans Office,ME,State,No State AE shown (ME),Halena Martin,Halena Martin,0.0,False,0,imputed,D,26.9,0.75,0.4614,4,Maintain
+Maine Office of Securities,ME,State,No State AE shown (ME),Halena Martin,Halena Martin,0.0,False,0,imputed,D,26.9,0.75,0.4614,4,Maintain
+Maine State Police,ME,State,No State AE shown (ME),Halena Martin,Halena Martin,0.0,False,0,imputed,D,26.9,0.75,0.4614,4,Maintain
+Kentucky Communications Network Authority,KY,State,State AE – KY/TN/AR,Carolina Prieto,Marcy Castro,0.0,False,0,imputed,D,34.7,0.75,0.5082,4,Maintain
+Kentucky Energy & Environment Cabinet,KY,State,State AE – KY/TN/AR,Carolina Prieto,Marcy Castro,0.0,True,0,imputed,D,34.7,0.75,0.5082,4,Maintain
+Kentucky Commission on Military Affairs,KY,State,State AE – KY/TN/AR,Carolina Prieto,Marcy Castro,0.0,False,0,imputed,D,34.7,0.75,0.5082,4,Maintain
+Kentucky Council on Postsecondary Education,KY,State,State AE – KY/TN/AR,Carolina Prieto,Marcy Castro,0.0,False,0,imputed,D,34.7,0.75,0.5082,4,Maintain
+Kentucky General Government Cabinet,KY,State,State AE – KY/TN/AR,Carolina Prieto,Marcy Castro,0.0,True,0,imputed,D,34.7,0.75,0.5082,4,Maintain
+Kentucky Labor Cabinet,KY,State,State AE – KY/TN/AR,Carolina Prieto,Marcy Castro,0.0,False,0,imputed,D,34.7,0.75,0.5082,4,Maintain
+Kentucky Office of the State Budget Director,KY,State,State AE – KY/TN/AR,Carolina Prieto,Marcy Castro,0.0,False,0,imputed,D,34.7,0.75,0.5082,4,Maintain
+Kentucky Justice and Public Safety Cabinet,KY,State,State AE – KY/TN/AR,Carolina Prieto,Marcy Castro,0.0,True,0,imputed,D,34.7,0.75,0.5082,4,Maintain
+Kentucky Fish & Wildlife,KY,State,State AE – KY/TN/AR,Carolina Prieto,Marcy Castro,0.0,False,0,imputed,D,34.7,0.75,0.5082,4,Maintain
+Kentucky Public Pensions Authority,KY,State,State AE – KY/TN/AR,Carolina Prieto,Marcy Castro,0.0,True,0,imputed,D,34.7,0.75,0.5082,4,Maintain
+Kentucky Portal (Kentucky.gov),KY,State,State AE – KY/TN/AR,Carolina Prieto,Marcy Castro,0.0,True,0,imputed,D,34.7,0.75,0.5082,4,Maintain
+Kentucky Personnel Cabinet,KY,State,State AE – KY/TN/AR,Carolina Prieto,Marcy Castro,0.0,True,0,imputed,D,34.7,0.75,0.5082,4,Maintain
+Kentucky Public Protection Cabinet,KY,State,State AE – KY/TN/AR,Carolina Prieto,Marcy Castro,0.0,True,0,imputed,D,34.7,0.75,0.5082,4,Maintain
+"Kentucky Tourism, Arts and Heritage Cabinet",KY,State,State AE – KY/TN/AR,Carolina Prieto,Marcy Castro,0.0,True,0,imputed,D,34.7,0.75,0.5082,4,Maintain
+North Dakota Department of Career and Technical Education,ND,State,Scott Mark,Carolina Prieto,Brooke Minichino,0.0,False,0,imputed,D,34.7,0.75,0.5082,4,Maintain
+North Dakota Department of Agriculture,ND,State,Scott Mark,Carolina Prieto,Brooke Minichino,0.0,True,0,imputed,D,34.7,0.75,0.5082,4,Maintain
+North Dakota Department of Emergency Services,ND,State,Scott Mark,Carolina Prieto,Brooke Minichino,0.0,False,0,imputed,D,34.7,0.75,0.5082,4,Maintain
+North Dakota Department of Public Instruction,ND,State,Scott Mark,Carolina Prieto,Brooke Minichino,0.0,False,0,imputed,D,34.7,0.75,0.5082,4,Maintain
+North Dakota Department of Environmental Quality,ND,State,Scott Mark,Carolina Prieto,Brooke Minichino,0.0,False,0,imputed,D,34.7,0.75,0.5082,4,Maintain
+North Dakota Ethics Commission,ND,State,Scott Mark,Carolina Prieto,Brooke Minichino,0.0,True,0,imputed,D,34.7,0.75,0.5082,4,Maintain
+North Dakota Housing Finance Agency,ND,State,Scott Mark,Carolina Prieto,Brooke Minichino,0.0,False,0,imputed,D,34.7,0.75,0.5082,4,Maintain
+North Dakota Securities Department,ND,State,Scott Mark,Carolina Prieto,Brooke Minichino,0.0,False,0,imputed,D,34.7,0.75,0.5082,4,Maintain
+North Dakota Office of Management and Budget,ND,State,Scott Mark,Carolina Prieto,Brooke Minichino,0.0,False,0,imputed,D,34.7,0.75,0.5082,4,Maintain
+North Dakota Insurance Department,ND,State,Scott Mark,Carolina Prieto,Brooke Minichino,0.0,False,0,imputed,D,34.7,0.75,0.5082,4,Maintain
+North Dakota State Library,ND,State,Scott Mark,Carolina Prieto,Brooke Minichino,0.0,False,0,imputed,D,34.7,0.75,0.5082,4,Maintain
+Blue text = hardcoded inputs. Revised XP (column G) is editable from a dropdown. Column O is counted from Account Product Categories in the 9/21 export; column P (yellow) takes a Y where an account is Service Cloud Advanced.,,,,,,0.0,False,0,n/a,,,,,,Unmapped
