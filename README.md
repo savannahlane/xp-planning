@@ -47,9 +47,12 @@ The proposed view in `index.html` applies these staffing rules:
 - Non-SAM special districts are Local SMG. SAM special districts stay Enterprise: GLAVCD
   remains with Colleen. Luke Mulvaney's three districts sit with Carlos Torres so Halena is not
   paired with that vertical.
-- Nathan's three federal accounts consolidate with Jr Wycinsky. Jake's Local SMG groups move
-  by AE: Emery Herrschel to Kerrian Dailey, Kimberley Steelmann to Andrés Pérez, and Luke
-  Mulvaney to Carlos Torres.
+- Enterprise and Local SMG are separate books. No Enterprise XP carries a Local SMG account.
+  Marcy Castro, Cody Nichols and Alejandro Solano moved to Enterprise and offloaded their
+  Local SMG books; Brooke Minichino, Carolina Cambronero and Paige Wendle offloaded theirs
+  too. Each Local SMG AE group moved whole to a dedicated Local SMG XP, so 62 accounts moved
+  and proposed XP↔AE relationships fell from 131 to 100.
+- Nathan's three federal accounts consolidate with Jr Wycinsky.
 - The three Nevada state agencies sit with Cody Nichols, who already works with Cameron
   Chadsey on Arizona and New Mexico. Virginia Department of General Services is removed from
   the map.
@@ -127,7 +130,9 @@ hypothesis document.
 
 ## Rules modeled
 
-- No more than 17 countable accounts per Enterprise XP
+- Enterprise books: up to 17 countable accounts, 20 absolute maximum
+- Local SMG books: up to 30 countable accounts
+- Enterprise XPs carry no Local SMG accounts
 - Complex accounts (more than 7 capabilities, or Service Cloud Advanced) no more than one third of a book
 - XP time zone plus or minus one hour
 - Holds: San Antonio with Steffany, DC with Paige, Denver with a Savannah report, Columbus with an Ashley report, LA and GLACVCD with Colleen, WA with Paige, CT and ME with Halena
