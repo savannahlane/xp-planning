@@ -1,0 +1,11 @@
+# Treat the planning workbook as binary so Git does not try to merge or
+# convert line endings inside the zip-based .xlsx format.
+*.xlsx binary
+*.xls binary
+*.xlsm binary
+
+# Keep HTML and Markdown as text for diffs and GitHub preview
+*.html text
+*.md text
+*.css text
+*.js text
