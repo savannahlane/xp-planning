@@ -100,6 +100,10 @@ LOCAL_SMG_OVER_CAP_ALLOWED = {"Eduardo Ruiz", "Kerrian Dailey", "Natalia Sanchez
 AE_OWNER = {
     "Scott Mark": "Carolina Prieto",
     "Stephanie DelSignore": "Halena Martin",
+    "Demi Washington": "Taylor Roman",
+    "Desmond Davis": "Taylor Roman",
+    "Sarah Duncan": "Carolina Cambronero",
+    "Spencer Ferrell": "Carolina Cambronero",
 }
 
 
