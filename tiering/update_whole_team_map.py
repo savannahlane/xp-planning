@@ -318,11 +318,15 @@ def update_markup(source: str) -> str:
             "sit with Carlos Torres so Halena is not paired with that vertical.</li>",
         )
 
-    source = source.replace(
-        "Savannah Lane, Kristen Murphy and Ashley Hill carry no accounts in the "
-        "proposed book.",
+    # The replacement contains its own search text, so a plain str.replace would
+    # prepend the two names again on every run. Collapse any number of copies.
+    source = re.sub(
+        r"(?:Jake Sager, Nathan Williamson, )*"
+        r"Savannah Lane, Kristen Murphy and Ashley Hill carry no accounts in the "
+        r"proposed book\.",
         "Jake Sager, Nathan Williamson, Savannah Lane, Kristen Murphy and Ashley "
         "Hill carry no accounts in the proposed book.",
+        source,
     )
     source = source.replace(
         "The proposed view removes account books from Savannah Lane, Kristen "
