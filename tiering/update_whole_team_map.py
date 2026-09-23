@@ -8,7 +8,11 @@ that landed on main and changes only the proposed assignment (`newxp`):
 * Ashley's seven current Enterprise accounts land with direct reports.
 * Displaced Local SMG accounts move as whole AE groups to an XP who already
   works with that AE. This removes an XP↔AE edge instead of creating one.
-* Carolina Prieto is labelled Team Lead, not Manager.
+* Carolina Prieto is labelled Team Lead, not Manager. She keeps the Kentucky
+  and North Dakota enterprise agreements (two customers) and releases the
+  scattered local accounts.
+* Non-SAM special districts move to Local SMG. SAM special districts stay
+  Enterprise (GLAVCD remains with Colleen).
 
 The current-assignment (`cur`) field is historical and is not rewritten.
 """
@@ -52,6 +56,45 @@ LOCAL_SMG_DESTINATION = {
     "Jeffrey Johnson": "Andrés Pérez",
 }
 
+# Kentucky COT and North Dakota ITD are the billed parents of statewide
+# enterprise agreements. Sister agency rows travel with them and do not
+# consume a countable slot.
+EA_PARENTS = {
+    "Kentucky Commonwealth Office of Technology",
+    "North Dakota Information Technology Department",
+}
+
+# Non-SAM special districts leave Local ENT. SAM-territory districts stay.
+# Destinations are SMG XPs who already cover that geography, except Luke
+# Mulvaney's three accounts which collapse onto one XP so Halena (and the
+# other Enterprise XPs) no longer pair with that vertical.
+SPECIAL_DISTRICT_SMG = {
+    "Health Care District of Palm Beach County - FL": "Natalia Sanchez",
+    "North Collier Fire Control and Rescue District": "Natalia Sanchez",
+    "Housing Authority of the City of Pittsburgh": "Carlos Torres",
+    "Los Angeles County Sanitation District": "Eduardo Ruiz",
+    "Metropolitan Water District of Southern California": "Eduardo Ruiz",
+    "North Central Texas Council of Governments": "Jake Sager",
+    "North Jersey Transportation Planning Authority": "Jake Sager",
+    "Tri-County Metropolitan Transportation District of Oregon (TriMet)": "Jake Sager",
+}
+
+# Carolina keeps KY + ND. Each scatter account moves to an XP who already
+# works with that AE, except Glendale AZ (Conrad Taylor has no other book).
+CAROLINA_SCATTER = {
+    "Nashville-Davidson County TN": "Andy O'Brien",
+    "Oakland, CA": "Colleen Moran",
+    "Aurora, IL": "Marcy Castro",
+    "Glendale, AZ": "Colleen Moran",
+    "Allegheny County Treasurer Office": "Halena Martin",
+    "Outagamie County, WI": "Brooke Minichino",
+}
+
+# Brooke is at the 17-account cap. Outagamie is a Tyler Carlson add; Ocala
+# is a Local SMG FL row Natalia already covers, so moving it frees the slot
+# without a new AE relationship.
+BROOKE_CAPACITY_MOVE = "Ocala, FL"
+
 
 def extract_page(source: str) -> tuple[dict, int, int]:
     start = source.index("const PAGE = ") + len("const PAGE = ")
@@ -90,6 +133,22 @@ def apply_assignments(page: dict) -> dict:
         if row["acct"] == "Connecticut Public Utilities Regulatory Authority [PURA],":
             row["newxp"] = "Steffany Amador"
 
+        if row["acct"] in SPECIAL_DISTRICT_SMG:
+            row["segment"] = "Local SMG"
+            row["ent"] = False
+            row["newxp"] = SPECIAL_DISTRICT_SMG[row["acct"]]
+
+        if old == "Carolina Prieto" or row["newxp"] == "Carolina Prieto":
+            if row["acct"] in CAROLINA_SCATTER:
+                row["newxp"] = CAROLINA_SCATTER[row["acct"]]
+            elif row["state"] in {"KY", "ND"}:
+                row["newxp"] = "Carolina Prieto"
+                if row["acct"] not in EA_PARENTS:
+                    row["alloc"] = True
+
+        if row["acct"] == BROOKE_CAPACITY_MOVE and row["newxp"] == "Brooke Minichino":
+            row["newxp"] = "Natalia Sanchez"
+
         if row["newxp"] != old:
             moved.append((row["acct"], old, row["newxp"], row["person"]))
 
@@ -109,12 +168,47 @@ def apply_assignments(page: dict) -> dict:
             + ", ".join(f"{r['acct']} → {r['newxp']}" for r in bad)
         )
 
+    carolina = [r for r in rows if r["newxp"] == "Carolina Prieto"]
+    carolina_countable = [r for r in carolina if not r["alloc"]]
+    extra = [
+        r["acct"]
+        for r in carolina_countable
+        if r["acct"] not in EA_PARENTS
+    ]
+    if extra:
+        raise RuntimeError(
+            "Carolina Prieto still has countable accounts outside KY/ND EAs: "
+            + ", ".join(extra)
+        )
+    missing = EA_PARENTS - {r["acct"] for r in carolina}
+    if missing:
+        raise RuntimeError(f"Carolina is missing EA parents: {sorted(missing)}")
+
+    halena_luke = [
+        r["acct"]
+        for r in rows
+        if r["newxp"] == "Halena Martin" and r["person"] == "Luke Mulvaney"
+    ]
+    if halena_luke:
+        raise RuntimeError(
+            "Halena still paired with Luke Mulvaney: " + ", ".join(halena_luke)
+        )
+
+    glavcd = next(
+        r
+        for r in rows
+        if r["acct"] == "Greater Los Angeles County Vector Control District CA"
+    )
+    if glavcd["newxp"] != "Colleen Moran" or not glavcd.get("ent"):
+        raise RuntimeError("GLAVCD must stay Enterprise with Colleen")
+
     after_edges = proposed_edges(rows)
     return {
         "moved": moved,
         "before_edges": before_edges,
         "after_edges": after_edges,
         "ashley_enterprise": ashley_enterprise,
+        "carolina_countable": carolina_countable,
     }
 
 
@@ -122,6 +216,13 @@ def update_markup(source: str) -> str:
     source = source.replace(
         "<title>XP ↔ AE alignment, Enterprise</title>",
         "<title>XP ↔ AE alignment, US team</title>",
+    )
+    source = source.replace(
+        "<li>Segmentation: every State and Local ENT account by sales segment is "
+        "Enterprise, with no special-entity overrides, plus DC.</li>",
+        "<li>Segmentation: State and Local ENT accounts are Enterprise, plus DC. "
+        "Non-SAM special districts are Local SMG; SAM special districts stay "
+        "Enterprise.</li>",
     )
 
     # Remove the requested section, including its table target.
@@ -172,6 +273,20 @@ def update_markup(source: str) -> str:
             "Halena retains the broader Connecticut estate.</li>",
         )
 
+    if "enterprise agreements (two customers" not in source:
+        source = source.replace(
+            "Halena retains the broader Connecticut estate.</li>",
+            "Halena retains the broader Connecticut estate.</li>\n"
+            "      <li>Carolina Prieto keeps the Kentucky and North Dakota statewide "
+            "enterprise agreements (two customers; sister agencies are allocated "
+            "children) and releases the scattered local accounts to XPs who already "
+            "work with those AEs. Glendale AZ is the exception: Conrad Taylor has no "
+            "other book, so it goes to Colleen with her other Pacific SAM work.</li>\n"
+            "      <li>Local SMG includes special districts except SAM territories. "
+            "GLAVCD stays Enterprise with Colleen. Luke Mulvaney's three districts "
+            "sit with one SMG XP so Halena is not paired with that vertical.</li>",
+        )
+
     # The coverage section is gone, so tables() must no longer write into #gaps.
     source = re.sub(
         r'function tables\(\)\{\n'
@@ -206,6 +321,9 @@ def main() -> None:
     print("Ashley's Enterprise destinations:")
     for row in result["ashley_enterprise"]:
         print(f"  {row['acct']} → {row['newxp']}")
+    print("Carolina countable EA parents:")
+    for row in result["carolina_countable"]:
+        print(f"  {row['acct']} ${row['arr']:.0f}")
 
 
 if __name__ == "__main__":

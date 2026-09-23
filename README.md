@@ -16,11 +16,16 @@ The proposed view in `index.html` applies these staffing rules:
 - Savannah Lane, Kristen Murphy and Ashley Hill carry no proposed accounts.
 - Ashley's current Enterprise accounts route only to her direct reports. The open Pacific XP
   reports to Ashley.
-- Carolina Prieto is a Team Lead, not a manager.
+- Carolina Prieto is a Team Lead, not a manager. She keeps the Kentucky and North Dakota
+  statewide enterprise agreements (two customers; sister agencies count as allocated children)
+  and does not keep the scattered local accounts (Nashville, Oakland, Aurora, Glendale,
+  Allegheny County Treasurer, Outagamie County, and the Pittsburgh Housing Authority).
+- Non-SAM special districts are Local SMG. SAM special districts stay Enterprise: GLAVCD
+  remains with Colleen. Luke Mulvaney's three districts sit with one SMG XP so Halena is not
+  paired with that vertical.
 - When those three books were removed, each displaced Local SMG AE group moved intact to an XP
-  who already worked with that AE. This reduced proposed XP↔AE relationships from 161 to 145,
-  reduced excess AE partners from 97 to 81, and reduced the maximum number of XPs working with
-  one AE from 11 to 9.
+  who already worked with that AE. Together with the Carolina rebalance and special-district
+  moves, proposed XP↔AE relationships fell from 161 to 137.
 - Connecticut PURA is the necessary exception to the no-new-relationship rule. Ashley's
   reporting-line constraint moves it from Halena to Steffany while Halena retains the broader
   Connecticut estate, so Stephanie DelSignore works with two XPs rather than one.
@@ -93,3 +98,4 @@ hypothesis document.
 - Complex accounts (more than 7 capabilities, or Service Cloud Advanced) no more than one third of a book
 - XP time zone plus or minus one hour
 - Holds: San Antonio with Steffany, DC with Paige, Denver with a Savannah report, Columbus with an Ashley report, LA and GLACVCD with Colleen, WA with Paige, CT and ME with Halena
+- Local SMG includes special districts except SAM territories
