@@ -1,0 +1,69 @@
+# Hand-curated overlay. Every row traces to research/granicus-market-and-competitive-landscape.md
+# (purchasing_access, channel_occupied, local_capacity),
+# research/govtech-state-demand-growth-2026.md section 5d (tax_cap_pressure), and
+# research/state-fiscal-capacity-and-it-modernization-fy2026-fy2027.md section 2 (it_mod_signal).
+#
+# purchasing_access: strong = live, Granicus-named or statutorily-open statewide vehicle.
+#                    present = usable state vehicle, but reseller paper, expiring, or currency unverified.
+#                    coop_only = national cooperatives (OMNIA 159768, NASPO, NACo PPP) only.
+# channel_occupied:  yes = VC3 holds the state municipal league endorsement, so the trusted-referral
+#                    slot into locals is taken. Granicus holds no state league endorsement anywhere.
+# local_capacity:    constrained = documented township fragmentation or documented absence of local IT
+#                    staff/procurement capacity. typical = no adverse evidence found (a default, not a finding).
+# tax_cap_pressure:  yes = enacted or on-ballot property tax cap/relief that squeezes local own-source revenue.
+# it_mod_signal:     funded = named, funded state IT modernization appropriation.
+#                    governance = named program that adds oversight but no money.
+#                    headwind = identified negative signal (cuts, holdbacks, or a tax on IT services).
+#                    none = no 2025-2026 signal verified. Means "not found", not "nothing happening".
+state,purchasing_access,channel_occupied,local_capacity,tax_cap_pressure,it_mod_signal,note
+Alabama,coop_only,yes,typical,no,none,VC3 holds the Alabama league endorsement
+Alaska,coop_only,no,typical,no,none,Structural deficit despite 51.7pct reserves
+Arizona,present,no,typical,no,headwind,ADOA/ASET statewide contracts open to locals; ~5pct across-the-board agency reductions proposed
+Arkansas,coop_only,no,typical,no,none,
+California,present,yes,typical,no,neutral,CMAS/NASPO via Carahsoft only; Cal Cities and CSDA both endorse VC3; state IT budget holding the line
+Colorado,present,no,typical,yes,headwind,SIPA doubles as procurement vehicle and grant source; IT capital request only 9.8M GF; TABOR caps
+Connecticut,coop_only,yes,typical,no,none,VC3 holds the CCM endorsement
+Delaware,coop_only,no,typical,no,none,
+District of Columbia,coop_only,no,typical,no,none,Single consolidated OCTO buyer
+Florida,present,no,typical,yes,governance,OMNIA/Cobb vehicle to Apr 2028; HB 1197 adds Florida Digital Service oversight without funding; Amendment 3 on the Nov 2026 ballot
+Georgia,present,yes,typical,no,funded,GTA statewide contracts; Technology Empowerment Fund 57.5M AFY2026; VC3 holds the GMA endorsement
+Hawaii,coop_only,no,typical,no,none,Consolidated state plus four counties
+Idaho,coop_only,no,typical,no,headwind,4pct agency holdback FY26 and a further 5pct planned FY27
+Illinois,coop_only,no,constrained,no,none,No Granicus statewide vehicle found; 6930 local governments is the most in the nation
+Indiana,present,no,typical,no,none,State QPA contracts
+Iowa,strong,yes,constrained,no,none,Two state master agreements incl. 2019-BUS-228 open to other governmental entities; Iowa League endorses VC3
+Kansas,coop_only,no,constrained,no,none,Township-heavy; 2026 property tax attempts failed
+Kentucky,coop_only,no,typical,no,none,
+Louisiana,coop_only,no,typical,no,none,
+Maine,coop_only,no,constrained,no,none,
+Maryland,strong,yes,typical,no,headwind,COTS Master to Sep 2027; 3pct state tax on IT and data services is a direct vendor headwind; MML endorses VC3
+Massachusetts,present,no,typical,no,none,OSD statewide contracts open to munis; Community Compact IT grant prioritises ADA Title II
+Michigan,strong,no,constrained,no,none,Live MiDEAL contract to 9/30/2027 covering state and locals; Revize entrenched in small-city web; ~1300 munis with thin IT
+Minnesota,strong,no,constrained,no,funded,Cooperative Purchasing Venture open to counties and cities; Human Services Systems Modernization Fund ~50M FY27 plus 10M county IT
+Mississippi,coop_only,no,typical,no,none,
+Missouri,coop_only,no,constrained,no,none,
+Montana,present,no,constrained,yes,funded,State MSA cooperative clause reaches other states but initial term ran to 1/31/2021 - verify; SITSD 2027 biennium +19.0M
+Nebraska,coop_only,no,constrained,yes,none,
+Nevada,coop_only,no,typical,no,none,
+New Hampshire,coop_only,no,constrained,no,none,
+New Jersey,coop_only,no,typical,no,none,LEAP implementation grants explicitly cover technology; zero rainy day fund
+New Mexico,present,no,typical,no,funded,Carahsoft 30-00000-23-00067 to Apr 2027; Computer Systems Enhancement Fund plus 20M Technology Enhancement Fund
+New York,strong,no,constrained,no,none,GovQA is the de facto statewide FOIL standard at 63 of 72 agencies; township in every county outside NYC
+North Carolina,present,yes,constrained,no,none,NCDIT statewide term contracts; documented county procurement-capacity gap; VC3 holds the NCLM endorsement
+North Dakota,coop_only,no,constrained,yes,none,Only 6 of 53 counties employ full-time IT staff; statutory hiring freeze and 10pct cut mandate
+Ohio,present,no,constrained,no,funded,State Term Schedule 534354 expires Dec 2026 - renew or replace; DAS IT ~1.1B across the FY26-27 biennium; 2025 law requires local cyber plans
+Oklahoma,strong,no,typical,no,none,OMES SW1041C runs to Oct 2030 and OMES actively markets statewide contracts to cities
+Oregon,coop_only,no,typical,no,none,
+Pennsylvania,strong,no,constrained,no,funded,COSTARS opens 9500+ buyers and DGS 4400028357 runs to Aug 2028; but 2559 subcounty units; +10M cyber and CODE PA
+Rhode Island,coop_only,no,typical,no,none,
+South Carolina,coop_only,yes,typical,no,none,VC3 holds the MASC endorsement
+South Dakota,coop_only,no,constrained,no,none,
+Tennessee,coop_only,yes,typical,no,none,VC3 holds the TML endorsement
+Texas,strong,no,typical,yes,funded,DIR plus SmartBuy plus TXMAS plus TIPS plus BuyBoard is the strongest local purchasing access in the country; DIR pipeline 88 projects/788.1M; 51B committed to property tax relief
+Utah,present,no,typical,no,none,Utah DTS provides shared cyber services to ~80pct of local governments
+Vermont,coop_only,no,constrained,no,none,
+Virginia,strong,no,typical,no,funded,Statute opens VITA contracts to all localities and VITA policy disfavours co-op workarounds; VITA 393.1M FY26 and an 85-project 929.8M portfolio
+Washington,present,no,typical,no,none,DES 01313 names Granicus with MCUA and out-of-state access but term dates appear lapsed - verify
+West Virginia,coop_only,no,constrained,no,none,
+Wisconsin,present,yes,constrained,no,none,VendorNet cooperative purchasing; township in 71 of 72 counties; VC3 holds the League of Wisconsin Municipalities endorsement
+Wyoming,coop_only,no,constrained,no,none,
