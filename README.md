@@ -13,19 +13,24 @@ Internal and confidential. Contains account names, ARR and staffing. Keep this r
 
 The proposed view in `index.html` applies these staffing rules:
 
-- Savannah Lane, Kristen Murphy and Ashley Hill carry no proposed accounts.
+- Jake Sager, Nathan Williamson, Savannah Lane, Kristen Murphy and Ashley Hill carry no
+  proposed accounts.
 - Ashley's current Enterprise accounts route only to her direct reports. The open Pacific XP
   reports to Ashley.
 - Carolina Prieto is a Team Lead, not a manager. She keeps the Kentucky and North Dakota
   statewide enterprise agreements (two customers; sister agencies count as allocated children)
-  and does not keep the scattered local accounts (Nashville, Oakland, Aurora, Glendale,
-  Allegheny County Treasurer, Outagamie County, and the Pittsburgh Housing Authority).
+  plus Kentucky CHFS, Homeland Security and Transportation for state-book consolidation. She
+  does not keep the scattered local accounts (Nashville, Oakland, Aurora, Glendale, Allegheny
+  County Treasurer, Outagamie County, and the Pittsburgh Housing Authority).
 - Non-SAM special districts are Local SMG. SAM special districts stay Enterprise: GLAVCD
-  remains with Colleen. Luke Mulvaney's three districts sit with one SMG XP so Halena is not
+  remains with Colleen. Luke Mulvaney's three districts sit with Carlos Torres so Halena is not
   paired with that vertical.
+- Nathan's three federal accounts consolidate with Jr Wycinsky. Jake's Local SMG groups move
+  by AE: Emery Herrschel to Kerrian Dailey, Kimberley Steelmann to Andrés Pérez, and Luke
+  Mulvaney to Carlos Torres.
 - When those three books were removed, each displaced Local SMG AE group moved intact to an XP
   who already worked with that AE. Together with the Carolina rebalance and special-district
-  moves, proposed XP↔AE relationships fell from 161 to 137.
+  moves, proposed XP↔AE relationships fell from 161 to 133.
 - Connecticut PURA is the necessary exception to the no-new-relationship rule. Ashley's
   reporting-line constraint moves it from Halena to Steffany while Halena retains the broader
   Connecticut estate, so Stephanie DelSignore works with two XPs rather than one.

@@ -4,13 +4,14 @@
 This script is intentionally narrow. It starts from the whole-team PAGE payload
 that landed on main and changes only the proposed assignment (`newxp`):
 
-* Savannah Lane, Kristen Murphy and Ashley Hill hold no proposed accounts.
+* Jake Sager, Nathan Williamson, Savannah Lane, Kristen Murphy and Ashley Hill
+  hold no proposed accounts.
 * Ashley's seven current Enterprise accounts land with direct reports.
 * Displaced Local SMG accounts move as whole AE groups to an XP who already
   works with that AE. This removes an XP↔AE edge instead of creating one.
 * Carolina Prieto is labelled Team Lead, not Manager. She keeps the Kentucky
-  and North Dakota enterprise agreements (two customers) and releases the
-  scattered local accounts.
+  and North Dakota enterprise agreements (two customers), takes three other
+  Kentucky state accounts for consolidation, and releases scattered locals.
 * Non-SAM special districts move to Local SMG. SAM special districts stay
   Enterprise (GLAVCD remains with Colleen).
 
@@ -28,7 +29,13 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 HTML = ROOT / "index.html"
 
-NO_BOOK = {"Savannah Lane", "Kristen Murphy", "Ashley Hill"}
+NO_BOOK = {
+    "Jake Sager",
+    "Nathan Williamson",
+    "Savannah Lane",
+    "Kristen Murphy",
+    "Ashley Hill",
+}
 ASHLEY_REPORTS = {
     "Open XP2 (PT)",
     "Colleen Moran",
@@ -49,11 +56,12 @@ LOCAL_SMG_DESTINATION = {
     "Brittany Greer": "Marcy Castro",
     "Local SMG CA (Ter 8)": "Eduardo Ruiz",
     "John Meah": "Cody Nichols",
-    "Kimberley Steelmann": "Jake Sager",
+    "Kimberley Steelmann": "Andrés Pérez",
     "Amanda Brooks": "David Treminio",
     "Local SMG Ter 6 (TX/OK/AR)": "Kerrian Dailey",
-    "Emery Herrschel": "Jake Sager",
+    "Emery Herrschel": "Kerrian Dailey",
     "Jeffrey Johnson": "Andrés Pérez",
+    "Luke Mulvaney": "Carlos Torres",
 }
 
 # Kentucky COT and North Dakota ITD are the billed parents of statewide
@@ -64,19 +72,27 @@ EA_PARENTS = {
     "North Dakota Information Technology Department",
 }
 
+KENTUCKY_CONSOLIDATION = {
+    "Kentucky Cabinet for Health & Family Services (CHFS)",
+    "Kentucky Office of Homeland Security",
+    "Kentucky Transportation Cabinet",
+}
+
+CAROLINA_COUNTABLE = EA_PARENTS | KENTUCKY_CONSOLIDATION
+
 # Non-SAM special districts leave Local ENT. SAM-territory districts stay.
 # Destinations are SMG XPs who already cover that geography, except Luke
-# Mulvaney's three accounts which collapse onto one XP so Halena (and the
-# other Enterprise XPs) no longer pair with that vertical.
+# Mulvaney's three accounts which collapse onto one eligible XP so Halena (and
+# the other Enterprise XPs) no longer pair with that vertical.
 SPECIAL_DISTRICT_SMG = {
     "Health Care District of Palm Beach County - FL": "Natalia Sanchez",
     "North Collier Fire Control and Rescue District": "Natalia Sanchez",
     "Housing Authority of the City of Pittsburgh": "Carlos Torres",
     "Los Angeles County Sanitation District": "Eduardo Ruiz",
     "Metropolitan Water District of Southern California": "Eduardo Ruiz",
-    "North Central Texas Council of Governments": "Jake Sager",
-    "North Jersey Transportation Planning Authority": "Jake Sager",
-    "Tri-County Metropolitan Transportation District of Oregon (TriMet)": "Jake Sager",
+    "North Central Texas Council of Governments": "Carlos Torres",
+    "North Jersey Transportation Planning Authority": "Carlos Torres",
+    "Tri-County Metropolitan Transportation District of Oregon (TriMet)": "Carlos Torres",
 }
 
 # Carolina keeps KY + ND. Each scatter account moves to an XP who already
@@ -138,12 +154,18 @@ def apply_assignments(page: dict) -> dict:
             row["ent"] = False
             row["newxp"] = SPECIAL_DISTRICT_SMG[row["acct"]]
 
+        if row["acct"] in KENTUCKY_CONSOLIDATION:
+            row["newxp"] = "Carolina Prieto"
+
+        if old == "Nathan Williamson":
+            row["newxp"] = "Jr Wycinsky"
+
         if old == "Carolina Prieto" or row["newxp"] == "Carolina Prieto":
             if row["acct"] in CAROLINA_SCATTER:
                 row["newxp"] = CAROLINA_SCATTER[row["acct"]]
             elif row["state"] in {"KY", "ND"}:
                 row["newxp"] = "Carolina Prieto"
-                if row["acct"] not in EA_PARENTS:
+                if row["acct"] not in CAROLINA_COUNTABLE:
                     row["alloc"] = True
 
         if row["acct"] == BROOKE_CAPACITY_MOVE and row["newxp"] == "Brooke Minichino":
@@ -173,16 +195,16 @@ def apply_assignments(page: dict) -> dict:
     extra = [
         r["acct"]
         for r in carolina_countable
-        if r["acct"] not in EA_PARENTS
+        if r["acct"] not in CAROLINA_COUNTABLE
     ]
     if extra:
         raise RuntimeError(
-            "Carolina Prieto still has countable accounts outside KY/ND EAs: "
+            "Carolina Prieto has unexpected countable accounts: "
             + ", ".join(extra)
         )
-    missing = EA_PARENTS - {r["acct"] for r in carolina}
+    missing = CAROLINA_COUNTABLE - {r["acct"] for r in carolina_countable}
     if missing:
-        raise RuntimeError(f"Carolina is missing EA parents: {sorted(missing)}")
+        raise RuntimeError(f"Carolina is missing consolidated accounts: {sorted(missing)}")
 
     halena_luke = [
         r["acct"]
@@ -252,8 +274,9 @@ def update_markup(source: str) -> str:
         "read the same in both views.",
         'Counts exclude allocated child records. "AEs today" is the same count '
         "under current assignments. Complex means more than 7 capabilities. "
-        "The proposed view removes account books from Savannah Lane, Kristen "
-        "Murphy and Ashley Hill; the current view remains historical.",
+        "The proposed view removes account books from Jake Sager, Nathan "
+        "Williamson, Savannah Lane, Kristen Murphy and Ashley Hill; the "
+        "current view remains historical.",
     )
 
     if "When those three books were removed" not in source:
@@ -262,7 +285,8 @@ def update_markup(source: str) -> str:
             "travel with the parent). ARR is the export's converted ARR.</li>",
             "<li>Account counts exclude Allocated child records (they carry $0 and "
             "travel with the parent). ARR is the export's converted ARR.</li>\n"
-            "      <li>Savannah Lane, Kristen Murphy and Ashley Hill carry no accounts "
+            "      <li>Jake Sager, Nathan Williamson, Savannah Lane, Kristen Murphy "
+            "and Ashley Hill carry no accounts "
             "in the proposed book. Ashley's current Enterprise accounts route only "
             "to her reports; Carolina Prieto is a Team Lead, not a manager.</li>\n"
             "      <li>When those three books were removed, each displaced Local SMG "
@@ -279,13 +303,41 @@ def update_markup(source: str) -> str:
             "Halena retains the broader Connecticut estate.</li>\n"
             "      <li>Carolina Prieto keeps the Kentucky and North Dakota statewide "
             "enterprise agreements (two customers; sister agencies are allocated "
-            "children) and releases the scattered local accounts to XPs who already "
+            "children), plus CHFS, Homeland Security and Transportation for Kentucky "
+            "consolidation. She releases scattered local accounts to XPs who already "
             "work with those AEs. Glendale AZ is the exception: Conrad Taylor has no "
             "other book, so it goes to Colleen with her other Pacific SAM work.</li>\n"
             "      <li>Local SMG includes special districts except SAM territories. "
             "GLAVCD stays Enterprise with Colleen. Luke Mulvaney's three districts "
-            "sit with one SMG XP so Halena is not paired with that vertical.</li>",
+            "sit with Carlos Torres so Halena is not paired with that vertical.</li>",
         )
+
+    source = source.replace(
+        "Savannah Lane, Kristen Murphy and Ashley Hill carry no accounts in the "
+        "proposed book.",
+        "Jake Sager, Nathan Williamson, Savannah Lane, Kristen Murphy and Ashley "
+        "Hill carry no accounts in the proposed book.",
+    )
+    source = source.replace(
+        "The proposed view removes account books from Savannah Lane, Kristen "
+        "Murphy and Ashley Hill; the current view remains historical.",
+        "The proposed view removes account books from Jake Sager, Nathan "
+        "Williamson, Savannah Lane, Kristen Murphy and Ashley Hill; the current "
+        "view remains historical.",
+    )
+    source = source.replace(
+        "enterprise agreements (two customers; sister agencies are allocated "
+        "children) and releases the scattered local accounts",
+        "enterprise agreements (two customers; sister agencies are allocated "
+        "children), plus CHFS, Homeland Security and Transportation for Kentucky "
+        "consolidation. She releases scattered local accounts",
+    )
+    source = source.replace(
+        "Luke Mulvaney's three districts sit with one SMG XP so Halena is not "
+        "paired with that vertical.",
+        "Luke Mulvaney's three districts sit with Carlos Torres so Halena is not "
+        "paired with that vertical.",
+    )
 
     # The coverage section is gone, so tables() must no longer write into #gaps.
     source = re.sub(
@@ -321,7 +373,7 @@ def main() -> None:
     print("Ashley's Enterprise destinations:")
     for row in result["ashley_enterprise"]:
         print(f"  {row['acct']} → {row['newxp']}")
-    print("Carolina countable EA parents:")
+    print("Carolina countable consolidated accounts:")
     for row in result["carolina_countable"]:
         print(f"  {row['acct']} ${row['arr']:.0f}")
 
