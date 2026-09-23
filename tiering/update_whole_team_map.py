@@ -73,6 +73,8 @@ LOCAL_SMG_DESTINATION = {
     "Brittany Greer": "David Treminio",
     "John Meah": "Carlos Torres",
     "Not on maps provided": "Kerrian Dailey",
+    "Prachi Patel": "Natalia Sanchez",
+    "Michelle Cooper seat (open)": "Kerrian Dailey",
 }
 
 # Kentucky COT and North Dakota ITD are the billed parents of statewide
@@ -90,11 +92,15 @@ ENTERPRISE_TARGET = 17
 ENTERPRISE_MAX = 20
 LOCAL_SMG_MAX = 30
 
-# There are 181 countable Local SMG accounts and six dedicated Local SMG XPs,
-# so the book is one account larger than 6 x 30. Until a seat is added or an
-# account leaves the segment, one XP carries the remainder. Named here so the
+# There are more countable Local SMG accounts than 6 x 30. Named here so the
 # overage is a deliberate, visible exception rather than a silent drift.
-LOCAL_SMG_OVER_CAP_ALLOWED = {"Eduardo Ruiz"}
+LOCAL_SMG_OVER_CAP_ALLOWED = {"Eduardo Ruiz", "Kerrian Dailey", "Natalia Sanchez"}
+
+# Whole AE groups that always sit with one XP, regardless of who held them.
+AE_OWNER = {
+    "Scott Mark": "Carolina Prieto",
+    "Stephanie DelSignore": "Halena Martin",
+}
 
 
 def load_overrides(path: Path) -> dict[str, dict]:
@@ -160,6 +166,9 @@ def apply_assignments(page: dict, overrides: dict[str, dict]) -> dict:
                 row["ent"] = override["segment"] in ENTERPRISE_SEGMENTS
             if override["xp"]:
                 row["newxp"] = override["xp"]
+
+        if row["person"] in AE_OWNER:
+            row["newxp"] = AE_OWNER[row["person"]]
 
         # Kentucky and North Dakota are statewide enterprise agreements, so the
         # sister agencies travel with the billed parent instead of consuming a
@@ -257,6 +266,12 @@ def apply_assignments(page: dict, overrides: dict[str, dict]) -> dict:
         if ENTERPRISE_TARGET < n <= ENTERPRISE_MAX
     }
 
+    carolina_countable |= {
+        r["acct"]
+        for r in rows
+        if r["person"] == "Scott Mark" and not r["alloc"]
+    }
+
     # Hard validations: fail loudly instead of publishing a subtly wrong map.
     for xp in NO_BOOK:
         assigned = [r["acct"] for r in rows if r["newxp"] == xp]
@@ -266,7 +281,11 @@ def apply_assignments(page: dict, overrides: dict[str, dict]) -> dict:
     ashley_enterprise = [
         r for r in rows if r["cur"] == "Ashley Hill" and r.get("ent")
     ]
-    bad = [r for r in ashley_enterprise if r["newxp"] not in ASHLEY_REPORTS]
+    bad = [
+        r
+        for r in ashley_enterprise
+        if r["newxp"] not in ASHLEY_REPORTS and r["person"] not in AE_OWNER
+    ]
     if bad:
         raise RuntimeError(
             "Ashley's Enterprise accounts outside her reporting line: "
@@ -288,6 +307,11 @@ def apply_assignments(page: dict, overrides: dict[str, dict]) -> dict:
     missing = carolina_countable - {r["acct"] for r in carolina_rows}
     if missing:
         raise RuntimeError(f"Carolina is missing consolidated accounts: {sorted(missing)}")
+
+    for ae, xp in AE_OWNER.items():
+        stray = [r["acct"] for r in rows if r["person"] == ae and r["newxp"] != xp]
+        if stray:
+            raise RuntimeError(f"{ae} accounts not with {xp}: " + ", ".join(stray))
 
     halena_luke = [
         r["acct"]
