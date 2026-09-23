@@ -7,8 +7,9 @@ that landed on main and changes only the proposed assignment (`newxp`):
 * Jake Sager, Nathan Williamson, Savannah Lane, Kristen Murphy and Ashley Hill
   hold no proposed accounts.
 * Ashley's seven current Enterprise accounts land with direct reports.
-* Displaced Local SMG accounts move as whole AE groups to an XP who already
-  works with that AE. This removes an XP↔AE edge instead of creating one.
+* Enterprise XPs carry no Local SMG accounts. Each Local SMG AE group moves as
+  a whole group to a dedicated Local SMG XP, which removes XP↔AE edges rather
+  than creating them.
 * Carolina Prieto is labelled Team Lead, not Manager. She keeps the Kentucky
   and North Dakota enterprise agreements (two customers).
 
@@ -48,23 +49,30 @@ ASHLEY_REPORTS = {
     "Alejandro Solano",
 }
 
-# Each destination already works with the AE in the main-branch proposal.
-# Keeping an AE group intact removes the departing XP↔AE relationship without
-# adding one for the recipient.
+# Enterprise XPs hold no Local SMG accounts. Every Local SMG AE group that sits
+# with an Enterprise XP moves here as a whole group, so the AE keeps talking to
+# one XP rather than several. Destinations are dedicated Local SMG XPs, chosen
+# to reuse an existing XP↔AE relationship wherever one exists and to keep the
+# resulting books within a few accounts of each other.
 LOCAL_SMG_DESTINATION = {
     "Local SMG FL (Ter 4)": "Natalia Sanchez",
-    "Jared Cummings": "David Treminio",
-    "Caleb Fort Jr": "Kerrian Dailey",
-    "Tommy Monaghan": "Carlos Torres",
-    "Brittany Greer": "Marcy Castro",
     "Local SMG CA (Ter 8)": "Eduardo Ruiz",
-    "John Meah": "Cody Nichols",
+    "Local SMG Ter 6 (TX/OK/AR)": "Kerrian Dailey",
+    "Caleb Fort Jr": "Kerrian Dailey",
+    "Corey Andrade": "Natalia Sanchez",
+    "Emery Herrschel": "Kerrian Dailey",
+    "Jared Cummings": "Andrés Pérez",
+    "Jeffrey Johnson": "Andrés Pérez",
     "Kimberley Steelmann": "Andrés Pérez",
     "Amanda Brooks": "David Treminio",
-    "Local SMG Ter 6 (TX/OK/AR)": "Kerrian Dailey",
-    "Emery Herrschel": "Kerrian Dailey",
-    "Jeffrey Johnson": "Andrés Pérez",
+    "Andrew Collinsworth": "Eduardo Ruiz",
+    "Tommy Monaghan": "Carlos Torres",
     "Luke Mulvaney": "Carlos Torres",
+    # These three AE groups have no dedicated Local SMG XP on them today, so
+    # each group lands whole with the XP whose territory is closest.
+    "Brittany Greer": "David Treminio",
+    "John Meah": "Carlos Torres",
+    "Not on maps provided": "Kerrian Dailey",
 }
 
 # Kentucky COT and North Dakota ITD are the billed parents of statewide
@@ -76,6 +84,17 @@ EA_PARENTS = {
 }
 
 ENTERPRISE_SEGMENTS = {"State", "Local ENT"}
+
+# Book size caps, counting countable accounts only.
+ENTERPRISE_TARGET = 17
+ENTERPRISE_MAX = 20
+LOCAL_SMG_MAX = 30
+
+# There are 181 countable Local SMG accounts and six dedicated Local SMG XPs,
+# so the book is one account larger than 6 x 30. Until a seat is added or an
+# account leaves the segment, one XP carries the remainder. Named here so the
+# overage is a deliberate, visible exception rather than a silent drift.
+LOCAL_SMG_OVER_CAP_ALLOWED = {"Eduardo Ruiz"}
 
 
 def load_overrides(path: Path) -> dict[str, dict]:
@@ -130,14 +149,6 @@ def apply_assignments(page: dict, overrides: dict[str, dict]) -> dict:
     for row in rows:
         old = row["newxp"]
 
-        if row["segment"] == "Local SMG" and old in NO_BOOK:
-            try:
-                row["newxp"] = LOCAL_SMG_DESTINATION[row["person"]]
-            except KeyError as exc:
-                raise RuntimeError(
-                    f"No destination for displaced AE group {row['person']!r}"
-                ) from exc
-
         if old == "Nathan Williamson":
             row["newxp"] = "Jr Wycinsky"
 
@@ -178,6 +189,73 @@ def apply_assignments(page: dict, overrides: dict[str, dict]) -> dict:
     removed = [r["acct"] for r in rows if overrides.get(r["acct"], {}).get("remove")]
     rows = [r for r in rows if not overrides.get(r["acct"], {}).get("remove")]
     page["rows"] = rows
+
+    # Enterprise and Local SMG are separate books. Once every other rule has
+    # run, hand each Local SMG account held by an Enterprise XP to a dedicated
+    # Local SMG XP. NO_BOOK is folded in so a departing hybrid book lands here
+    # too rather than needing its own path.
+    enterprise_xps = {r["newxp"] for r in rows if r.get("ent") and not r["alloc"]}
+    offloaded = []
+    for row in rows:
+        if row["segment"] != "Local SMG":
+            continue
+        if row["newxp"] not in enterprise_xps | NO_BOOK:
+            continue
+        try:
+            destination = LOCAL_SMG_DESTINATION[row["person"]]
+        except KeyError as exc:
+            raise RuntimeError(
+                f"No Local SMG destination for AE group {row['person']!r}"
+            ) from exc
+        offloaded.append((row["acct"], row["newxp"], destination))
+        moved.append((row["acct"], row["newxp"], destination, row["person"]))
+        row["newxp"] = destination
+
+    hybrid = sorted(
+        {
+            r["newxp"]
+            for r in rows
+            if r["segment"] == "Local SMG" and r["newxp"] in enterprise_xps
+        }
+    )
+    if hybrid:
+        raise RuntimeError(f"Enterprise XPs still holding Local SMG: {hybrid}")
+
+    enterprise_load: dict[str, int] = defaultdict(int)
+    smg_load: dict[str, int] = defaultdict(int)
+    for row in rows:
+        if row["alloc"]:
+            continue
+        if row.get("ent"):
+            enterprise_load[row["newxp"]] += 1
+        elif row["segment"] == "Local SMG":
+            smg_load[row["newxp"]] += 1
+
+    over_enterprise = {
+        xp: n for xp, n in enterprise_load.items() if n > ENTERPRISE_MAX
+    }
+    if over_enterprise:
+        raise RuntimeError(
+            f"Enterprise books above the {ENTERPRISE_MAX}-account maximum: "
+            + ", ".join(f"{xp} {n}" for xp, n in sorted(over_enterprise.items()))
+        )
+
+    over_smg = {
+        xp: n
+        for xp, n in smg_load.items()
+        if n > LOCAL_SMG_MAX and xp not in LOCAL_SMG_OVER_CAP_ALLOWED
+    }
+    if over_smg:
+        raise RuntimeError(
+            f"Local SMG books above the {LOCAL_SMG_MAX}-account cap: "
+            + ", ".join(f"{xp} {n}" for xp, n in sorted(over_smg.items()))
+        )
+
+    over_target = {
+        xp: n
+        for xp, n in enterprise_load.items()
+        if ENTERPRISE_TARGET < n <= ENTERPRISE_MAX
+    }
 
     # Hard validations: fail loudly instead of publishing a subtly wrong map.
     for xp in NO_BOOK:
@@ -233,6 +311,10 @@ def apply_assignments(page: dict, overrides: dict[str, dict]) -> dict:
     return {
         "moved": moved,
         "removed": removed,
+        "offloaded": offloaded,
+        "enterprise_load": dict(enterprise_load),
+        "smg_load": dict(smg_load),
+        "over_target": over_target,
         "before_edges": before_edges,
         "after_edges": after_edges,
         "ashley_enterprise": ashley_enterprise,
@@ -301,6 +383,18 @@ def update_markup(source: str) -> str:
             "The exception is Connecticut PURA: Ashley's reporting-line rule requires "
             "one additional Stephanie DelSignore relationship for Steffany while "
             "Halena retains the broader Connecticut estate.</li>",
+        )
+
+    if "Enterprise and Local SMG are separate books" not in source:
+        source = source.replace(
+            "<li>Account counts exclude Allocated child records (they carry $0 and "
+            "travel with the parent). ARR is the export's converted ARR.</li>",
+            "<li>Account counts exclude Allocated child records (they carry $0 and "
+            "travel with the parent). ARR is the export's converted ARR.</li>\n"
+            "      <li>Enterprise and Local SMG are separate books. No Enterprise XP "
+            "carries a Local SMG account; each Local SMG AE group moves whole to a "
+            "dedicated Local SMG XP, so the AE works with one XP instead of several."
+            "</li>",
         )
 
     if "enterprise agreements (two customers" not in source:
@@ -375,6 +469,13 @@ def main() -> None:
     print(f"moved {len(moved)} proposed account records")
     if result["removed"]:
         print("removed from the map: " + ", ".join(sorted(result["removed"])))
+    if result["offloaded"]:
+        counts: dict[tuple[str, str], int] = defaultdict(int)
+        for _, source_xp, destination in result["offloaded"]:
+            counts[(source_xp, destination)] += 1
+        print(f"Local SMG offloaded from Enterprise XPs: {len(result['offloaded'])}")
+        for (source_xp, destination), n in sorted(counts.items()):
+            print(f"  {source_xp} → {destination}: {n}")
     print(
         "XP↔AE edges: "
         f"{len(result['before_edges'])} → {len(result['after_edges'])} "
@@ -385,6 +486,19 @@ def main() -> None:
     print("Ashley's Enterprise destinations:")
     for row in result["ashley_enterprise"]:
         print(f"  {row['acct']} → {row['newxp']}")
+    print(
+        f"Enterprise books (target {ENTERPRISE_TARGET}, max {ENTERPRISE_MAX}): "
+        f"max {max(result['enterprise_load'].values())}"
+    )
+    for xp, n in sorted(result["over_target"].items()):
+        print(f"  over target, within max: {xp} {n}")
+    print(
+        f"Local SMG books (cap {LOCAL_SMG_MAX}): "
+        f"max {max(result['smg_load'].values())}"
+    )
+    for xp in sorted(LOCAL_SMG_OVER_CAP_ALLOWED):
+        if result["smg_load"].get(xp, 0) > LOCAL_SMG_MAX:
+            print(f"  allowed overage: {xp} {result['smg_load'][xp]}")
     print("Carolina countable consolidated accounts:")
     for row in result["carolina_countable"]:
         print(f"  {row['acct']} ${row['arr']:.0f}")

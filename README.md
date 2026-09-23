@@ -40,6 +40,8 @@ The proposed view in `index.html` applies these staffing rules:
 - Ashley's current Enterprise accounts route only to her direct reports. The open Pacific XP
   reports to Ashley.
 - Non-SAM special districts are Local SMG. SAM special districts stay Enterprise.
+- Enterprise and Local SMG are separate books. No Enterprise XP carries a Local SMG
+  account.
 
 The `Current assignment` view is historical and still shows Savannah, Kristen and Ashley's
 current books.
@@ -108,7 +110,9 @@ hypothesis document.
 
 ## Rules modeled
 
-- No more than 17 countable accounts per Enterprise XP
+- Enterprise books: up to 17 countable accounts, 20 absolute maximum
+- Local SMG books: up to 30 countable accounts
+- Enterprise XPs carry no Local SMG accounts
 - Complex accounts (more than 7 capabilities, or Service Cloud Advanced) no more than one third of a book
 - XP time zone plus or minus one hour
 - Holds: San Antonio with Steffany, DC with Paige, Denver with a Savannah report, Columbus with an Ashley report, LA and GLACVCD with Colleen, WA with Paige, CT and ME with Halena
