@@ -1,0 +1,38 @@
+# Per-account overrides for the proposed book. Edit this file, then run:
+#   python3 tiering/update_whole_team_map.py
+#
+# account      Must match the account name in index.html exactly, and must match
+#              exactly one account. The script fails if a name matches nothing.
+# new_xp       The proposed XP. Blank keeps whatever the base map proposed.
+# new_segment  State, Local ENT or Local SMG. Blank keeps the segment.
+#              Local SMG clears the Enterprise flag; State and Local ENT set it.
+# remove       yes drops the account from the map entirely.
+# note         Free text. Not parsed.
+#
+# Rules that are not per-account live in update_whole_team_map.py: the list of
+# people who cannot hold accounts, where a displaced AE group goes, and the
+# Kentucky and North Dakota enterprise-agreement rollup.
+account,new_xp,new_segment,remove,note
+Nevada Department of Human Services,Cody Nichols,,,Nevada state agencies consolidate with Cody on Cameron Chadsey
+Nevada Health Authority,Cody Nichols,,,Nevada state agencies consolidate with Cody on Cameron Chadsey
+Nevada Department of Motor Vehicles,Cody Nichols,,,Nevada state agencies consolidate with Cody on Cameron Chadsey
+Virginia Department of General Services,,,yes,Removed from the book
+Nashville-Davidson County TN,Andy O'Brien,,,Off Carolina; Andy already works with Carter Bradford
+"Oakland, CA",Colleen Moran,,,Off Carolina; Colleen already works with Andrew Murray
+"Aurora, IL",Marcy Castro,,,Off Carolina; Marcy already works with Kent Hartsfield
+"Glendale, AZ",Colleen Moran,,,Off Carolina; Conrad Taylor has no other book and this is Pacific time
+Allegheny County Treasurer Office,Halena Martin,,,Off Carolina; Halena already works with Andrew Wyzkoski
+"Outagamie County, WI",Brooke Minichino,,,Off Carolina; Brooke already works with Tyler Carlson
+"Ocala, FL",Natalia Sanchez,,,Frees Brooke's seventeenth seat; Natalia already covers Local SMG FL
+Kentucky Cabinet for Health & Family Services (CHFS),Carolina Prieto,,,Kentucky consolidation
+Kentucky Office of Homeland Security,Carolina Prieto,,,Kentucky consolidation
+Kentucky Transportation Cabinet,Carolina Prieto,,,Kentucky consolidation
+"Connecticut Public Utilities Regulatory Authority [PURA],",Steffany Amador,,,Ashley's reporting-line rule; Halena keeps the rest of Connecticut
+Health Care District of Palm Beach County - FL,Natalia Sanchez,Local SMG,,Non-SAM special district
+North Collier Fire Control and Rescue District,Natalia Sanchez,Local SMG,,Non-SAM special district
+Housing Authority of the City of Pittsburgh,Carlos Torres,Local SMG,,Non-SAM special district
+Los Angeles County Sanitation District,Eduardo Ruiz,Local SMG,,Non-SAM special district
+Metropolitan Water District of Southern California,Eduardo Ruiz,Local SMG,,Non-SAM special district
+North Central Texas Council of Governments,Carlos Torres,Local SMG,,Non-SAM special district on the transportation vertical
+North Jersey Transportation Planning Authority,Carlos Torres,Local SMG,,Non-SAM special district on the transportation vertical
+Tri-County Metropolitan Transportation District of Oregon (TriMet),Carlos Torres,Local SMG,,Non-SAM special district on the transportation vertical
