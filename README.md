@@ -1,6 +1,8 @@
 # XP ↔ AE Alignment Model
 
-Internal and confidential. Contains account names, ARR and staffing. Keep this repository private.
+Internal and confidential. Contains account names, ARR and staffing. **Keep this repository private.** Do not enable GitHub Pages or share a public link.
+
+GitHub: [savannahlane/xp-planning](https://github.com/savannahlane/xp-planning)
 
 ## Contents
 
