@@ -104,7 +104,20 @@ AE_OWNER = {
     "Desmond Davis": "Taylor Roman",
     "Sarah Duncan": "Halena Martin",
     "Spencer Ferrell": "Carolina Cambronero",
+    # Marcy holds two of the three Territory 4a accounts today, so the open seat
+    # moves to her whole rather than splitting an already-open territory.
+    "Territory 4a (open)": "Marcy Castro",
 }
+
+# Kent Hartsfield carries his own T11b OH/IN/IL territory plus the Chicago and
+# Columbus SAM accounts on a temporary basis. Those two blocks now split: the
+# SAM accounts go to Halena in account_overrides.csv and T11b stays with Marcy,
+# which is why this AE group is not in AE_OWNER above.
+#
+# Columbus is one of them and is a current Ashley Hill account, so the rule that
+# her Enterprise book routes only to her reports has to give way. Named here so
+# the released hold is a deliberate, visible exception rather than silent drift.
+ASHLEY_HOLD_RELEASED = {"Columbus OH"}
 
 # New York and New Jersey state agencies sit with Taylor, including the
 # DelSignore rows that would otherwise follow the AE_OWNER rule above.
@@ -295,7 +308,9 @@ def apply_assignments(page: dict, overrides: dict[str, dict]) -> dict:
     bad = [
         r
         for r in ashley_enterprise
-        if r["newxp"] not in ASHLEY_REPORTS and r["person"] not in AE_OWNER
+        if r["newxp"] not in ASHLEY_REPORTS
+        and r["person"] not in AE_OWNER
+        and r["acct"] not in ASHLEY_HOLD_RELEASED
     ]
     if bad:
         raise RuntimeError(
@@ -538,7 +553,8 @@ def main() -> None:
         print(f"{xp}: 0 proposed accounts")
     print("Ashley's Enterprise destinations:")
     for row in result["ashley_enterprise"]:
-        print(f"  {row['acct']} → {row['newxp']}")
+        released = " (hold released)" if row["acct"] in ASHLEY_HOLD_RELEASED else ""
+        print(f"  {row['acct']} → {row['newxp']}{released}")
     print(
         f"Enterprise books (target {ENTERPRISE_TARGET}, max {ENTERPRISE_MAX}): "
         f"max {max(result['enterprise_load'].values())}"
