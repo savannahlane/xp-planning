@@ -28,8 +28,8 @@ One row per account, with these columns:
 | `note` | Why. Free text, not parsed. |
 
 Rules that are not per-account stay in `tiering/update_whole_team_map.py`: who cannot hold
-accounts at all, where a displaced AE group goes, and the Kentucky and North Dakota
-enterprise-agreement rollup.
+accounts at all, where a displaced AE group goes, the North Dakota enterprise-agreement
+rollup with Carolina Prieto, and the Kentucky enterprise-agreement rollup with Andy O'Brien.
 
 ## Which states an AE covers
 
@@ -72,6 +72,8 @@ The proposed view in `index.html` applies these staffing rules:
 - Taylor Roman holds Benjamin Shor, Stephanie DelSignore's New York and New Jersey
   accounts, Sarah Duncan, and Territory 4a. Stephanie's Connecticut accounts stay
   with Halena.
+- Carolina Prieto keeps only Idaho and North Dakota state (Scott Mark, including
+  the ND enterprise agreement). Andy O'Brien holds Kentucky state.
 
 The `Current assignment` view is historical and still shows Savannah, Kristen and Ashley's
 current books.

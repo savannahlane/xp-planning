@@ -10,8 +10,9 @@ that landed on main and changes only the proposed assignment (`newxp`):
 * Enterprise XPs carry no Local SMG accounts. Each Local SMG AE group moves as
   a whole group to a dedicated Local SMG XP, which removes XP↔AE edges rather
   than creating them.
-* Carolina Prieto is labelled Team Lead, not Manager. She keeps the Kentucky
-  and North Dakota enterprise agreements (two customers).
+* Carolina Prieto is labelled Team Lead, not Manager. She keeps only the Idaho
+  and North Dakota state book (Scott Mark, including the ND enterprise agreement).
+  Kentucky state, including the COT enterprise agreement, sits with Andy O'Brien.
 
 Per-account moves live in account_overrides.csv, which is the file to edit when
 an XP changes. It also carries segment changes and removals.
@@ -77,12 +78,19 @@ LOCAL_SMG_DESTINATION = {
     "Michelle Cooper seat (open)": "Kerrian Dailey",
 }
 
-# Kentucky COT and North Dakota ITD are the billed parents of statewide
-# enterprise agreements. Sister agency rows travel with them and do not
-# consume a countable slot.
-EA_PARENTS = {
-    "Kentucky Commonwealth Office of Technology",
-    "North Dakota Information Technology Department",
+# North Dakota ITD is the billed parent of a statewide enterprise agreement.
+# Sister agency rows travel with it and do not consume a countable slot.
+# Kentucky COT is the same pattern, but that estate sits with Andy O'Brien.
+ND_PARENT = "North Dakota Information Technology Department"
+KY_PARENT = "Kentucky Commonwealth Office of Technology"
+KY_STATE_XP = "Andy O'Brien"
+# Countable Kentucky state accounts. Everything else on the Kentucky estate is
+# an allocated child of COT, including the Tourism cabinet private-sector row.
+KY_COUNTABLE = {
+    KY_PARENT,
+    "Kentucky Cabinet for Health & Family Services (CHFS)",
+    "Kentucky Office of Homeland Security",
+    "Kentucky Transportation Cabinet",
 }
 
 ENTERPRISE_SEGMENTS = {"State", "Local ENT"}
@@ -162,10 +170,9 @@ def proposed_edges(rows: list[dict]) -> set[tuple[str, str]]:
 def apply_assignments(page: dict, overrides: dict[str, dict]) -> dict:
     rows = page["rows"]
     before_edges = proposed_edges(rows)
-    carolina_countable = EA_PARENTS | {
-        account
-        for account, override in overrides.items()
-        if override["xp"] == "Carolina Prieto"
+    carolina_countable = {
+        ND_PARENT,
+        "Idaho Labor Department",
     }
 
     # The open Pacific XP is an Ashley report. That preserves the coherent,
@@ -202,14 +209,21 @@ def apply_assignments(page: dict, overrides: dict[str, dict]) -> dict:
         if row["state"] in {"NY", "NJ"} and row["segment"] == "State":
             row["newxp"] = NY_NJ_STATE_XP
 
-        # Kentucky and North Dakota are statewide enterprise agreements, so the
-        # sister agencies travel with the billed parent instead of consuming a
-        # countable slot of their own.
-        if row["state"] in {"KY", "ND"} and (
+        # North Dakota is a statewide enterprise agreement: sister agencies
+        # travel with the billed parent and do not consume a countable slot.
+        if row["state"] == "ND" and (
             old == "Carolina Prieto" or row["newxp"] == "Carolina Prieto"
         ):
             row["newxp"] = "Carolina Prieto"
             if row["acct"] not in carolina_countable:
+                row["alloc"] = True
+
+        # Kentucky state (and the Tourism cabinet row) sits with Andy. COT is
+        # the billed parent; CHFS, Homeland Security and Transportation stay
+        # countable because they were already billed separately.
+        if row["state"] == "KY" and row["segment"] != "Local ENT":
+            row["newxp"] = KY_STATE_XP
+            if row["acct"] not in KY_COUNTABLE:
                 row["alloc"] = True
 
         if row["newxp"] != old:
@@ -365,6 +379,29 @@ def apply_assignments(page: dict, overrides: dict[str, dict]) -> dict:
             "NY/NJ state agencies not with Taylor: " + ", ".join(ny_nj_stray)
         )
 
+    ky_stray = [
+        f"{r['acct']} → {r['newxp']}"
+        for r in rows
+        if r["state"] == "KY"
+        and r["segment"] != "Local ENT"
+        and r["newxp"] != KY_STATE_XP
+    ]
+    if ky_stray:
+        raise RuntimeError(
+            "Kentucky state accounts not with Andy: " + ", ".join(ky_stray)
+        )
+
+    carolina_not_id_nd = [
+        r["acct"]
+        for r in carolina
+        if r["state"] not in {"ID", "ND"}
+    ]
+    if carolina_not_id_nd:
+        raise RuntimeError(
+            "Carolina Prieto still holding accounts outside Idaho and North Dakota: "
+            + ", ".join(carolina_not_id_nd)
+        )
+
     halena_luke = [
         r["acct"]
         for r in rows
@@ -495,16 +532,21 @@ def update_markup(source: str) -> str:
             "Connecticut accounts stay with Halena.</li>",
         )
 
-    if "enterprise agreements (two customers" not in source:
+    if (
+        "Carolina Prieto keeps only the Idaho" not in source
+        and "enterprise agreements (two customers" not in source
+    ):
         source = source.replace(
             "Halena retains the broader Connecticut estate.</li>",
             "Halena retains the broader Connecticut estate.</li>\n"
-            "      <li>Carolina Prieto keeps the Kentucky and North Dakota statewide "
-            "enterprise agreements (two customers; sister agencies are allocated "
-            "children), plus CHFS, Homeland Security and Transportation for Kentucky "
-            "consolidation. She releases scattered local accounts to XPs who already "
-            "work with those AEs. Glendale AZ is the exception: Conrad Taylor has no "
-            "other book, so it goes to Colleen with her other Pacific SAM work.</li>\n"
+            "      <li>Carolina Prieto keeps only the Idaho and North Dakota state "
+            "book (Scott Mark, including the North Dakota enterprise agreement). "
+            "Andy O'Brien holds Kentucky state, including the COT enterprise "
+            "agreement plus CHFS, Homeland Security and Transportation; sister "
+            "agencies are allocated children. She releases scattered local accounts "
+            "to XPs who already work with those AEs. Glendale AZ is the exception: "
+            "Conrad Taylor has no other book, so it goes to Colleen with her other "
+            "Pacific SAM work.</li>\n"
             "      <li>Local SMG includes special districts except SAM territories. "
             "GLAVCD stays Enterprise with Colleen. Luke Mulvaney's three districts "
             "sit with Carlos Torres so Halena is not paired with that vertical.</li>",
@@ -528,11 +570,21 @@ def update_markup(source: str) -> str:
         "view remains historical.",
     )
     source = source.replace(
-        "enterprise agreements (two customers; sister agencies are allocated "
-        "children) and releases the scattered local accounts",
+        "Carolina Prieto keeps the Kentucky and North Dakota statewide "
         "enterprise agreements (two customers; sister agencies are allocated "
         "children), plus CHFS, Homeland Security and Transportation for Kentucky "
         "consolidation. She releases scattered local accounts",
+        "Carolina Prieto keeps only the Idaho and North Dakota state book "
+        "(Scott Mark, including the North Dakota enterprise agreement). Andy "
+        "O'Brien holds Kentucky state, including the COT enterprise agreement "
+        "plus CHFS, Homeland Security and Transportation; sister agencies are "
+        "allocated children. She releases scattered local accounts",
+    )
+    source = source.replace(
+        "enterprise agreements (two customers; sister agencies are allocated "
+        "children) and releases the scattered local accounts",
+        "Carolina Prieto keeps only the Idaho and North Dakota state book. She "
+        "releases scattered local accounts",
     )
     source = source.replace(
         "Luke Mulvaney's three districts sit with one SMG XP so Halena is not "
