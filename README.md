@@ -78,6 +78,8 @@ The proposed view in `index.html` applies these staffing rules:
 - Taylor Roman holds Benjamin Shor, Stephanie DelSignore's New York and New Jersey
   accounts, Sarah Duncan, Spencer Ferrell, and Territory 4a. Stephanie's
   Connecticut accounts stay with Halena.
+- Halena Martin holds Kent Hartsfield's whole group: T11b OH/IN/IL plus the
+  Chicago and Columbus SAM accounts.
 - Carolina Prieto keeps only Idaho and North Dakota state (Scott Mark, including
   the ND enterprise agreement). Andy O'Brien holds Kentucky state.
 
@@ -160,7 +162,7 @@ hypothesis document.
 - Complex accounts (more than 7 capabilities, or Service Cloud Advanced) no more than one third of a book
 - XP time zone plus or minus one hour
 - Holds: San Antonio with Steffany, DC with Paige, Denver with a Savannah report, LA and GLACVCD with Colleen, WA with Paige, CT and ME with Halena
-- Released holds: Columbus, which moved to Halena with the rest of Kent Hartsfield's Chicago and Columbus SAM block, so it no longer sits with an Ashley report. Named in `ASHLEY_HOLD_RELEASED` in `tiering/update_whole_team_map.py`
+- Released holds: Columbus, which moved to Halena with Kent Hartsfield's whole group, so it no longer sits with an Ashley report. Named in `ASHLEY_HOLD_RELEASED` in `tiering/update_whole_team_map.py`
 - Local SMG includes special districts except SAM territories
 - Florida Enterprise exception: Health Care District of Palm Beach County stays with
   Carolina Cambronero rather than moving to midmarket

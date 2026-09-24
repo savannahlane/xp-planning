@@ -164,16 +164,15 @@ AE_OWNER = {
     # rest of the NY/NJ local-and-state book rather than remaining a Midwest
     # attachment.
     "Territory 4a (open)": "Taylor Roman",
+    # Kent's T11b OH/IN/IL territory and the temporary Chicago/Columbus SAM
+    # accounts sit together with Halena rather than splitting the AE group.
+    "Kent Hartsfield": "Halena Martin",
 }
 
-# Kent Hartsfield carries his own T11b OH/IN/IL territory plus the Chicago and
-# Columbus SAM accounts on a temporary basis. Those two blocks now split: the
-# SAM accounts go to Halena in account_overrides.csv and T11b stays with Marcy,
-# which is why this AE group is not in AE_OWNER above.
-#
-# Columbus is one of them and is a current Ashley Hill account, so the rule that
-# her Enterprise book routes only to her reports has to give way. Named here so
-# the released hold is a deliberate, visible exception rather than silent drift.
+# Columbus is a current Ashley Hill account, so the rule that her Enterprise
+# book routes only to her reports has to give way for Kent's whole group.
+# Named here so the released hold is a deliberate, visible exception rather
+# than silent drift.
 ASHLEY_HOLD_RELEASED = {"Columbus OH"}
 
 # New York and New Jersey state agencies sit with Taylor, including the
