@@ -67,13 +67,17 @@ The proposed view in `index.html` applies these staffing rules:
   Enterprise with Carolina Cambronero.
 - Enterprise and Local SMG are separate books. No Enterprise XP carries a Local SMG
   account.
+- Nine dedicated Local SMG XPs cover the midmarket book. Tatiana Montero holds
+  Southern California, Eduardo Ruiz holds North/Central California, Luis Aguilar
+  holds Texas, and Ricardo Castro holds the Southeast and Mid-Atlantic. The build
+  reports account count, ARR, tier mix and complex-account count for every SMG XP.
 - Carolina Cambronero holds the Florida Enterprise book (Demi Washington, Desmond Davis,
   Bill Marshall) plus Health Care District of Palm Beach County, on top of her
-  existing Louisiana book. Cedric Simpkins's Texas SAM group consolidates with
-  Steffany Amador, who already held San Antonio and VIA.
+  existing Louisiana book. Cedric Simpkins's Texas SAM group
+  consolidates with Steffany Amador, who already held San Antonio and VIA.
 - Taylor Roman holds Benjamin Shor, Stephanie DelSignore's New York and New Jersey
-  accounts, Sarah Duncan, Spencer Ferrell, and Territory 4a. Stephanie's Connecticut
-  accounts stay with Halena.
+  accounts, Sarah Duncan, Spencer Ferrell, and Territory 4a. Stephanie's
+  Connecticut accounts stay with Halena.
 - Carolina Prieto keeps only Idaho and North Dakota state (Scott Mark, including
   the ND enterprise agreement). Andy O'Brien holds Kentucky state.
 
@@ -149,6 +153,9 @@ hypothesis document.
 
 - Enterprise books: up to 17 countable accounts, 20 absolute maximum
 - Local SMG books: up to 30 countable accounts
+- Local SMG balance is reviewed by tier mix, ARR and complex-account count in
+  addition to the account cap; geographic books are not artificially mixed just
+  to make tier counts equal
 - Enterprise XPs carry no Local SMG accounts
 - Complex accounts (more than 7 capabilities, or Service Cloud Advanced) no more than one third of a book
 - XP time zone plus or minus one hour
