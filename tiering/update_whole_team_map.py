@@ -102,9 +102,13 @@ AE_OWNER = {
     "Stephanie DelSignore": "Halena Martin",
     "Demi Washington": "Taylor Roman",
     "Desmond Davis": "Taylor Roman",
-    "Sarah Duncan": "Carolina Cambronero",
+    "Sarah Duncan": "Halena Martin",
     "Spencer Ferrell": "Carolina Cambronero",
 }
+
+# New York and New Jersey state agencies sit with Taylor, including the
+# DelSignore rows that would otherwise follow the AE_OWNER rule above.
+NY_NJ_STATE_XP = "Taylor Roman"
 
 
 def load_overrides(path: Path) -> dict[str, dict]:
@@ -173,6 +177,9 @@ def apply_assignments(page: dict, overrides: dict[str, dict]) -> dict:
 
         if row["person"] in AE_OWNER:
             row["newxp"] = AE_OWNER[row["person"]]
+
+        if row["state"] in {"NY", "NJ"} and row["segment"] == "State":
+            row["newxp"] = NY_NJ_STATE_XP
 
         # Kentucky and North Dakota are statewide enterprise agreements, so the
         # sister agencies travel with the billed parent instead of consuming a
@@ -313,9 +320,27 @@ def apply_assignments(page: dict, overrides: dict[str, dict]) -> dict:
         raise RuntimeError(f"Carolina is missing consolidated accounts: {sorted(missing)}")
 
     for ae, xp in AE_OWNER.items():
-        stray = [r["acct"] for r in rows if r["person"] == ae and r["newxp"] != xp]
+        stray = [
+            r["acct"]
+            for r in rows
+            if r["person"] == ae
+            and r["newxp"] != xp
+            and not (r["state"] in {"NY", "NJ"} and r["segment"] == "State")
+        ]
         if stray:
             raise RuntimeError(f"{ae} accounts not with {xp}: " + ", ".join(stray))
+
+    ny_nj_stray = [
+        f"{r['acct']} → {r['newxp']}"
+        for r in rows
+        if r["state"] in {"NY", "NJ"}
+        and r["segment"] == "State"
+        and r["newxp"] != NY_NJ_STATE_XP
+    ]
+    if ny_nj_stray:
+        raise RuntimeError(
+            "NY/NJ state agencies not with Taylor: " + ", ".join(ny_nj_stray)
+        )
 
     halena_luke = [
         r["acct"]
