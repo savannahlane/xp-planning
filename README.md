@@ -69,11 +69,11 @@ The proposed view in `index.html` applies these staffing rules:
   account.
 - Carolina Cambronero holds the Florida Enterprise book (Demi Washington, Desmond Davis,
   Bill Marshall) plus Health Care District of Palm Beach County, on top of her
-  existing Louisiana and Spencer Ferrell book. Cedric Simpkins's Texas SAM group
-  consolidates with Steffany Amador, who already held San Antonio and VIA.
+  existing Louisiana book. Cedric Simpkins's Texas SAM group consolidates with
+  Steffany Amador, who already held San Antonio and VIA.
 - Taylor Roman holds Benjamin Shor, Stephanie DelSignore's New York and New Jersey
-  accounts, Sarah Duncan, and Territory 4a. Stephanie's Connecticut accounts stay
-  with Halena.
+  accounts, Sarah Duncan, Spencer Ferrell, and Territory 4a. Stephanie's Connecticut
+  accounts stay with Halena.
 - Carolina Prieto keeps only Idaho and North Dakota state (Scott Mark, including
   the ND enterprise agreement). Andy O'Brien holds Kentucky state.
 
