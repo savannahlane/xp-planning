@@ -7,9 +7,8 @@ that landed on main and changes only the proposed assignment (`newxp`):
 * Jake Sager, Nathan Williamson, Savannah Lane, Kristen Murphy and Ashley Hill
   hold no proposed accounts.
 * Ashley's seven current Enterprise accounts land with direct reports.
-* Enterprise XPs carry no Local SMG accounts. Each Local SMG AE group moves as
-  a whole group to a dedicated Local SMG XP, which removes XP↔AE edges rather
-  than creating them.
+* Enterprise XPs carry no Local SMG accounts. Nine dedicated Local SMG XPs
+  cover whole AE groups except the forced California and transportation splits.
 * Carolina Prieto is labelled Team Lead, not Manager. She keeps only the Idaho
   and North Dakota state book (Scott Mark, including the ND enterprise agreement).
   Kentucky state, including the COT enterprise agreement, sits with Andy O'Brien.
@@ -50,32 +49,78 @@ ASHLEY_REPORTS = {
     "Alejandro Solano",
 }
 
-# Enterprise XPs hold no Local SMG accounts. Every Local SMG AE group that sits
-# with an Enterprise XP moves here as a whole group, so the AE keeps talking to
-# one XP rather than several. Destinations are dedicated Local SMG XPs, chosen
-# to reuse an existing XP↔AE relationship wherever one exists and to keep the
-# resulting books within a few accounts of each other.
+# Canonical Local SMG books. Whole AE groups stay together wherever possible:
+# 16 of the 19 seats work with exactly one XP. California has 47 accounts and
+# must split at the 30-account cap, so its placeholder seat is divided
+# North/Central (Eduardo) and Southern (Tatiana). Luke Mulvaney's national
+# transportation vertical is the other split: its TX account follows Luis,
+# while NJ and OR stay with Carlos.
 LOCAL_SMG_DESTINATION = {
     "Local SMG FL (Ter 4)": "Natalia Sanchez",
-    "Local SMG CA (Ter 8)": "Eduardo Ruiz",
-    "Local SMG Ter 6 (TX/OK/AR)": "Kerrian Dailey",
-    "Caleb Fort Jr": "Kerrian Dailey",
-    "Corey Andrade": "Natalia Sanchez",
+    "Local SMG Ter 6 (TX/OK/AR)": "Luis Aguilar",
+    "Caleb Fort Jr": "Ricardo Rodriguez",
+    "Corey Andrade": "Carlos Torres",
     "Emery Herrschel": "Kerrian Dailey",
-    "Jared Cummings": "Andrés Pérez",
-    "Jeffrey Johnson": "Andrés Pérez",
+    "Jared Cummings": "Kerrian Dailey",
+    "Jeffrey Johnson": "David Treminio",
     "Kimberley Steelmann": "Andrés Pérez",
     "Amanda Brooks": "David Treminio",
-    "Andrew Collinsworth": "Eduardo Ruiz",
+    "Andrew Collinsworth": "Ricardo Rodriguez",
     "Tommy Monaghan": "Carlos Torres",
-    "Luke Mulvaney": "Carlos Torres",
-    # These three AE groups have no dedicated Local SMG XP on them today, so
-    # each group lands whole with the XP whose territory is closest.
-    "Brittany Greer": "David Treminio",
-    "John Meah": "Carlos Torres",
-    "Not on maps provided": "Kerrian Dailey",
-    "Prachi Patel": "Natalia Sanchez",
-    "Michelle Cooper seat (open)": "Kerrian Dailey",
+    "Brittany Greer": "Kerrian Dailey",
+    "John Meah": "Ricardo Rodriguez",
+    "Not on maps provided": "Andrés Pérez",
+    "Prachi Patel": "Carlos Torres",
+    "Michelle Cooper seat (open)": "Luis Aguilar",
+}
+
+LOCAL_SMG_XPS = {
+    "Andrés Pérez",
+    "Carlos Torres",
+    "David Treminio",
+    "Eduardo Ruiz",
+    "Kerrian Dailey",
+    "Luis Aguilar",
+    "Natalia Sanchez",
+    "Ricardo Rodriguez",
+    "Tatiana Salazar",
+}
+
+# Provisional geographic cut of the four-seat California placeholder. The
+# source payload does not identify its LA, Bay Area, San Diego and North/Central
+# sub-seats, so this uses account geography and is intentionally explicit for
+# review. Everything not named here goes to Eduardo's North/Central book.
+SOUTHERN_CA_LOCAL_SMG = {
+    "Bell, CA",
+    "Brawley CA",
+    "Burbank CA",
+    "Chino Valley Independent Fire District",
+    "Coachella, CA",
+    "Culver City, CA",
+    "Eastvale CA",
+    "El Monte, CA",
+    "Encinitas, CA",
+    "Fullerton, CA",
+    "Hesperia, CA",
+    "Imperial Irrigation District",
+    "La Puente, CA",
+    "Laguna Beach, CA",
+    "Manhattan Beach, CA",
+    "Metropolitan Water District of Southern California",
+    "Newport Beach, CA",
+    "Ontario International Airport",
+    "Orange, CA",
+    "Palm Springs, CA",
+    "Pasadena, CA",
+    "Perris, CA",
+    "Rancho Santa Margarita, CA",
+    "San Diego State University",
+    "Santa Margarita Water District",
+    "South Coast Water District",
+    "Tustin, CA",
+    "Victorville, CA",
+    "Vista, CA",
+    "Westminster, CA",
 }
 
 # North Dakota ITD is the billed parent of a statewide enterprise agreement.
@@ -99,10 +144,6 @@ ENTERPRISE_SEGMENTS = {"State", "Local ENT"}
 ENTERPRISE_TARGET = 17
 ENTERPRISE_MAX = 20
 LOCAL_SMG_MAX = 30
-
-# There are more countable Local SMG accounts than 6 x 30. Named here so the
-# overage is a deliberate, visible exception rather than a silent drift.
-LOCAL_SMG_OVER_CAP_ALLOWED = {"Eduardo Ruiz", "Kerrian Dailey", "Natalia Sanchez"}
 
 # Whole AE groups that always sit with one XP, regardless of who held them.
 AE_OWNER = {
@@ -171,6 +212,24 @@ def proposed_edges(rows: list[dict]) -> set[tuple[str, str]]:
     return {(r["newxp"], r["person"]) for r in rows if r.get("newxp")}
 
 
+def local_smg_destination(row: dict) -> str:
+    """Return the canonical XP for one Local SMG account."""
+    if row["person"] in {"Local SMG CA (Ter 8)", "Jaxson McBride"}:
+        return (
+            "Tatiana Salazar"
+            if row["acct"] in SOUTHERN_CA_LOCAL_SMG
+            else "Eduardo Ruiz"
+        )
+    if row["person"] == "Luke Mulvaney":
+        return "Luis Aguilar" if row["state"] == "TX" else "Carlos Torres"
+    try:
+        return LOCAL_SMG_DESTINATION[row["person"]]
+    except KeyError as exc:
+        raise RuntimeError(
+            f"No Local SMG destination for AE group {row['person']!r}"
+        ) from exc
+
+
 def apply_assignments(page: dict, overrides: dict[str, dict]) -> dict:
     rows = page["rows"]
     before_edges = proposed_edges(rows)
@@ -185,6 +244,10 @@ def apply_assignments(page: dict, overrides: dict[str, dict]) -> dict:
     page["meta"]["Carolina Prieto"] = ["—", "—", "Team Lead", "Not specified"]
     page["meta"].pop("Carolina Torres", None)
     page["order"] = [xp for xp in page["order"] if xp != "Carolina Torres"]
+    for xp in ("Tatiana Salazar", "Luis Aguilar", "Ricardo Rodriguez"):
+        page["meta"].setdefault(xp, ["—", "n/a", "—", "—"])
+        if xp not in page["order"]:
+            page["order"].append(xp)
 
     moved = []
     matched = set()
@@ -246,25 +309,19 @@ def apply_assignments(page: dict, overrides: dict[str, dict]) -> dict:
     page["rows"] = rows
 
     # Enterprise and Local SMG are separate books. Once every other rule has
-    # run, hand each Local SMG account held by an Enterprise XP to a dedicated
-    # Local SMG XP. NO_BOOK is folded in so a departing hybrid book lands here
-    # too rather than needing its own path.
+    # run, apply the canonical nine-XP Local SMG cut. This is unconditional so
+    # reruns converge after older per-account balancing overrides and after the
+    # source PAGE has already been rewritten once.
     enterprise_xps = {r["newxp"] for r in rows if r.get("ent") and not r["alloc"]}
     offloaded = []
     for row in rows:
         if row["segment"] != "Local SMG":
             continue
-        if row["newxp"] not in enterprise_xps | NO_BOOK:
-            continue
-        try:
-            destination = LOCAL_SMG_DESTINATION[row["person"]]
-        except KeyError as exc:
-            raise RuntimeError(
-                f"No Local SMG destination for AE group {row['person']!r}"
-            ) from exc
-        offloaded.append((row["acct"], row["newxp"], destination))
-        moved.append((row["acct"], row["newxp"], destination, row["person"]))
-        row["newxp"] = destination
+        destination = local_smg_destination(row)
+        if row["newxp"] != destination:
+            offloaded.append((row["acct"], row["newxp"], destination))
+            moved.append((row["acct"], row["newxp"], destination, row["person"]))
+            row["newxp"] = destination
 
     hybrid = sorted(
         {
@@ -295,15 +352,50 @@ def apply_assignments(page: dict, overrides: dict[str, dict]) -> dict:
             + ", ".join(f"{xp} {n}" for xp, n in sorted(over_enterprise.items()))
         )
 
-    over_smg = {
-        xp: n
-        for xp, n in smg_load.items()
-        if n > LOCAL_SMG_MAX and xp not in LOCAL_SMG_OVER_CAP_ALLOWED
-    }
+    over_smg = {xp: n for xp, n in smg_load.items() if n > LOCAL_SMG_MAX}
     if over_smg:
         raise RuntimeError(
             f"Local SMG books above the {LOCAL_SMG_MAX}-account cap: "
             + ", ".join(f"{xp} {n}" for xp, n in sorted(over_smg.items()))
+        )
+
+    missing_smg_xps = sorted(LOCAL_SMG_XPS - set(smg_load))
+    if missing_smg_xps:
+        raise RuntimeError(
+            "Local SMG XPs with no proposed accounts: " + ", ".join(missing_smg_xps)
+        )
+
+    foreign_smg_xps = sorted(set(smg_load) - LOCAL_SMG_XPS)
+    if foreign_smg_xps:
+        raise RuntimeError(
+            "Local SMG accounts assigned outside the nine-XP roster: "
+            + ", ".join(foreign_smg_xps)
+        )
+
+    wrong_smg_owner = [
+        f"{r['acct']} → {r['newxp']}"
+        for r in rows
+        if r["segment"] == "Local SMG"
+        and r["newxp"] != local_smg_destination(r)
+    ]
+    if wrong_smg_owner:
+        raise RuntimeError(
+            "Local SMG accounts outside the canonical cut: "
+            + ", ".join(wrong_smg_owner)
+        )
+
+    ca_accounts = {
+        r["acct"]
+        for r in rows
+        if r["segment"] == "Local SMG"
+        and r["state"] == "CA"
+        and not r["alloc"]
+    }
+    missing_southern_ca = sorted(SOUTHERN_CA_LOCAL_SMG - ca_accounts)
+    if missing_southern_ca:
+        raise RuntimeError(
+            "Southern California cut names accounts not in the CA Local SMG book: "
+            + ", ".join(missing_southern_ca)
         )
 
     over_target = {
@@ -611,6 +703,22 @@ def update_markup(source: str) -> str:
         "book. Luke Mulvaney's three districts",
     )
     source = source.replace(
+        "each Local SMG AE group moves whole to a dedicated Local SMG XP, so the "
+        "AE works with one XP instead of several.",
+        "nine dedicated Local SMG XPs cover whole AE groups wherever the 30-account "
+        "cap permits. Tatiana Salazar holds Southern California, Eduardo Ruiz holds "
+        "North/Central California, Luis Aguilar holds Texas, and Ricardo Rodriguez "
+        "holds the Southeast and Mid-Atlantic. California's 47 accounts force its "
+        "placeholder AE seat to split; Luke Mulvaney's Texas account follows Luis "
+        "while his New Jersey and Oregon accounts stay with Carlos Torres.",
+    )
+    source = source.replace(
+        "Luke Mulvaney's three districts sit with Carlos Torres so Halena is not "
+        "paired with that vertical.",
+        "Luke Mulvaney's Texas district sits with Luis Aguilar; his New Jersey and "
+        "Oregon districts stay with Carlos Torres.",
+    )
+    source = source.replace(
         "County. Taylor Roman holds Benjamin Shor",
         "County. Cedric Simpkins's Texas SAM group consolidates with Steffany "
         "Amador, who already held San Antonio and VIA. Taylor Roman holds Benjamin "
@@ -649,7 +757,7 @@ def main() -> None:
         counts: dict[tuple[str, str], int] = defaultdict(int)
         for _, source_xp, destination in result["offloaded"]:
             counts[(source_xp, destination)] += 1
-        print(f"Local SMG offloaded from Enterprise XPs: {len(result['offloaded'])}")
+        print(f"Local SMG reassigned to canonical books: {len(result['offloaded'])}")
         for (source_xp, destination), n in sorted(counts.items()):
             print(f"  {source_xp} → {destination}: {n}")
     print(
@@ -673,9 +781,8 @@ def main() -> None:
         f"Local SMG books (cap {LOCAL_SMG_MAX}): "
         f"max {max(result['smg_load'].values())}"
     )
-    for xp in sorted(LOCAL_SMG_OVER_CAP_ALLOWED):
-        if result["smg_load"].get(xp, 0) > LOCAL_SMG_MAX:
-            print(f"  allowed overage: {xp} {result['smg_load'][xp]}")
+    for xp, n in sorted(result["smg_load"].items()):
+        print(f"  {xp}: {n}")
     print("Carolina countable consolidated accounts:")
     for row in result["carolina_countable"]:
         print(f"  {row['acct']} ${row['arr']:.0f}")
