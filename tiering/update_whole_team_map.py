@@ -157,8 +157,8 @@ AE_OWNER = {
     # AL/GA state book, rather than splitting the two Georgia AEs across XPs.
     "Spencer Ferrell": "Taylor Roman",
     # Steffany already holds San Antonio and VIA from this Texas SAM group.
-    # Consolidating the remaining four accounts with her leaves Steffany and
-    # Carolina Cambronero at the 20-account maximum and removes one AE split.
+    # Consolidating the remaining four accounts with her removes one AE split
+    # and leaves Steffany at the 20-account maximum.
     "Cedric Simpkins": "Steffany Amador",
     # After the Marcy swap on main, Territory 4a continues to Taylor with the
     # rest of the NY/NJ local-and-state book rather than remaining a Midwest
@@ -666,8 +666,8 @@ def update_markup(source: str) -> str:
             "      <li>Carolina Cambronero holds the Florida Enterprise book (Desmond Davis, "
             "Bill Marshall, Demi Washington) plus Health Care District of Palm Beach "
             "County. Taylor Roman holds Benjamin Shor, Stephanie DelSignore's New York "
-            "and New Jersey accounts, Sarah Duncan, and Territory 4a; Stephanie's "
-            "Connecticut accounts stay with Halena.</li>",
+            "and New Jersey accounts, Sarah Duncan, Spencer Ferrell, and Territory 4a; "
+            "Stephanie's Connecticut accounts stay with Halena.</li>",
         )
 
     if (
