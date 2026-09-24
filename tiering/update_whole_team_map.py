@@ -100,13 +100,12 @@ LOCAL_SMG_OVER_CAP_ALLOWED = {"Eduardo Ruiz", "Kerrian Dailey", "Natalia Sanchez
 AE_OWNER = {
     "Scott Mark": "Carolina Prieto",
     "Stephanie DelSignore": "Halena Martin",
-    "Demi Washington": "Taylor Roman",
-    "Desmond Davis": "Taylor Roman",
-    "Sarah Duncan": "Halena Martin",
+    "Demi Washington": "Carolina Torres",
+    "Desmond Davis": "Carolina Torres",
+    "Bill Marshall": "Carolina Torres",
+    "Sarah Duncan": "Taylor Roman",
     "Spencer Ferrell": "Carolina Cambronero",
-    # Marcy holds two of the three Territory 4a accounts today, so the open seat
-    # moves to her whole rather than splitting an already-open territory.
-    "Territory 4a (open)": "Marcy Castro",
+    "Territory 4a (open)": "Taylor Roman",
 }
 
 # Kent Hartsfield carries his own T11b OH/IN/IL territory plus the Chicago and
@@ -170,6 +169,12 @@ def apply_assignments(page: dict, overrides: dict[str, dict]) -> dict:
     # single-XP California State AE groups while satisfying the reporting rule.
     page["meta"]["Open XP2 (PT)"][0] = "Ashley Hill"
     page["meta"]["Carolina Prieto"] = ["—", "—", "Team Lead", "Not specified"]
+    # Carolina Torres is the Florida Enterprise book. Manager and level are not
+    # in the Lookups sheet yet, so they stay unspecified rather than copied from
+    # Taylor, who is the other Savannah-report XP in Florida.
+    page["meta"]["Carolina Torres"] = ["Savannah Lane", "ET", "—", "Florida"]
+    if "Carolina Torres" not in page["order"]:
+        page["order"].insert(page["order"].index("Taylor Roman") + 1, "Carolina Torres")
 
     moved = []
     matched = set()
@@ -375,6 +380,17 @@ def apply_assignments(page: dict, overrides: dict[str, dict]) -> dict:
     if glavcd["newxp"] != "Colleen Moran" or not glavcd.get("ent"):
         raise RuntimeError("GLAVCD must stay Enterprise with Colleen")
 
+    palm_beach = next(
+        r
+        for r in rows
+        if r["acct"] == "Health Care District of Palm Beach County - FL"
+    )
+    if palm_beach["newxp"] != "Carolina Torres" or not palm_beach.get("ent"):
+        raise RuntimeError(
+            "Health Care District of Palm Beach County must stay Enterprise "
+            "with Carolina Torres"
+        )
+
     after_edges = proposed_edges(rows)
     return {
         "moved": moved,
@@ -465,6 +481,17 @@ def update_markup(source: str) -> str:
             "</li>",
         )
 
+    if "Carolina Torres holds the Florida Enterprise book" not in source:
+        source = source.replace(
+            "Halena retains the broader Connecticut estate.</li>",
+            "Halena retains the broader Connecticut estate.</li>\n"
+            "      <li>Carolina Torres holds the Florida Enterprise book (Desmond Davis, "
+            "Bill Marshall, Demi Washington) plus Health Care District of Palm Beach "
+            "County. Taylor Roman holds Benjamin Shor, Stephanie DelSignore's New York "
+            "and New Jersey accounts, Sarah Duncan, and Territory 4a; Stephanie's "
+            "Connecticut accounts stay with Halena.</li>",
+        )
+
     if "enterprise agreements (two customers" not in source:
         source = source.replace(
             "Halena retains the broader Connecticut estate.</li>",
@@ -509,6 +536,12 @@ def update_markup(source: str) -> str:
         "paired with that vertical.",
         "Luke Mulvaney's three districts sit with Carlos Torres so Halena is not "
         "paired with that vertical.",
+    )
+    source = source.replace(
+        "GLAVCD stays Enterprise with Colleen. Luke Mulvaney's three districts",
+        "GLAVCD stays Enterprise with Colleen. Health Care District of Palm Beach "
+        "County stays Enterprise with Carolina Torres and the rest of the Florida "
+        "book. Luke Mulvaney's three districts",
     )
 
     # The coverage section is gone, so tables() must no longer write into #gaps.
