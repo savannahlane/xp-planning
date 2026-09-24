@@ -1,0 +1,84 @@
+# The states each AE covers. Edit this file, then run:
+#   python3 tiering/update_ae_territories.py
+#
+# ae      Must match the AE, SAM or seat name in index.html exactly. Every AE on
+#         the map must have a row here; the script fails if one is missing.
+# states  The assigned territory, as USPS codes separated by commas. Leave blank
+#         when the AE has no state territory (federal and vertical seats) or when
+#         the source maps do not list one. The note then says which.
+# note    Free text shown next to the territory on the page, so keep it to what
+#         the territory label already on the page does not say: mainly why
+#         states is blank. Not parsed.
+#
+# This is the assigned territory, which is not the same thing as the states the
+# AE holds accounts in. index.html derives that second list from the accounts
+# themselves and shows both, so a state listed here with no accounts reads as
+# open territory rather than as a mistake.
+#
+# Sources: State territory map 6/12/26, Local ENT and Local SMG maps 6/30/26,
+# vertical maps 7/2/26.
+ae,states,note
+Allison Hamilton,,"Federal seat, national"
+Amanda Brooks,"OR, WA",
+Andrew Collinsworth,"AL, NC, SC, WV",
+Andrew Murray,CA,
+Andrew Wyzkoski,,Local ENT T2; the Local ENT map does not list its states
+Austin Goodman,,Local ENT T17; the Local ENT map does not list its states
+Benjamin Shor,"MD, NY, VA",
+Bettsy Desjarlais,"IN, OH, PA",
+Bill Anderson,"CA, TX, WA",
+Bill Marshall,FL,
+Bill Pintsak,"IL, MO",
+Brenna Casey,,"Federal seat, national"
+Brittany Greer,"IA, IN, MI, WI",
+Caleb Fort Jr,"GA, KY, LA, MS",
+Cameron Chadsey,"AZ, NM, NV",
+Carmel Hinkle,,"Federal seat, national"
+Carrie Breedlove,"AK, HI, OR, WA",
+Carter Bradford,,Local ENT T15; the Local ENT map does not list its states
+Cedric Simpkins,TX,
+Che Bustos,"CO, UT",
+Chris Thiers,,Community Services vertical (West and TX); not a state territory
+Conrad Taylor,,Local ENT SAM 7b; the Local ENT map does not list its states
+Corey Andrade,"CT, MA, ME, NH, NY, RI, VT",
+David Cliff,,Local ENT T9; the Local ENT map does not list its states
+Davis Keeter,TX,
+Demi Washington,"FL, LA",
+Desmond Davis,FL,
+Emery Herrschel,"CO, ID, MO, NE, WY",
+Emily Boldt,,"Federal seat, national"
+Gil Roy,"AR, LA, TX",
+Grant Samson,"MD, NC, SC, VA, WV",State Tier 2; holds no accounts in this book
+Jared Cummings,"KS, MN, ND, SD",
+Jaxson McBride,,Utilities and Water vertical (West); not a state territory
+Jeff Gaisford,,Local ENT SAM 16; the Local ENT map does not list its states
+Jeffrey Johnson,"AK, AZ, HI, NM, NV, UT",
+Joe Chang,,"Federal seat, national"
+Joe Spair,"MN, WI",
+Joel Parris,,Local ENT T3; the Local ENT map does not list its states
+John Meah,"MD, TN, VA",
+Josh Gondwe,,Local ENT T16; the Local ENT map does not list its states
+Kent Hartsfield,"IL, IN, OH",
+Kimberley Steelmann,IL,
+Local SMG CA (Ter 8),CA,
+Local SMG FL (Ter 4),FL,
+Local SMG Ter 6 (TX/OK/AR),"AR, OK, TX",
+Luke Mulvaney,,"Transportation, Transit and Ports vertical; not a state territory"
+Matt Russell,"KS, NE, OK",
+Michelle Cooper seat (open),TX,
+Not on maps provided,,
+Prachi Patel,,Community Services vertical (East); not a state territory
+Sarah Duncan,"AL, GA, MS, SC",
+Scott Mark,"ID, MT, ND, SD, WY",
+Spencer Ferrell,,Local ENT T5; the Local ENT map does not list its states
+State AE – CA/HI,"CA, HI",Open seat; Hector Franco termed May 2026
+State AE – KY/TN/AR,"AR, KY, TN",Open seat; Makeda Boehm termed 4/17/26
+State SAM – Farnham seat (open),"CT, IA, KY, MA, ME, MI, OH",
+Stephanie DelSignore,"CT, DE, MA, NH, NJ, NY, RI, VT",
+Stephen Allen,,Local ENT T7a; the Local ENT map does not list its states
+TX State SAM (unconfirmed),TX,
+Territory 4a (open),"CT, MA, ME, NH, NY, RI, VT",
+Todd Bowers,"AK, OR, WA",
+Tom Gilliatt,,
+Tommy Monaghan,"DE, NJ, OH, PA",
+Tyler Carlson,,Local ENT T10; the Local ENT map does not list its states
