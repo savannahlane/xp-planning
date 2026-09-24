@@ -104,13 +104,18 @@ LOCAL_SMG_MAX = 30
 # overage is a deliberate, visible exception rather than a silent drift.
 LOCAL_SMG_OVER_CAP_ALLOWED = {"Eduardo Ruiz", "Kerrian Dailey", "Natalia Sanchez"}
 
+# Carolina Cambronero was briefly modeled as a second XP named Carolina Torres.
+# Combining those books puts her over the Enterprise maximum. Named here so the
+# overage stays visible rather than silent.
+ENTERPRISE_OVER_CAP_ALLOWED = {"Carolina Cambronero"}
+
 # Whole AE groups that always sit with one XP, regardless of who held them.
 AE_OWNER = {
     "Scott Mark": "Carolina Prieto",
     "Stephanie DelSignore": "Halena Martin",
-    "Demi Washington": "Carolina Torres",
-    "Desmond Davis": "Carolina Torres",
-    "Bill Marshall": "Carolina Torres",
+    "Demi Washington": "Carolina Cambronero",
+    "Desmond Davis": "Carolina Cambronero",
+    "Bill Marshall": "Carolina Cambronero",
     "Sarah Duncan": "Taylor Roman",
     "Spencer Ferrell": "Carolina Cambronero",
     # After the Marcy swap on main, Territory 4a continues to Taylor with the
@@ -179,12 +184,8 @@ def apply_assignments(page: dict, overrides: dict[str, dict]) -> dict:
     # single-XP California State AE groups while satisfying the reporting rule.
     page["meta"]["Open XP2 (PT)"][0] = "Ashley Hill"
     page["meta"]["Carolina Prieto"] = ["—", "—", "Team Lead", "Not specified"]
-    # Carolina Torres is the Florida Enterprise book. Manager and level are not
-    # in the Lookups sheet yet, so they stay unspecified rather than copied from
-    # Taylor, who is the other Savannah-report XP in Florida.
-    page["meta"]["Carolina Torres"] = ["Savannah Lane", "ET", "—", "Florida"]
-    if "Carolina Torres" not in page["order"]:
-        page["order"].insert(page["order"].index("Taylor Roman") + 1, "Carolina Torres")
+    page["meta"].pop("Carolina Torres", None)
+    page["order"] = [xp for xp in page["order"] if xp != "Carolina Torres"]
 
     moved = []
     matched = set()
@@ -287,7 +288,9 @@ def apply_assignments(page: dict, overrides: dict[str, dict]) -> dict:
             smg_load[row["newxp"]] += 1
 
     over_enterprise = {
-        xp: n for xp, n in enterprise_load.items() if n > ENTERPRISE_MAX
+        xp: n
+        for xp, n in enterprise_load.items()
+        if n > ENTERPRISE_MAX and xp not in ENTERPRISE_OVER_CAP_ALLOWED
     }
     if over_enterprise:
         raise RuntimeError(
@@ -425,10 +428,17 @@ def apply_assignments(page: dict, overrides: dict[str, dict]) -> dict:
         for r in rows
         if r["acct"] == "Health Care District of Palm Beach County - FL"
     )
-    if palm_beach["newxp"] != "Carolina Torres" or not palm_beach.get("ent"):
+    if palm_beach["newxp"] != "Carolina Cambronero" or not palm_beach.get("ent"):
         raise RuntimeError(
             "Health Care District of Palm Beach County must stay Enterprise "
-            "with Carolina Torres"
+            "with Carolina Cambronero"
+        )
+
+    still_torres = [r["acct"] for r in rows if r["newxp"] == "Carolina Torres"]
+    if still_torres:
+        raise RuntimeError(
+            "Carolina Torres is Carolina Cambronero; stray proposed accounts: "
+            + ", ".join(still_torres)
         )
 
     after_edges = proposed_edges(rows)
@@ -443,6 +453,11 @@ def apply_assignments(page: dict, overrides: dict[str, dict]) -> dict:
         "after_edges": after_edges,
         "ashley_enterprise": ashley_enterprise,
         "carolina_countable": carolina_rows,
+        "enterprise_over_allowed": {
+            xp: n
+            for xp, n in enterprise_load.items()
+            if n > ENTERPRISE_MAX and xp in ENTERPRISE_OVER_CAP_ALLOWED
+        },
     }
 
 
@@ -521,11 +536,16 @@ def update_markup(source: str) -> str:
             "</li>",
         )
 
-    if "Carolina Torres holds the Florida Enterprise book" not in source:
+    if "Carolina Cambronero holds the Florida Enterprise book" not in source:
+        source = source.replace(
+            "Carolina Torres holds the Florida Enterprise book",
+            "Carolina Cambronero holds the Florida Enterprise book",
+        )
+    if "Carolina Cambronero holds the Florida Enterprise book" not in source:
         source = source.replace(
             "Halena retains the broader Connecticut estate.</li>",
             "Halena retains the broader Connecticut estate.</li>\n"
-            "      <li>Carolina Torres holds the Florida Enterprise book (Desmond Davis, "
+            "      <li>Carolina Cambronero holds the Florida Enterprise book (Desmond Davis, "
             "Bill Marshall, Demi Washington) plus Health Care District of Palm Beach "
             "County. Taylor Roman holds Benjamin Shor, Stephanie DelSignore's New York "
             "and New Jersey accounts, Sarah Duncan, and Territory 4a; Stephanie's "
@@ -595,7 +615,7 @@ def update_markup(source: str) -> str:
     source = source.replace(
         "GLAVCD stays Enterprise with Colleen. Luke Mulvaney's three districts",
         "GLAVCD stays Enterprise with Colleen. Health Care District of Palm Beach "
-        "County stays Enterprise with Carolina Torres and the rest of the Florida "
+        "County stays Enterprise with Carolina Cambronero and the rest of the Florida "
         "book. Luke Mulvaney's three districts",
     )
 
@@ -609,6 +629,8 @@ def update_markup(source: str) -> str:
         count=1,
         flags=re.S,
     )
+    # Carolina Torres was a duplicate name for Carolina Cambronero.
+    source = source.replace("Carolina Torres", "Carolina Cambronero")
     return source
 
 
@@ -649,6 +671,8 @@ def main() -> None:
     )
     for xp, n in sorted(result["over_target"].items()):
         print(f"  over target, within max: {xp} {n}")
+    for xp, n in sorted(result["enterprise_over_allowed"].items()):
+        print(f"  allowed overage: {xp} {n}")
     print(
         f"Local SMG books (cap {LOCAL_SMG_MAX}): "
         f"max {max(result['smg_load'].values())}"

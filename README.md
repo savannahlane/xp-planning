@@ -64,11 +64,13 @@ The proposed view in `index.html` applies these staffing rules:
   one released exception. The open Pacific XP reports to Ashley.
 - Non-SAM special districts are Local SMG. SAM special districts stay Enterprise.
   Health Care District of Palm Beach County is the Florida exception: it stays
-  Enterprise with Carolina Torres.
+  Enterprise with Carolina Cambronero.
 - Enterprise and Local SMG are separate books. No Enterprise XP carries a Local SMG
   account.
-- Carolina Torres holds the Florida Enterprise book (Demi Washington, Desmond Davis,
-  Bill Marshall) plus Health Care District of Palm Beach County.
+- Carolina Cambronero holds the Florida Enterprise book (Demi Washington, Desmond Davis,
+  Bill Marshall) plus Health Care District of Palm Beach County, on top of her
+  existing Texas, Louisiana and Spencer Ferrell book. That combined book is over
+  the 20-account Enterprise maximum and is named in `ENTERPRISE_OVER_CAP_ALLOWED`.
 - Taylor Roman holds Benjamin Shor, Stephanie DelSignore's New York and New Jersey
   accounts, Sarah Duncan, and Territory 4a. Stephanie's Connecticut accounts stay
   with Halena.
@@ -145,7 +147,9 @@ hypothesis document.
 
 ## Rules modeled
 
-- Enterprise books: up to 17 countable accounts, 20 absolute maximum
+- Enterprise books: up to 17 countable accounts, 20 absolute maximum. Carolina
+  Cambronero is the named exception in `ENTERPRISE_OVER_CAP_ALLOWED` after the
+  Florida book was folded back into her existing book.
 - Local SMG books: up to 30 countable accounts
 - Enterprise XPs carry no Local SMG accounts
 - Complex accounts (more than 7 capabilities, or Service Cloud Advanced) no more than one third of a book
@@ -154,4 +158,4 @@ hypothesis document.
 - Released holds: Columbus, which moved to Halena with the rest of Kent Hartsfield's Chicago and Columbus SAM block, so it no longer sits with an Ashley report. Named in `ASHLEY_HOLD_RELEASED` in `tiering/update_whole_team_map.py`
 - Local SMG includes special districts except SAM territories
 - Florida Enterprise exception: Health Care District of Palm Beach County stays with
-  Carolina Torres rather than moving to midmarket
+  Carolina Cambronero rather than moving to midmarket
