@@ -72,6 +72,7 @@ td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
 section{margin-top:40px}
 .notes{max-width:78ch;color:var(--muted);font-size:14.5px}
 .notes li{margin:5px 0}
+code{font:500 13px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
 .hint{color:var(--muted);font-size:14px;margin:0}
 @media (max-width:760px){.detail{grid-template-columns:1fr}}
 </style>
@@ -90,6 +91,10 @@ section{margin-top:40px}
       <button type="button" data-w="n" aria-pressed="true">Weight by accounts</button>
       <button type="button" data-w="arr" aria-pressed="false">Weight by ARR</button>
     </div>
+    <div class="seg" role="group" aria-label="AE label">
+      <button type="button" data-l="st" aria-pressed="true">Label AEs by state</button>
+      <button type="button" data-l="terr" aria-pressed="false">Label AEs by territory</button>
+    </div>
     <div class="seg" role="group" aria-label="Segment">
       <button type="button" data-g="all" aria-pressed="true">All segments</button>
       <button type="button" data-g="ent" aria-pressed="false">Enterprise</button>
@@ -102,7 +107,7 @@ section{margin-top:40px}
       <span class="g">Open seat, term, or no AE on the maps</span>
     </div>
   </div>
-  <p class="hint">Select an XP or an AE to see the accounts behind each line. Select it again to clear.</p>
+  <p class="hint">AEs are labelled with the states they hold accounts in; switch the label to see the territory they are assigned instead. Select an XP or an AE to see the accounts behind each line, and the two state lists side by side. Select it again to clear.</p>
 
   <div class="board" id="board"></div>
 
@@ -128,8 +133,8 @@ section{margin-top:40px}
 
 
   <section>
-    <h2>AE load</h2>
-    <p class="hint" style="margin-bottom:10px">How many XPs each AE coordinates with in the current view.</p>
+    <h2>AE coverage and load</h2>
+    <p class="hint" style="margin-bottom:10px">The states each AE is assigned, the states they hold accounts in, and how many XPs they coordinate with. Territory is the assigned map and does not move; states in this view are counted from the accounts, so they follow the book and segment toggles. The number in brackets is accounts in that state.</p>
     <div class="card tscroll"><table id="load"></table></div>
   </section>
 
@@ -143,6 +148,7 @@ section{margin-top:40px}
       <li>When those three books were removed, each displaced Local SMG AE group moved intact to an XP who already works with that AE. This strictly reduces coordination fan-out without creating a new relationship. The exception is Connecticut PURA: Ashley's reporting-line rule requires one additional Stephanie DelSignore relationship for Steffany while Halena retains the broader Connecticut estate.</li>
       <li>Carolina Prieto keeps the Kentucky and North Dakota statewide enterprise agreements (two customers; sister agencies are allocated children), plus CHFS, Homeland Security and Transportation for Kentucky consolidation. She releases scattered local accounts to XPs who already work with those AEs. Glendale AZ is the exception: Conrad Taylor has no other book, so it goes to Colleen with her other Pacific SAM work.</li>
       <li>Local SMG includes special districts except SAM territories. GLAVCD stays Enterprise with Colleen. Luke Mulvaney's three districts sit with Carlos Torres so Halena is not paired with that vertical.</li>
+      <li>AE territories are held in <code>tiering/ae_territories.csv</code>, one row per AE, SAM or vertical seat. Federal and vertical seats have no state territory, and where the source maps do not list states for a territory the row says so; those AEs show only the states they hold accounts in.</li>
     </ul>
   </section>
 </div>
@@ -224,6 +230,26 @@ let scn="new", seg="all", ROWS, XP_ORDER, L, leftN, rightN, xpIdx;
 const fmt$ = v => v>=1e6 ? "$"+(v/1e6).toFixed(2)+"M" : "$"+Math.round(v/1e3)+"K";
 const isGapName = p => /^(No State AE|State AE –|State SAM –|Territory 4a|Carrie Breedlove|Not on maps|TX State SAM|Michelle Cooper seat|Local SMG CA|Local SMG Ter 6|Dallas SAM)/.test(p);
 
+// An AE has two state lists: the territory they are assigned, which comes from
+// ae_territories.csv, and the states they hold accounts in, which comes from the
+// accounts in the current view and so moves with the book and segment toggles.
+const territoryOf = p => AE_TERRITORY[p] || {states:[], note:""};
+function stateTally(rows){
+  const n = {}, seen = [];
+  for(const r of rows){
+    if(!r.state) continue;
+    if(!(r.state in n)){ n[r.state]=0; seen.push(r.state); }
+    if(!r.alloc) n[r.state]++;
+  }
+  return seen.sort((a,b)=>n[b]-n[a] || a.localeCompare(b)).map(s=>({state:s, n:n[s]}));
+}
+const stateCodes = rows => stateTally(rows).map(t=>t.state);
+const stateText = rows => stateTally(rows).map(t=>t.n?`${t.state} (${t.n})`:t.state).join(", ");
+const territoryText = p => {
+  const t = territoryOf(p);
+  return t.states.length ? t.states.join(", ") : (t.note || "Not listed on the maps provided");
+};
+
 
 function recompute(){
 ROWS = ROWS_ALL.filter(r => seg==="all" || (seg==="ent" ? r.ent : seg==="smg" ? r.segment==="Local SMG" : !r.ent && r.segment!=="Local SMG"));
@@ -243,12 +269,12 @@ rightN = aeNodes(s=>s==="Local");
 }
 function aeNodes(sideTest){
   const m = {};
-  for(const l of L) if(sideTest(l.side)){ (m[l.person] ||= {person:l.person, side:l.side, terr:l.terr, xs:[], w:0}); m[l.person].xs.push(xpIdx[l.xp]); m[l.person].w+=l.n; }
+  for(const l of L) if(sideTest(l.side)){ (m[l.person] ||= {person:l.person, side:l.side, terr:l.terr, xs:[], w:0, rows:[]}); m[l.person].xs.push(xpIdx[l.xp]); m[l.person].w+=l.n; m[l.person].rows.push(...l.rows); }
   return Object.values(m).map(o=>({...o, bc:o.xs.reduce((a,b)=>a+b,0)/o.xs.length})).sort((a,b)=>a.bc-b.bc);
 }
 recompute();
 
-let weight = "n", sel = null;
+let weight = "n", lbl = "st", sel = null;
 const W=1100, ROW=36, TOP=56;
 let H;
 const xL=250, xR=W-250, xpW=280, xC=W/2;
@@ -279,13 +305,16 @@ function render(){
   const aeNode = (n,left)=>{
     const y=pos[(left?"L|":"R|")+n.person], gap=isGapName(n.person);
     const terr = n.terr || "";
+    const here = stateCodes(n.rows).join(", ");
+    const sub = lbl==="st" ? (here || territoryOf(n.person).states.join(", ") || terr) : terr;
     const tx = left? xL-4 : xR+4, anchor = left?"end":"start";
     const cx = left? xL+4 : xR-4;
-    return `<g class="node ae ${gap?"gapnode":""}" tabindex="0" role="button" data-ae="${n.person}" aria-label="${n.person}">
+    return `<g class="node ae ${gap?"gapnode":""}" tabindex="0" role="button" data-ae="${n.person}" aria-label="${n.person}, accounts in ${here||"no states"}">
+      <title>${n.person} — territory ${territoryText(n.person)}; accounts in this view ${here||"none"}</title>
       <rect class="pill ${gap?"gap":""}" x="${left?xL-236:xR-8}" y="${y-15}" width="244" height="30" rx="6"/>
       <circle cx="${cx}" cy="${y}" r="3.5" fill="${gap?"var(--gap)":left?"var(--state)":"var(--local)"}"/>
       <text class="nm" x="${left?tx-8:tx+8}" y="${y-1}" text-anchor="${anchor}">${n.person}</text>
-      <text class="sub" x="${left?tx-8:tx+8}" y="${y+11}" text-anchor="${anchor}">${terr.length>40?terr.slice(0,39)+"…":terr}</text>
+      <text class="sub" x="${left?tx-8:tx+8}" y="${y+11}" text-anchor="${anchor}">${sub.length>40?sub.slice(0,39)+"…":sub}</text>
     </g>`;
   };
   leftN.forEach(n=>s+=aeNode(n,true));
@@ -333,9 +362,12 @@ function partnerBlock(l, showXp){
   const flags=[...new Set(l.rows.map(r=>r.flag).filter(Boolean))];
   const alloc=l.rows.filter(r=>r.alloc).length;
   const list=l.rows.filter(r=>!r.alloc).sort((a,b)=>b.arr-a.arr).map(r=>`<li>${r.acct} <span class="v">${r.state}, ${fmt$(r.arr)}</span></li>`).join("");
+  const states=stateText(l.rows);
   return `<div class="partner">
     <div class="pname ${cls}">${showXp? l.xp : l.person}</div>
     <div class="pmeta">${showXp? "" : (l.side==="Neither map"?"":l.side+" · ")}${showXp?"":terr} </div>
+    ${showXp? "" : `<div class="pmeta">Territory: ${territoryText(l.person)}</div>`}
+    ${states? `<div class="pmeta">States: ${states}</div>` : ""}
     <div class="pmeta">${l.n} accounts, ${fmt$(l.arr)}${alloc?` (plus ${alloc} allocated)`:""}</div>
     <ul class="accts">${list}</ul>
     ${flags.map(f=>`<div class="flag">${f}</div>`).join("")}
@@ -344,7 +376,7 @@ function partnerBlock(l, showXp){
 
 function renderDetail(){
   const d=document.getElementById("detail");
-  if(!sel){ d.innerHTML=`<div class="card full"><h3>Nothing selected</h3><p class="stat">Pick an XP to see their counterparts, or pick an AE to see which XPs they work with.</p></div>`; return; }
+  if(!sel){ d.innerHTML=`<div class="card full"><h3>Nothing selected</h3><p class="stat">Pick an XP to see their counterparts and the states each one covers, or pick an AE to see their territory and which XPs they work with.</p></div>`; return; }
   if(sel.xp){
     const mine=L.filter(l=>l.xp===sel.xp).sort((a,b)=>b.arr-a.arr);
     const st=mine.filter(l=>l.side==="State"), lo=mine.filter(l=>l.side==="Local");
@@ -354,7 +386,14 @@ function renderDetail(){
   } else {
     const mine=L.filter(l=>l.person===sel.ae).sort((a,b)=>b.arr-a.arr);
     const terr=mine[0].terr;
-    d.innerHTML=`<div class="card full"><h3>${sel.ae}</h3><p class="stat">${mine[0].side} · ${terr}. Works with ${new Set(mine.map(l=>l.xp)).size} XP(s).</p>${mine.map(l=>partnerBlock(l,true)).join("")}</div>`;
+    const rows=mine.flatMap(l=>l.rows);
+    const here=stateCodes(rows);
+    const t=territoryOf(sel.ae);
+    const unworked=t.states.filter(s=>!here.includes(s));
+    d.innerHTML=`<div class="card full"><h3>${sel.ae}</h3><p class="stat">${mine[0].side} · ${terr}. Works with ${new Set(mine.map(l=>l.xp)).size} XP(s).</p>
+      <p class="stat">Territory: ${territoryText(sel.ae)}${t.states.length&&t.note?` · ${t.note}`:""}<br>
+      States in this view: ${stateText(rows)||"none"}${unworked.length?` · <span style="color:var(--gap)">no accounts in ${unworked.join(", ")}</span>`:""}</p>
+      ${mine.map(l=>partnerBlock(l,true)).join("")}</div>`;
   }
 }
 
@@ -387,14 +426,18 @@ function tiers(){
 }
 function tables(){
   const m={};
-  for(const l of L){ if(isGapName(l.person)) continue; (m[l.person] ||= {p:l.person, side:l.side, seg:[...new Set(l.rows.map(r=>r.segment))].join(', '), xps:new Set(), n:0, arr:0}); m[l.person].xps.add(l.xp); m[l.person].n+=l.n; m[l.person].arr+=l.arr; }
+  for(const l of L){ if(isGapName(l.person)) continue; (m[l.person] ||= {p:l.person, side:l.side, seg:[...new Set(l.rows.map(r=>r.segment))].join(', '), xps:new Set(), n:0, arr:0, rows:[]}); m[l.person].xps.add(l.xp); m[l.person].n+=l.n; m[l.person].arr+=l.arr; m[l.person].rows.push(...l.rows); }
   const rows=Object.values(m).sort((a,b)=>b.xps.size-a.xps.size||b.arr-a.arr);
-  document.getElementById("load").innerHTML=`<thead><tr><th>AE</th><th>Map</th><th>Segment</th><th>XPs</th><th class="n">Accounts</th><th class="n">ARR</th></tr></thead><tbody>`+
-    rows.map(r=>`<tr><td>${r.p}</td><td>${r.side}</td><td>${r.seg}</td><td>${[...r.xps].join(", ")}</td><td class="n">${r.n}</td><td class="n">${fmt$(r.arr)}</td></tr>`).join("")+`</tbody>`;
+  const terrCell=p=>{const t=territoryOf(p); return t.states.length? t.states.join(", ") : `<span style="color:var(--muted)">${t.note||"Not listed"}</span>`;};
+  document.getElementById("load").innerHTML=`<thead><tr><th>AE</th><th>Map</th><th>Segment</th><th>Territory</th><th>States in this view</th><th>XPs</th><th class="n">Accounts</th><th class="n">ARR</th></tr></thead><tbody>`+
+    rows.map(r=>`<tr><td>${r.p}</td><td>${r.side}</td><td>${r.seg}</td><td>${terrCell(r.p)}</td><td>${stateText(r.rows)||"—"}</td><td>${[...r.xps].join(", ")}</td><td class="n">${r.n}</td><td class="n">${fmt$(r.arr)}</td></tr>`).join("")+`</tbody>`;
 }
 
 document.querySelectorAll(".seg button[data-w]").forEach(b=>b.addEventListener("click",()=>{
   weight=b.dataset.w; document.querySelectorAll(".seg button[data-w]").forEach(x=>x.setAttribute("aria-pressed",x===b)); render();
+}));
+document.querySelectorAll(".seg button[data-l]").forEach(b=>b.addEventListener("click",()=>{
+  lbl=b.dataset.l; document.querySelectorAll(".seg button[data-l]").forEach(x=>x.setAttribute("aria-pressed",x===b)); render();
 }));
 document.querySelectorAll(".seg button[data-s]").forEach(b=>b.addEventListener("click",()=>{
   scn=b.dataset.s; sel=null; document.querySelectorAll(".seg button[data-s]").forEach(x=>x.setAttribute("aria-pressed",x===b)); recompute(); render(); tables(); summary();
