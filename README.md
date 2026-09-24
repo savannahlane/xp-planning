@@ -28,8 +28,8 @@ One row per account, with these columns:
 | `note` | Why. Free text, not parsed. |
 
 Rules that are not per-account stay in `tiering/update_whole_team_map.py`: who cannot hold
-accounts at all, where a displaced AE group goes, and the Kentucky and North Dakota
-enterprise-agreement rollup.
+accounts at all, where a displaced AE group goes, the North Dakota enterprise-agreement
+rollup with Carolina Prieto, and the Kentucky enterprise-agreement rollup with Andy O'Brien.
 
 ## Which states an AE covers
 
@@ -64,14 +64,18 @@ The proposed view in `index.html` applies these staffing rules:
   one released exception. The open Pacific XP reports to Ashley.
 - Non-SAM special districts are Local SMG. SAM special districts stay Enterprise.
   Health Care District of Palm Beach County is the Florida exception: it stays
-  Enterprise with Carolina Torres.
+  Enterprise with Carolina Cambronero.
 - Enterprise and Local SMG are separate books. No Enterprise XP carries a Local SMG
   account.
-- Carolina Torres holds the Florida Enterprise book (Demi Washington, Desmond Davis,
-  Bill Marshall) plus Health Care District of Palm Beach County.
+- Carolina Cambronero holds the Florida Enterprise book (Demi Washington, Desmond Davis,
+  Bill Marshall) plus Health Care District of Palm Beach County, on top of her
+  existing Louisiana and Spencer Ferrell book. Cedric Simpkins's Texas SAM group
+  consolidates with Steffany Amador, who already held San Antonio and VIA.
 - Taylor Roman holds Benjamin Shor, Stephanie DelSignore's New York and New Jersey
   accounts, Sarah Duncan, and Territory 4a. Stephanie's Connecticut accounts stay
   with Halena.
+- Carolina Prieto keeps only Idaho and North Dakota state (Scott Mark, including
+  the ND enterprise agreement). Andy O'Brien holds Kentucky state.
 
 The `Current assignment` view is historical and still shows Savannah, Kristen and Ashley's
 current books.
@@ -152,4 +156,4 @@ hypothesis document.
 - Released holds: Columbus, which moved to Halena with the rest of Kent Hartsfield's Chicago and Columbus SAM block, so it no longer sits with an Ashley report. Named in `ASHLEY_HOLD_RELEASED` in `tiering/update_whole_team_map.py`
 - Local SMG includes special districts except SAM territories
 - Florida Enterprise exception: Health Care District of Palm Beach County stays with
-  Carolina Torres rather than moving to midmarket
+  Carolina Cambronero rather than moving to midmarket
