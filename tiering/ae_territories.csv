@@ -1,0 +1,82 @@
+# The states each AE covers. Edit this file, then run:
+#   python3 tiering/update_ae_territories.py
+#
+# ae      Must match the AE, SAM or seat name in index.html exactly. Every AE on
+#         the map must have a row here; the script fails if one is missing.
+# states  The assigned territory, as USPS codes separated by commas. Leave blank
+#         when the AE has no state territory (federal and vertical seats) or when
+#         the source maps do not list one. The note then says which.
+# note    Free text shown next to the territory on the page. Not parsed.
+#
+# This is the assigned territory, which is not the same thing as the states the
+# AE holds accounts in. index.html derives that second list from the accounts
+# themselves and shows both, so a state listed here with no accounts reads as
+# open territory rather than as a mistake.
+#
+# Sources: State territory map 6/12/26, Local ENT and Local SMG maps 6/30/26,
+# vertical maps 7/2/26.
+ae,states,note
+Allison Hamilton,,"Federal seat, national"
+Amanda Brooks,"OR, WA",Local SMG Ter 14
+Andrew Collinsworth,"AL, NC, SC, WV",Local SMG Ter 3
+Andrew Murray,CA,Local ENT SAM 8
+Andrew Wyzkoski,,Local ENT T2; the Local ENT map does not list its states
+Austin Goodman,,Local ENT T17; the Local ENT map does not list its states
+Benjamin Shor,"MD, NY, VA",State SAM named accounts
+Bettsy Desjarlais,"IN, OH, PA",State Tier 2
+Bill Anderson,"CA, TX, WA",State SAM named accounts
+Bill Marshall,FL,"Local ENT T1b, South Florida"
+Bill Pintsak,"IL, MO",State Tier 2
+Brenna Casey,,"Federal seat, national"
+Brittany Greer,"IA, IN, MI, WI",Local SMG Ter 13
+Caleb Fort Jr,"GA, KY, LA, MS",Local SMG Ter 5
+Cameron Chadsey,"AZ, NM, NV",State Tier 2
+Carmel Hinkle,,"Federal seat, national"
+Carrie Breedlove,"AK, HI, OR, WA",Local ENT T14b; termed 7/10/26
+Carter Bradford,,Local ENT T15; the Local ENT map does not list its states
+Cedric Simpkins,TX,"Local ENT SAM 6a, Austin and San Antonio"
+Che Bustos,"CO, UT",State Tier 2
+Chris Thiers,,Community Services vertical (West and TX); not a state territory
+Conrad Taylor,,Local ENT SAM 7b; the Local ENT map does not list its states
+Corey Andrade,"CT, MA, ME, NH, NY, RI, VT","Local SMG Ter 1, New England and NY"
+David Cliff,,Local ENT T9; the Local ENT map does not list its states
+Davis Keeter,TX,Energy and Power vertical; Texas only
+Demi Washington,"FL, LA",State Tier 2
+Desmond Davis,FL,"Local ENT T1a, North Florida"
+Emery Herrschel,"CO, ID, MO, NE, WY",Local SMG Ter 9
+Emily Boldt,,"Federal seat, national"
+Gil Roy,"AR, LA, TX",State SAM named accounts
+Grant Samson,"MD, NC, SC, VA, WV",State Tier 2; holds no accounts in this book
+Jared Cummings,"KS, MN, ND, SD",Local SMG Ter 10
+Jaxson McBride,,Utilities and Water vertical (West); not a state territory
+Jeff Gaisford,,Local ENT SAM 16; the Local ENT map does not list its states
+Jeffrey Johnson,"AK, AZ, HI, NM, NV, UT",Local SMG Ter 7
+Joe Chang,,"Federal seat, national"
+Joe Spair,"MN, WI",State Tier 3
+Joel Parris,,Local ENT T3; the Local ENT map does not list its states
+John Meah,"MD, TN, VA",Local SMG Ter 15
+Josh Gondwe,,Local ENT T16; the Local ENT map does not list its states
+Kent Hartsfield,"IL, IN, OH",Local ENT T11b plus Chicago and Columbus SAM (temporary)
+Kimberley Steelmann,IL,Local SMG Ter 12
+Local SMG CA (Ter 8),CA,"Four seats; LA and Bay Area open, San Diego and North/Central filled"
+Local SMG FL (Ter 4),FL,Two seats
+Local SMG Ter 6 (TX/OK/AR),"AR, OK, TX",Three seats; Houston and AR open
+Luke Mulvaney,,"Transportation, Transit and Ports vertical; not a state territory"
+Matt Russell,"KS, NE, OK",State Tier 2
+Michelle Cooper seat (open),TX,Local ENT SAM Dallas and Houston; Michelle Cooper termed 5/21/26
+Not on maps provided,,Placeholder for accounts with no AE on the maps provided
+Prachi Patel,,Community Services vertical (East); not a state territory
+Sarah Duncan,"AL, GA, MS, SC",State Tier 2
+Scott Mark,"ID, MT, ND, SD, WY",State Tier 3
+Spencer Ferrell,,Local ENT T5; the Local ENT map does not list its states
+State AE – CA/HI,"CA, HI",Open seat; Hector Franco termed May 2026
+State AE – KY/TN/AR,"AR, KY, TN",Open seat; Makeda Boehm termed 4/17/26
+State SAM – Farnham seat (open),"CT, IA, KY, MA, ME, MI, OH",State SAM named accounts; Matthew Farnham termed 4/29/26
+Stephanie DelSignore,"CT, DE, MA, NH, NJ, NY, RI, VT",State Tier 1
+Stephen Allen,,Local ENT T7a; the Local ENT map does not list its states
+TX State SAM (unconfirmed),TX,Split between Bill Anderson and Gil Roy on the SAM lists
+Territory 4a (open),"CT, MA, ME, NH, NY, RI, VT",Local ENT T4a; open since 3/20/26
+Todd Bowers,"AK, OR, WA",State Tier 1
+Tom Gilliatt,,"Federal seat, national"
+Tommy Monaghan,"DE, NJ, OH, PA",Local SMG Ter 2
+Tyler Carlson,,Local ENT T10; the Local ENT map does not list its states
