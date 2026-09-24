@@ -60,8 +60,8 @@ The proposed view in `index.html` applies these staffing rules:
 
 - Jake Sager, Nathan Williamson, Savannah Lane, Kristen Murphy and Ashley Hill carry no
   proposed accounts.
-- Ashley's current Enterprise accounts route only to her direct reports. The open Pacific XP
-  reports to Ashley.
+- Ashley's current Enterprise accounts route only to her direct reports, with Columbus the
+  one released exception. The open Pacific XP reports to Ashley.
 - Non-SAM special districts are Local SMG. SAM special districts stay Enterprise.
 - Enterprise and Local SMG are separate books. No Enterprise XP carries a Local SMG
   account.
@@ -141,5 +141,6 @@ hypothesis document.
 - Enterprise XPs carry no Local SMG accounts
 - Complex accounts (more than 7 capabilities, or Service Cloud Advanced) no more than one third of a book
 - XP time zone plus or minus one hour
-- Holds: San Antonio with Steffany, DC with Paige, Denver with a Savannah report, Columbus with an Ashley report, LA and GLACVCD with Colleen, WA with Paige, CT and ME with Halena
+- Holds: San Antonio with Steffany, DC with Paige, Denver with a Savannah report, LA and GLACVCD with Colleen, WA with Paige, CT and ME with Halena
+- Released holds: Columbus, which moved to Halena with the rest of Kent Hartsfield's Chicago and Columbus SAM block, so it no longer sits with an Ashley report. Named in `ASHLEY_HOLD_RELEASED` in `tiering/update_whole_team_map.py`
 - Local SMG includes special districts except SAM territories
