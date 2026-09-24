@@ -6,7 +6,7 @@ GitHub: [savannahlane/xp-planning](https://github.com/savannahlane/xp-planning)
 
 ## Contents
 
-- `index.html`: interactive whole-US-team map across Enterprise, Local SMG and federal books. Toggle between the proposed and current assignments, and filter by segment. Open it in any browser; it needs no server.
+- `index.html`: interactive whole-US-team map across Enterprise, Local SMG and federal books. Toggle between the proposed and current assignments, filter by segment, and label each AE with the states they cover. Open it in any browser; it needs no server.
 - `XP_AE_Rebalance_Model.xlsx`: the working model. Revised XP assignments (editable dropdown), the holds check, AE fan-out, capacity checks, per-account growth tiers, and the `Growth Tiers` territory sheet.
 - `research/`: the sourced research behind the tiering, plus the tiering hypothesis itself.
 - `tiering/`: the scoring model and its outputs.
@@ -30,6 +30,29 @@ One row per account, with these columns:
 Rules that are not per-account stay in `tiering/update_whole_team_map.py`: who cannot hold
 accounts at all, where a displaced AE group goes, and the Kentucky and North Dakota
 enterprise-agreement rollup.
+
+## Which states an AE covers
+
+`index.html` shows two state lists for every AE, and they answer different questions.
+
+**Territory** is the states the AE is assigned. It comes from
+**`tiering/ae_territories.csv`**; edit that file and run
+`python3 tiering/update_ae_territories.py`. One row per AE, SAM or vertical seat:
+
+| Column | What it does |
+|---|---|
+| `ae` | Must match the AE name in `index.html` exactly. Every AE on the map needs a row; a missing one fails the run. |
+| `states` | The assigned territory as USPS codes, comma separated. Blank for federal and vertical seats, and for territories the source maps do not break down by state. |
+| `note` | Shown next to the territory on the page. Say why when `states` is blank. Free text, not parsed. |
+
+**States in this view** is the states the AE actually holds accounts in. The page counts
+it from the accounts themselves, so it follows the book and segment toggles and needs no
+maintenance. A territory state with no accounts behind it reads as open territory on the
+AE card rather than as a missing row.
+
+The publish script fails on an unknown state code, a duplicate row, or an AE on the map
+with no row. It then prints where the two lists disagree: territory states with no
+account, accounts outside the listed territory, and AEs with no territory on file.
 
 ## Whole-team proposed assignment
 
@@ -74,10 +97,13 @@ capability whitespace) against ARR:
 python3 tiering/build_tiering.py      # score territories and accounts
 python3 tiering/update_workbook.py    # refresh the xlsx
 python3 tiering/update_whole_team_map.py  # reapply assignment rules and account_overrides.csv
+python3 tiering/update_ae_territories.py  # republish ae_territories.csv
 ```
 
 `tiering/account_overrides.csv` is the per-account assignment table described above. The update
-script is idempotent, so running it twice changes nothing the second time.
+script is idempotent, so running it twice changes nothing the second time. So is
+`update_ae_territories.py`, and the two are independent: one writes the `PAGE` payload, the
+other the `AE_TERRITORY` block.
 
 `tiering/inject_html.py` targets the earlier Enterprise-only page payload. Do not run it against
 the whole-team `PAGE` payload in the current `index.html`.
