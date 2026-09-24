@@ -58,17 +58,17 @@ ASHLEY_REPORTS = {
 LOCAL_SMG_DESTINATION = {
     "Local SMG FL (Ter 4)": "Natalia Sanchez",
     "Local SMG Ter 6 (TX/OK/AR)": "Luis Aguilar",
-    "Caleb Fort Jr": "Ricardo Rodriguez",
+    "Caleb Fort Jr": "Ricardo Castro",
     "Corey Andrade": "Carlos Torres",
     "Emery Herrschel": "Kerrian Dailey",
     "Jared Cummings": "Kerrian Dailey",
     "Jeffrey Johnson": "David Treminio",
     "Kimberley Steelmann": "Andrés Pérez",
     "Amanda Brooks": "David Treminio",
-    "Andrew Collinsworth": "Ricardo Rodriguez",
+    "Andrew Collinsworth": "Ricardo Castro",
     "Tommy Monaghan": "Carlos Torres",
     "Brittany Greer": "Kerrian Dailey",
-    "John Meah": "Ricardo Rodriguez",
+    "John Meah": "Ricardo Castro",
     "Not on maps provided": "Andrés Pérez",
     "Prachi Patel": "Carlos Torres",
     "Michelle Cooper seat (open)": "Luis Aguilar",
@@ -82,8 +82,8 @@ LOCAL_SMG_XPS = {
     "Kerrian Dailey",
     "Luis Aguilar",
     "Natalia Sanchez",
-    "Ricardo Rodriguez",
-    "Tatiana Salazar",
+    "Ricardo Castro",
+    "Tatiana Montero",
 }
 
 # Provisional geographic cut of the four-seat California placeholder. The
@@ -153,7 +153,9 @@ AE_OWNER = {
     "Desmond Davis": "Carolina Cambronero",
     "Bill Marshall": "Carolina Cambronero",
     "Sarah Duncan": "Taylor Roman",
-    "Spencer Ferrell": "Carolina Cambronero",
+    # Spencer's AL/GA locals sit with Taylor, who already holds Sarah Duncan's
+    # AL/GA state book, rather than splitting the two Georgia AEs across XPs.
+    "Spencer Ferrell": "Taylor Roman",
     # Steffany already holds San Antonio and VIA from this Texas SAM group.
     # Consolidating the remaining four accounts with her leaves Steffany and
     # Carolina Cambronero at the 20-account maximum and removes one AE split.
@@ -215,7 +217,7 @@ def local_smg_destination(row: dict) -> str:
     """Return the canonical XP for one Local SMG account."""
     if row["person"] in {"Local SMG CA (Ter 8)", "Jaxson McBride"}:
         return (
-            "Tatiana Salazar"
+            "Tatiana Montero"
             if row["acct"] in SOUTHERN_CA_LOCAL_SMG
             else "Eduardo Ruiz"
         )
@@ -243,7 +245,7 @@ def apply_assignments(page: dict, overrides: dict[str, dict]) -> dict:
     page["meta"]["Carolina Prieto"] = ["—", "—", "Team Lead", "Not specified"]
     page["meta"].pop("Carolina Torres", None)
     page["order"] = [xp for xp in page["order"] if xp != "Carolina Torres"]
-    for xp in ("Tatiana Salazar", "Luis Aguilar", "Ricardo Rodriguez"):
+    for xp in ("Tatiana Montero", "Luis Aguilar", "Ricardo Castro"):
         page["meta"].setdefault(xp, ["—", "n/a", "—", "—"])
         if xp not in page["order"]:
             page["order"].append(xp)
@@ -334,13 +336,20 @@ def apply_assignments(page: dict, overrides: dict[str, dict]) -> dict:
 
     enterprise_load: dict[str, int] = defaultdict(int)
     smg_load: dict[str, int] = defaultdict(int)
+    smg_arr: dict[str, float] = defaultdict(float)
+    smg_complex: dict[str, int] = defaultdict(int)
+    smg_tiers: dict[str, list[int]] = defaultdict(lambda: [0, 0, 0, 0])
     for row in rows:
         if row["alloc"]:
             continue
         if row.get("ent"):
             enterprise_load[row["newxp"]] += 1
         elif row["segment"] == "Local SMG":
-            smg_load[row["newxp"]] += 1
+            xp = row["newxp"]
+            smg_load[xp] += 1
+            smg_arr[xp] += row["arr"]
+            smg_complex[xp] += row["ncap"] > 7
+            smg_tiers[xp][row["tier"] - 1] += 1
 
     over_enterprise = {
         xp: n for xp, n in enterprise_load.items() if n > ENTERPRISE_MAX
@@ -356,6 +365,20 @@ def apply_assignments(page: dict, overrides: dict[str, dict]) -> dict:
         raise RuntimeError(
             f"Local SMG books above the {LOCAL_SMG_MAX}-account cap: "
             + ", ".join(f"{xp} {n}" for xp, n in sorted(over_smg.items()))
+        )
+
+    over_complex = {
+        xp: smg_complex[xp]
+        for xp, n in smg_load.items()
+        if smg_complex[xp] * 3 > n
+    }
+    if over_complex:
+        raise RuntimeError(
+            "Local SMG books above the one-third complex-account ceiling: "
+            + ", ".join(
+                f"{xp} {complex_n}/{smg_load[xp]}"
+                for xp, complex_n in sorted(over_complex.items())
+            )
         )
 
     missing_smg_xps = sorted(LOCAL_SMG_XPS - set(smg_load))
@@ -536,6 +559,9 @@ def apply_assignments(page: dict, overrides: dict[str, dict]) -> dict:
         "offloaded": offloaded,
         "enterprise_load": dict(enterprise_load),
         "smg_load": dict(smg_load),
+        "smg_arr": dict(smg_arr),
+        "smg_complex": dict(smg_complex),
+        "smg_tiers": dict(smg_tiers),
         "over_target": over_target,
         "before_edges": before_edges,
         "after_edges": after_edges,
@@ -545,6 +571,15 @@ def apply_assignments(page: dict, overrides: dict[str, dict]) -> dict:
 
 
 def update_markup(source: str) -> str:
+    # Normalize renamed seats and the complete Taylor book on every run. These
+    # replacements are safe before the PAGE payload is rewritten below.
+    source = source.replace("Tatiana Salazar", "Tatiana Montero")
+    source = source.replace("Ricardo Rodriguez", "Ricardo Castro")
+    source = source.replace(
+        "Sarah Duncan, and Territory 4a",
+        "Sarah Duncan, Spencer Ferrell, and Territory 4a",
+    )
+
     source = source.replace(
         "<title>XP ↔ AE alignment, Enterprise</title>",
         "<title>XP ↔ AE alignment, US team</title>",
@@ -705,8 +740,8 @@ def update_markup(source: str) -> str:
         "each Local SMG AE group moves whole to a dedicated Local SMG XP, so the "
         "AE works with one XP instead of several.",
         "nine dedicated Local SMG XPs cover whole AE groups wherever the 30-account "
-        "cap permits. Tatiana Salazar holds Southern California, Eduardo Ruiz holds "
-        "North/Central California, Luis Aguilar holds Texas, and Ricardo Rodriguez "
+        "cap permits. Tatiana Montero holds Southern California, Eduardo Ruiz holds "
+        "North/Central California, Luis Aguilar holds Texas, and Ricardo Castro "
         "holds the Southeast and Mid-Atlantic. California's 47 accounts force its "
         "placeholder AE seat to split; Luke Mulvaney's Texas account follows Luis "
         "while his New Jersey and Oregon accounts stay with Carlos Torres.",
@@ -781,7 +816,12 @@ def main() -> None:
         f"max {max(result['smg_load'].values())}"
     )
     for xp, n in sorted(result["smg_load"].items()):
-        print(f"  {xp}: {n}")
+        tiers = result["smg_tiers"][xp]
+        print(
+            f"  {xp}: {n}, ${result['smg_arr'][xp]:,.0f} ARR, "
+            f"T1/T2/T3/T4 {'/'.join(map(str, tiers))}, "
+            f"complex {result['smg_complex'][xp]}"
+        )
     print("Carolina countable consolidated accounts:")
     for row in result["carolina_countable"]:
         print(f"  {row['acct']} ${row['arr']:.0f}")
