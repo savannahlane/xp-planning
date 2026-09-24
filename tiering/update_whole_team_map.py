@@ -104,11 +104,6 @@ LOCAL_SMG_MAX = 30
 # overage is a deliberate, visible exception rather than a silent drift.
 LOCAL_SMG_OVER_CAP_ALLOWED = {"Eduardo Ruiz", "Kerrian Dailey", "Natalia Sanchez"}
 
-# Carolina Cambronero was briefly modeled as a second XP named Carolina Torres.
-# Combining those books puts her over the Enterprise maximum. Named here so the
-# overage stays visible rather than silent.
-ENTERPRISE_OVER_CAP_ALLOWED = {"Carolina Cambronero"}
-
 # Whole AE groups that always sit with one XP, regardless of who held them.
 AE_OWNER = {
     "Scott Mark": "Carolina Prieto",
@@ -118,6 +113,10 @@ AE_OWNER = {
     "Bill Marshall": "Carolina Cambronero",
     "Sarah Duncan": "Taylor Roman",
     "Spencer Ferrell": "Carolina Cambronero",
+    # Steffany already holds San Antonio and VIA from this Texas SAM group.
+    # Consolidating the remaining four accounts with her leaves Steffany and
+    # Carolina Cambronero at the 20-account maximum and removes one AE split.
+    "Cedric Simpkins": "Steffany Amador",
     # After the Marcy swap on main, Territory 4a continues to Taylor with the
     # rest of the NY/NJ local-and-state book rather than remaining a Midwest
     # attachment.
@@ -288,9 +287,7 @@ def apply_assignments(page: dict, overrides: dict[str, dict]) -> dict:
             smg_load[row["newxp"]] += 1
 
     over_enterprise = {
-        xp: n
-        for xp, n in enterprise_load.items()
-        if n > ENTERPRISE_MAX and xp not in ENTERPRISE_OVER_CAP_ALLOWED
+        xp: n for xp, n in enterprise_load.items() if n > ENTERPRISE_MAX
     }
     if over_enterprise:
         raise RuntimeError(
@@ -453,11 +450,6 @@ def apply_assignments(page: dict, overrides: dict[str, dict]) -> dict:
         "after_edges": after_edges,
         "ashley_enterprise": ashley_enterprise,
         "carolina_countable": carolina_rows,
-        "enterprise_over_allowed": {
-            xp: n
-            for xp, n in enterprise_load.items()
-            if n > ENTERPRISE_MAX and xp in ENTERPRISE_OVER_CAP_ALLOWED
-        },
     }
 
 
@@ -618,6 +610,12 @@ def update_markup(source: str) -> str:
         "County stays Enterprise with Carolina Cambronero and the rest of the Florida "
         "book. Luke Mulvaney's three districts",
     )
+    source = source.replace(
+        "County. Taylor Roman holds Benjamin Shor",
+        "County. Cedric Simpkins's Texas SAM group consolidates with Steffany "
+        "Amador, who already held San Antonio and VIA. Taylor Roman holds Benjamin "
+        "Shor",
+    )
 
     # The coverage section is gone, so tables() must no longer write into #gaps.
     source = re.sub(
@@ -671,8 +669,6 @@ def main() -> None:
     )
     for xp, n in sorted(result["over_target"].items()):
         print(f"  over target, within max: {xp} {n}")
-    for xp, n in sorted(result["enterprise_over_allowed"].items()):
-        print(f"  allowed overage: {xp} {n}")
     print(
         f"Local SMG books (cap {LOCAL_SMG_MAX}): "
         f"max {max(result['smg_load'].values())}"
