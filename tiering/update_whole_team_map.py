@@ -105,6 +105,9 @@ AE_OWNER = {
     "Bill Marshall": "Carolina Torres",
     "Sarah Duncan": "Taylor Roman",
     "Spencer Ferrell": "Carolina Cambronero",
+    # After the Marcy swap on main, Territory 4a continues to Taylor with the
+    # rest of the NY/NJ local-and-state book rather than remaining a Midwest
+    # attachment.
     "Territory 4a (open)": "Taylor Roman",
 }
 
