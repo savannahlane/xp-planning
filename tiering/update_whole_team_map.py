@@ -36,6 +36,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 HTML = ROOT / "index.html"
 OVERRIDES = Path(__file__).resolve().parent / "account_overrides.csv"
+PIPELINE = Path(__file__).resolve().parent / "fy2027_pipeline.csv"
 
 NO_BOOK = {
     "Jake Sager",
@@ -183,6 +184,11 @@ ASHLEY_HOLD_RELEASED = {"Columbus OH"}
 # DelSignore rows that would otherwise follow the AE_OWNER rule above.
 NY_NJ_STATE_XP = "Taylor Roman"
 
+# Carolina keeps the Scott Mark group, which is otherwise Idaho and North
+# Dakota. This committed logo is the first account on his mapped Wyoming
+# territory, so it stays with that AE rather than opening a second XP.
+CAROLINA_BEYOND_ID_ND = {"Wyoming Department of Environmental Quality"}
+
 
 def load_overrides(path: Path) -> dict[str, dict]:
     """Read the per-account override table, ignoring the comment header."""
@@ -215,6 +221,100 @@ def extract_page(source: str) -> tuple[dict, int, int]:
 
 def proposed_edges(rows: list[dict]) -> set[tuple[str, str]]:
     return {(r["newxp"], r["person"]) for r in rows if r.get("newxp")}
+
+
+def load_pipeline(path: Path) -> list[dict]:
+    """Read the FY2027 committed-pipeline extract."""
+    body = "\n".join(
+        line for line in path.read_text().splitlines() if not line.startswith("#")
+    )
+    pipeline = []
+    for record in csv.DictReader(io.StringIO(body)):
+        account = (record["account"] or "").strip()
+        if not account:
+            continue
+        included = (record["in_us_book"] or "").strip().lower()
+        if included not in {"yes", "no"}:
+            raise RuntimeError(f"{account!r} must set in_us_book to yes or no")
+        try:
+            nnarr = float(record["nnarr"])
+        except ValueError as exc:
+            raise RuntimeError(f"{account!r} has no numeric nnarr") from exc
+        tier = (record["tier"] or "").strip()
+        pipeline.append(
+            {
+                "account": account,
+                "state": (record["state"] or "").strip().upper(),
+                "ae": (record["ae"] or "").strip(),
+                "xp": (record["xp"] or "").strip(),
+                "tier": int(tier) if tier else None,
+                "nnarr": nnarr,
+                "included": included == "yes",
+                "note": (record["note"] or "").strip(),
+            }
+        )
+    return pipeline
+
+
+def apply_pipeline(rows: list[dict], pipeline: list[dict]) -> dict:
+    """Add FY2027 pipeline without double-counting it on a later run.
+
+    New logos enter the proposed book only. Expansion on an account that is
+    already in the book stays in `fy27` and the page adds it to proposed ARR.
+    """
+    by_name = {row["acct"]: row for row in rows}
+    added = []
+    expanded = []
+    for record in pipeline:
+        if not record["included"]:
+            continue
+        existing = by_name.get(record["account"])
+        label = f"FY2027 committed pipeline ${record['nnarr']:,.0f}"
+        if record["note"]:
+            label += f" · {record['note']}"
+        if existing:
+            existing["fy27"] = record["nnarr"]
+            if label not in (existing.get("flag") or ""):
+                existing["flag"] = (
+                    f"{existing['flag']} · {label}" if existing.get("flag") else label
+                )
+            expanded.append(record)
+            continue
+        if record["tier"] not in {1, 2, 3, 4}:
+            raise RuntimeError(f"{record['account']!r} needs a tier")
+        siblings = [row for row in rows if row["person"] == record["ae"]]
+        if not siblings:
+            raise RuntimeError(
+                f"{record['account']!r} names AE {record['ae']!r}, who is not on the map"
+            )
+        xp = AE_OWNER.get(record["ae"], record["xp"])
+        if record["state"] in {"NY", "NJ"}:
+            xp = NY_NJ_STATE_XP
+        if not xp:
+            raise RuntimeError(f"{record['account']!r} has no proposed XP")
+        row = {
+            "acct": record["account"],
+            "state": record["state"],
+            "segment": "State",
+            "side": "State",
+            "person": record["ae"],
+            "terr": siblings[0]["terr"],
+            "flag": label,
+            "cur": xp,
+            "newxp": xp,
+            "arr": 0,
+            "alloc": False,
+            "ncap": 1,
+            "ent": True,
+            "tier": record["tier"],
+            "fy27": record["nnarr"],
+            "pipe": True,
+        }
+        rows.append(row)
+        by_name[row["acct"]] = row
+        added.append(record)
+    outside = [record for record in pipeline if not record["included"]]
+    return {"added": added, "expanded": expanded, "outside": outside}
 
 
 def local_smg_destination(row: dict) -> str:
@@ -335,6 +435,7 @@ def apply_assignments(page: dict, overrides: dict[str, dict]) -> dict:
 
     removed = [r["acct"] for r in rows if overrides.get(r["acct"], {}).get("remove")]
     rows = [r for r in rows if not overrides.get(r["acct"], {}).get("remove")]
+    pipeline = apply_pipeline(rows, load_pipeline(PIPELINE))
     page["rows"] = rows
 
     # Enterprise and Local SMG are separate books. Once every other rule has
@@ -536,7 +637,7 @@ def apply_assignments(page: dict, overrides: dict[str, dict]) -> dict:
     carolina_not_id_nd = [
         r["acct"]
         for r in carolina
-        if r["state"] not in {"ID", "ND"}
+        if r["state"] not in {"ID", "ND"} and r["acct"] not in CAROLINA_BEYOND_ID_ND
     ]
     if carolina_not_id_nd:
         raise RuntimeError(
@@ -595,6 +696,7 @@ def apply_assignments(page: dict, overrides: dict[str, dict]) -> dict:
         "after_edges": after_edges,
         "ashley_enterprise": ashley_enterprise,
         "carolina_countable": carolina_rows,
+        "pipeline": pipeline,
     }
 
 
@@ -819,6 +921,13 @@ def update_markup(source: str) -> str:
         count=1,
         flags=re.S,
     )
+    pipeline_note = (
+        " The proposed view adds the US state logos and expansion ARR from the "
+        "visible Q3 FY2027 pipeline extract. UK pipeline stays off this map."
+    )
+    anchor = "accounts sit with Jr Wycinsky."
+    if pipeline_note not in source:
+        source = source.replace(anchor, anchor + pipeline_note)
     return source
 
 
@@ -870,9 +979,22 @@ def main() -> None:
             f"T1/T2/T3/T4 {'/'.join(map(str, tiers))}, "
             f"complex {result['smg_complex'][xp]}"
         )
+    pipeline = result["pipeline"]
+    print(
+        "FY2027 pipeline: "
+        f"{len(pipeline['added'])} new logos, "
+        f"{len(pipeline['expanded'])} expansions, "
+        f"{len(pipeline['outside'])} outside the US book"
+    )
+    for record in pipeline["added"] + pipeline["expanded"]:
+        kind = "new" if record in pipeline["added"] else "expansion"
+        print(f"  {kind}: {record['account']} ${record['nnarr']:,.0f}")
+    outside_arr = sum(record["nnarr"] for record in pipeline["outside"])
+    if pipeline["outside"]:
+        print(f"  outside the US book: ${outside_arr:,.0f}")
     print("Carolina countable consolidated accounts:")
     for row in result["carolina_countable"]:
-        print(f"  {row['acct']} ${row['arr']:.0f}")
+        print(f"  {row['acct']} ${row['arr'] + row.get('fy27', 0):,.0f}")
 
 
 if __name__ == "__main__":

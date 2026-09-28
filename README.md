@@ -61,6 +61,13 @@ The proposed view in `index.html` applies these staffing rules:
 - Jake Sager is a VP. Savannah Lane, Kristen Murphy and Ashley Hill are managers.
   None of them carries a proposed account book.
 - Nathan Williamson has left the team. His federal accounts sit with Jr Wycinsky.
+- The proposed FY2027 book adds the visible Q3 committed pipeline in
+  `tiering/fy2027_pipeline.csv`. New US state logos join the AE already covering
+  that state. Expansion ARR lands on the existing account. Wyoming Department
+  of Environmental Quality is the one addition outside Carolina Prieto's Idaho
+  and North Dakota book: it is Scott Mark's first Wyoming account, so it stays
+  with him. UK pipeline is left off the US map. The extract is 15 of 35
+  opportunities, so it is not the full committed pipeline.
 - Ashley's current Enterprise accounts route only to her direct reports, with Columbus the
   one released exception. The open Pacific XP reports to Ashley.
 - Non-SAM special districts are Local SMG. SAM special districts stay Enterprise.
