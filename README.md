@@ -58,8 +58,9 @@ account, accounts outside the listed territory, and AEs with no territory on fil
 
 The proposed view in `index.html` applies these staffing rules:
 
-- Jake Sager, Nathan Williamson, Savannah Lane, Kristen Murphy and Ashley Hill carry no
-  proposed accounts.
+- Jake Sager is a VP. Savannah Lane, Kristen Murphy and Ashley Hill are managers.
+  None of them carries a proposed account book.
+- Nathan Williamson has left the team. His federal accounts sit with Jr Wycinsky.
 - Ashley's current Enterprise accounts route only to her direct reports, with Columbus the
   one released exception. The open Pacific XP reports to Ashley.
 - Non-SAM special districts are Local SMG. SAM special districts stay Enterprise.

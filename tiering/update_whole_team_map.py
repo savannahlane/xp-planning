@@ -4,8 +4,10 @@
 This script is intentionally narrow. It starts from the whole-team PAGE payload
 that landed on main and changes only the proposed assignment (`newxp`):
 
-* Jake Sager, Nathan Williamson, Savannah Lane, Kristen Murphy and Ashley Hill
-  hold no proposed accounts.
+* Jake Sager is a VP. Savannah Lane, Kristen Murphy and Ashley Hill are
+  managers. None of the four holds a proposed account book.
+* Nathan Williamson has left the team. His federal accounts sit with Jr
+  Wycinsky in both the current and proposed views.
 * Ashley's seven current Enterprise accounts land with direct reports.
 * Enterprise XPs carry no Local SMG accounts. Nine dedicated Local SMG XPs
   cover whole AE groups except the forced California and transportation splits.
@@ -16,7 +18,9 @@ that landed on main and changes only the proposed assignment (`newxp`):
 Per-account moves live in account_overrides.csv, which is the file to edit when
 an XP changes. It also carries segment changes and removals.
 
-The current-assignment (`cur`) field is historical and is not rewritten.
+The current-assignment (`cur`) field is historical and is not rewritten,
+except where Nathan Williamson still held an account: he has left, so those
+rows move to Jr Wycinsky.
 """
 
 from __future__ import annotations
@@ -253,8 +257,17 @@ def apply_assignments(page: dict, overrides: dict[str, dict]) -> dict:
     # can both survive into the order. Keep the first occurrence.
     page["order"] = list(dict.fromkeys(page["order"]))
 
-    # A blank level is an XP1 seat. Wendy and JR are the two exceptions.
-    named_level = {"Wendy Bhagat": "Director", "Jr Wycinsky": "XP4"}
+    # A blank level is an XP1 seat. These seats have an explicit role instead.
+    named_level = {
+        "Wendy Bhagat": "Director",
+        "Jr Wycinsky": "XP4",
+        "Jake Sager": "VP",
+        "Kristen Murphy": "Manager",
+        "Ashley Hill": "Manager",
+        "Savannah Lane": "Manager",
+    }
+    page["meta"].pop("Nathan Williamson", None)
+    page["order"] = [xp for xp in page["order"] if xp != "Nathan Williamson"]
     for xp, meta in page["meta"].items():
         if xp in named_level:
             meta[2] = named_level[xp]
@@ -266,7 +279,11 @@ def apply_assignments(page: dict, overrides: dict[str, dict]) -> dict:
     for row in rows:
         old = row["newxp"]
 
-        if old == "Nathan Williamson":
+        # Nathan has left. Jr already holds this federal book in the proposal,
+        # and the current view should not keep a departed XP on the team.
+        if row["cur"] == "Nathan Williamson":
+            row["cur"] = "Jr Wycinsky"
+        if row["newxp"] == "Nathan Williamson":
             row["newxp"] = "Jr Wycinsky"
 
         override = overrides.get(row["acct"])
@@ -630,9 +647,10 @@ def update_markup(source: str) -> str:
         "read the same in both views.",
         'Counts exclude allocated child records. "AEs today" is the same count '
         "under current assignments. Complex means more than 7 capabilities. "
-        "The proposed view removes account books from Jake Sager, Nathan "
-        "Williamson, Savannah Lane, Kristen Murphy and Ashley Hill; the "
-        "current view remains historical.",
+        "The proposed view removes account books from Jake Sager, Savannah "
+        "Lane, Kristen Murphy and Ashley Hill; the current view remains "
+        "historical. Nathan Williamson has left the team, and his federal "
+        "accounts sit with Jr Wycinsky.",
     )
 
     if "When those three books were removed" not in source:
@@ -714,9 +732,19 @@ def update_markup(source: str) -> str:
     source = source.replace(
         "The proposed view removes account books from Savannah Lane, Kristen "
         "Murphy and Ashley Hill; the current view remains historical.",
+        "The proposed view removes account books from Jake Sager, Savannah "
+        "Lane, Kristen Murphy and Ashley Hill; the current view remains "
+        "historical. Nathan Williamson has left the team, and his federal "
+        "accounts sit with Jr Wycinsky.",
+    )
+    source = source.replace(
         "The proposed view removes account books from Jake Sager, Nathan "
-        "Williamson, Savannah Lane, Kristen Murphy and Ashley Hill; the current "
-        "view remains historical.",
+        "Williamson, Savannah Lane, Kristen Murphy and Ashley Hill; the "
+        "current view remains historical.",
+        "The proposed view removes account books from Jake Sager, Savannah "
+        "Lane, Kristen Murphy and Ashley Hill; the current view remains "
+        "historical. Nathan Williamson has left the team, and his federal "
+        "accounts sit with Jr Wycinsky.",
     )
     source = source.replace(
         "Carolina Prieto keeps the Kentucky and North Dakota statewide "
