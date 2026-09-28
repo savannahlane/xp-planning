@@ -249,6 +249,17 @@ def apply_assignments(page: dict, overrides: dict[str, dict]) -> dict:
         page["meta"].setdefault(xp, ["—", "n/a", "—", "—"])
         if xp not in page["order"]:
             page["order"].append(xp)
+    # The seat rename is a text replacement, so an older name and its new name
+    # can both survive into the order. Keep the first occurrence.
+    page["order"] = list(dict.fromkeys(page["order"]))
+
+    # A blank level is an XP1 seat. Wendy and JR are the two exceptions.
+    named_level = {"Wendy Bhagat": "Director", "Jr Wycinsky": "XP4"}
+    for xp, meta in page["meta"].items():
+        if xp in named_level:
+            meta[2] = named_level[xp]
+        elif str(meta[2]).strip() in {"", "—", "n/a"}:
+            meta[2] = "XP1"
 
     moved = []
     matched = set()
@@ -771,6 +782,15 @@ def update_markup(source: str) -> str:
     )
     # Carolina Torres was a duplicate name for Carolina Cambronero.
     source = source.replace("Carolina Torres", "Carolina Cambronero")
+
+    # The modeling notes are working commentary, not part of the page.
+    source = re.sub(
+        r'\n  <section>\n    <h2>How this was modeled</h2>.*?</section>\n',
+        "\n",
+        source,
+        count=1,
+        flags=re.S,
+    )
     return source
 
 
