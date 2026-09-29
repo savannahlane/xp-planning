@@ -103,11 +103,24 @@ The proposed view in `index.html` applies these staffing rules:
 The `Current assignment` view is historical and still shows Savannah, Kristen and Ashley's
 current books.
 
-`Pod aligned` ignores who holds the accounts today. Each seat is named with an XP. US staff
-stay within an hour of the account's time zone; Costa Rica staff can sit in any region.
-Seats with no XP inside that rule stay open. District of Columbia stays with Paige Wendle.
-Federal accounts stay with Jr Wycinsky. All nine dedicated midmarket XPs are in Costa Rica,
-so none of their pod seats has a timezone restriction.
+`Pod aligned` ignores who holds the accounts today and follows the recommended seats:
+4 State SAMs, then Northwest 2, Northeast 3, California 4, Southwest 2, Mountain Plains 2,
+Texas 2, Great Lakes 3, Southeast 4 and Mid-Atlantic 3. Each seat is its own card. When
+one XP covers two seats, both cards stay up and the XP is named on each. US staff stay
+within an hour of the account's time zone; Costa Rica staff can sit in any region. Seats
+with no XP inside that rule stay open. On the pod cards the territory is the bold title,
+and the line under it names the XP. An open seat still names the AE on that line, so
+State SAM · Farnham reads as open and names the Farnham seat. District of Columbia stays
+with Paige Wendle. Federal accounts stay with Jr Wycinsky. All nine dedicated midmarket
+XPs are in Costa Rica, so none of their pod seats has a timezone restriction.
+
+Halena Martin holds the New England enterprise seat. Steffany Amador holds the Ohio,
+Indiana and Pennsylvania enterprise seat, so Columbus stays with her in the pod view.
+Andy O'Brien holds both Mid-Atlantic enterprise seats (Maryland/Virginia/North Carolina
+and Kentucky/Tennessee), shown as two cards. Gil Roy is the Texas State SAM: his seat
+includes his own Texas and Louisiana accounts, Bill Anderson's Texas accounts, and the
+unconfirmed Texas State SAM. Bill Anderson's seat is California and Washington. A
+territory picklist filters the cards to one or more of these regions.
 
 ## Growth tiering
 
