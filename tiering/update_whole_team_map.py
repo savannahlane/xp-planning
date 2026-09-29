@@ -6,8 +6,16 @@ that landed on main and changes only the proposed assignment (`newxp`):
 
 * Jake Sager is a VP. Savannah Lane, Kristen Murphy and Ashley Hill are
   managers. None of the four holds a proposed account book.
+* Reporting lines: Wendy Bhagat reports to Angy Peterson and Jr Wycinsky
+  reports to Wendy. Every midmarket XP, including Marcy Castro, reports to
+  Kristen Murphy. Savannah Lane's reports are Colleen Moran, Brooke Minichino,
+  Julio, Paige Wendle, Steffany Amador, Taylor Roman, Carolina Prieto and
+  Ashley Hill. Ashley's reports are Alejandro Solano, Andy O'Brien, Halena
+  Martin, Carolina Cambronero, Cody Nichols, Tatiana Montero and the open
+  Pacific seat.
 * Nathan Williamson has left the team. His federal accounts sit with Jr
-  Wycinsky in both the current and proposed views.
+  Wycinsky in both the current and proposed views. Every federal account is
+  in DC. District of Columbia itself stays with Paige Wendle.
 * Ashley's seven current Enterprise accounts land with direct reports.
 * Enterprise XPs carry no Local SMG accounts. Nine dedicated Local SMG XPs
   cover whole AE groups except the forced California and transportation splits.
@@ -47,13 +55,26 @@ NO_BOOK = {
     "Kristen Murphy",
     "Ashley Hill",
 }
+# Ashley's direct reports. Steffany and Colleen report to Savannah. Marcy is
+# midmarket and reports to Kristen. Andy is the "Andrew" on this roster.
 ASHLEY_REPORTS = {
     "Open XP2 (PT)",
-    "Colleen Moran",
-    "Cody Nichols",
-    "Steffany Amador",
-    "Marcy Castro",
     "Alejandro Solano",
+    "Andy O'Brien",
+    "Halena Martin",
+    "Carolina Cambronero",
+    "Cody Nichols",
+    "Tatiana Montero",
+}
+SAVANNAH_REPORTS = {
+    "Colleen Moran",
+    "Brooke Minichino",
+    "Julio",
+    "Paige Wendle",
+    "Steffany Amador",
+    "Taylor Roman",
+    "Carolina Prieto",
+    "Ashley Hill",
 }
 
 # Canonical Local SMG books. Whole AE groups stay together wherever possible:
@@ -132,6 +153,24 @@ SOUTHERN_CA_LOCAL_SMG = {
     "Vista, CA",
     "Westminster, CA",
 }
+# The pod view splits the southern list again so California has three
+# midmarket seats. These are San Diego, Imperial and the Inland Empire; the
+# rest of the southern list is Los Angeles and Orange County.
+SD_INLAND_CA_LOCAL_SMG = {
+    "Brawley CA",
+    "Chino Valley Independent Fire District",
+    "Coachella, CA",
+    "Eastvale CA",
+    "Encinitas, CA",
+    "Hesperia, CA",
+    "Imperial Irrigation District",
+    "Ontario International Airport",
+    "Palm Springs, CA",
+    "Perris, CA",
+    "San Diego State University",
+    "Victorville, CA",
+    "Vista, CA",
+}
 
 # Tatiana takes Marcy's enterprise book. These AE groups sit entirely with
 # Marcy. David Cliff and the Farnham seat do not, so only their Marcy accounts
@@ -198,7 +237,7 @@ BILL_ANDERSON_TEXAS_XP = "Paige Wendle"
 
 # Current Ashley Hill Enterprise accounts that may leave her reporting line.
 # Name any exception here so it is deliberate rather than silent drift. Columbus
-# no longer needs one: it sits with Steffany, who reports to Ashley.
+# sits with Steffany, who reports to Savannah, through the Kent Hartsfield rule.
 ASHLEY_HOLD_RELEASED: set[str] = set()
 
 # New York and New Jersey state agencies sit with Taylor, including the
@@ -279,7 +318,8 @@ POD_ASSIGNED = [
     ("Northeast ENT · New England", "Halena Martin", "ENT", "New England · ENT", "Northeast"),
     ("Northeast ENT · OH/IN/PA", "Steffany Amador", "ENT", "Ohio/Indiana/Pennsylvania · ENT", "Northeast"),
     ("Northeast MM", "Eduardo Ruiz", "MM", "Northeast · MM", "Northeast"),
-    ("California MM · South", "Marcy Castro", "MM", "California · South", "California"),
+    ("California MM · South", "Marcy Castro", "MM", "California · LA/Orange", "California"),
+    ("California MM · SD/Inland", "Open · California SD/Inland", "MM", "California · SD/Inland", "California"),
     ("California MM · North", "Carlos Torres", "MM", "California · North", "California"),
     ("California ENT", "Open XP2 (PT)", "ENT", "California · ENT", "California"),
     ("Southwest ENT", "Cody Nichols", "ENT", "Southwest · ENT", "Southwest"),
@@ -304,7 +344,7 @@ POD_ASSIGNED = [
 REGION_SHAPE = {
     "Northwest": {"ENT": 1, "MM": 1},
     "Northeast": {"ENT": 2, "MM": 1},
-    "California": {"ENT": 1, "MM": 2},
+    "California": {"ENT": 1, "MM": 3},
     "Southwest": {"ENT": 1, "MM": 1},
     "Mountain Plains": {"ENT": 1, "MM": 1},
     "Texas": {"ENT": 1, "MM": 1},
@@ -327,10 +367,8 @@ RETIRED_POD_NAMES = {
     "Northeast ENT · OH/IN/PA",
     "Northeast MM",
     "California MM · LA/OC",
-    "California MM · SD/Inland",
     "California MM · South",
     "California MM · North",
-    "Open · California SD/Inland",
     "Open · North Florida MM",
     "California ENT · uncovered",
     "California ENT",
@@ -362,8 +400,9 @@ MID_ATLANTIC_ENT_COAST = {"MD", "VA", "WV", "NC"}
 MID_ATLANTIC_ENT_INLAND = {"AR", "TN", "KY"}
 COLUMBUS = "Columbus OH"
 
-# California midmarket is two seats. The southern list is Tier 8 outside
-# Jaxon Sher's North/Central book. North is everything else in the state.
+# California midmarket is three seats. The southern list is Tier 8 outside
+# Jaxon Sher's North/Central book, split into LA/Orange and SD/Inland. North
+# is everything else in the state.
 
 # Southeast midmarket is three seats. South Florida is named; the rest of
 # Florida is the north seat; Georgia, Louisiana, Alabama and South Carolina
@@ -408,6 +447,8 @@ def pod_seat(row: dict) -> str:
     if state == "CA":
         if not mm:
             return "California ENT"
+        if row["acct"] in SD_INLAND_CA_LOCAL_SMG:
+            return "California MM · SD/Inland"
         if row["acct"] in SOUTHERN_CA_LOCAL_SMG:
             return "California MM · South"
         return "California MM · North"
@@ -481,6 +522,11 @@ def assign_pods(page: dict, rows: list[dict]) -> dict[str, int]:
     page["podXp"] = pod_xp
     page["territories"] = territories
 
+    if not SD_INLAND_CA_LOCAL_SMG <= SOUTHERN_CA_LOCAL_SMG:
+        raise RuntimeError(
+            "SD/Inland names accounts outside the southern California list: "
+            + ", ".join(sorted(SD_INLAND_CA_LOCAL_SMG - SOUTHERN_CA_LOCAL_SMG))
+        )
     named_ca = SOUTHERN_CA_LOCAL_SMG
     ca_smg = {
         r["acct"]
@@ -753,8 +799,7 @@ def apply_assignments(page: dict, overrides: dict[str, dict]) -> dict:
 
     # The open Pacific XP is an Ashley report. That preserves the coherent,
     # single-XP California State AE groups while satisfying the reporting rule.
-    page["meta"]["Open XP2 (PT)"][0] = "Ashley Hill"
-    page["meta"]["Carolina Prieto"] = ["—", "—", "Team Lead", "Not specified"]
+    page["meta"]["Carolina Prieto"] = ["Savannah Lane", "—", "Team Lead", "Not specified"]
     page["meta"].pop("Carolina Torres", None)
     page["order"] = [xp for xp in page["order"] if xp != "Carolina Torres"]
     for xp in ("Tatiana Montero", "Luis Aguilar", "Ricardo Castro"):
@@ -788,10 +833,31 @@ def apply_assignments(page: dict, overrides: dict[str, dict]) -> dict:
         elif str(meta[2]).strip() in {"", "—", "n/a"}:
             meta[2] = "XP1"
 
+    # meta[0] is the manager on the book check. Julio is on Savannah's team
+    # and holds no accounts, so this row is the reporting line only. Set it
+    # after the blank-level fill so he is not labelled XP1.
+    reports_to = {xp: "Kristen Murphy" for xp in LOCAL_SMG_XPS}
+    reports_to.update({xp: "Savannah Lane" for xp in SAVANNAH_REPORTS})
+    reports_to.update({xp: "Ashley Hill" for xp in ASHLEY_REPORTS})
+    reports_to["Wendy Bhagat"] = "Angy Peterson"
+    reports_to["Jr Wycinsky"] = "Wendy Bhagat"
+    for xp, manager in reports_to.items():
+        meta = page["meta"].setdefault(xp, ["—", "—", "—", "—"])
+        meta[0] = manager
+    page["meta"]["Julio"][1] = "—"
+    page["meta"]["Julio"][2] = "—"
+    page["meta"]["Julio"][3] = "Savannah's team; no accounts on this map"
+
     moved = []
     matched = set()
     for row in rows:
         old = row["newxp"]
+
+        # Federal accounts are a DC book. Robinhood was the one row filed under
+        # Tom Gilliatt in California; the other federal rows were scattered
+        # across MD, VA, NY or a blank state.
+        if row["segment"] == "Federal" and row.get("state") != "DC":
+            row["state"] = "DC"
 
         # Nathan has left. Jr already holds this federal book in the proposal,
         # and the current view should not keep a departed XP on the team.
@@ -1120,6 +1186,19 @@ def apply_assignments(page: dict, overrides: dict[str, dict]) -> dict:
             "Carolina Torres is Carolina Cambronero; stray proposed accounts: "
             + ", ".join(still_torres)
         )
+
+    fed_elsewhere = [
+        f"{r['acct']} ({r.get('state') or 'no state'})"
+        for r in rows
+        if r["segment"] == "Federal" and r.get("state") != "DC"
+    ]
+    if fed_elsewhere:
+        raise RuntimeError(
+            "Federal accounts outside DC: " + ", ".join(fed_elsewhere)
+        )
+    for xp, manager in reports_to.items():
+        if page["meta"].get(xp, [None])[0] != manager:
+            raise RuntimeError(f"{xp} should report to {manager}")
 
     after_edges = proposed_edges(rows)
     pod_load = assign_pods(page, rows)
