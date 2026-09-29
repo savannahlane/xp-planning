@@ -6,8 +6,16 @@ that landed on main and changes only the proposed assignment (`newxp`):
 
 * Jake Sager is a VP. Savannah Lane, Kristen Murphy and Ashley Hill are
   managers. None of the four holds a proposed account book.
+* Reporting lines: Wendy Bhagat reports to Angy Peterson and Jr Wycinsky
+  reports to Wendy. Every midmarket XP, including Marcy Castro, reports to
+  Kristen Murphy. Savannah Lane's reports are Colleen Moran, Brooke Minichino,
+  Julio, Paige Wendle, Steffany Amador, Taylor Roman, Carolina Prieto and
+  Ashley Hill. Ashley's reports are Alejandro Solano, Andy O'Brien, Halena
+  Martin, Carolina Cambronero, Cody Nichols, Tatiana Montero and the open
+  Pacific seat.
 * Nathan Williamson has left the team. His federal accounts sit with Jr
-  Wycinsky in both the current and proposed views.
+  Wycinsky in both the current and proposed views. Every federal account is
+  in DC. District of Columbia itself stays with Paige Wendle.
 * Ashley's seven current Enterprise accounts land with direct reports.
 * Enterprise XPs carry no Local SMG accounts. Nine dedicated Local SMG XPs
   cover whole AE groups except the forced California and transportation splits.
@@ -47,13 +55,26 @@ NO_BOOK = {
     "Kristen Murphy",
     "Ashley Hill",
 }
+# Ashley's direct reports. Steffany and Colleen report to Savannah. Marcy is
+# midmarket and reports to Kristen. Andy is the "Andrew" on this roster.
 ASHLEY_REPORTS = {
     "Open XP2 (PT)",
-    "Colleen Moran",
-    "Cody Nichols",
-    "Steffany Amador",
-    "Marcy Castro",
     "Alejandro Solano",
+    "Andy O'Brien",
+    "Halena Martin",
+    "Carolina Cambronero",
+    "Cody Nichols",
+    "Tatiana Montero",
+}
+SAVANNAH_REPORTS = {
+    "Colleen Moran",
+    "Brooke Minichino",
+    "Julio",
+    "Paige Wendle",
+    "Steffany Amador",
+    "Taylor Roman",
+    "Carolina Prieto",
+    "Ashley Hill",
 }
 
 # Canonical Local SMG books. Whole AE groups stay together wherever possible:
@@ -198,7 +219,7 @@ BILL_ANDERSON_TEXAS_XP = "Paige Wendle"
 
 # Current Ashley Hill Enterprise accounts that may leave her reporting line.
 # Name any exception here so it is deliberate rather than silent drift. Columbus
-# no longer needs one: it sits with Steffany, who reports to Ashley.
+# sits with Steffany, who reports to Savannah, through the Kent Hartsfield rule.
 ASHLEY_HOLD_RELEASED: set[str] = set()
 
 # New York and New Jersey state agencies sit with Taylor, including the
@@ -734,8 +755,7 @@ def apply_assignments(page: dict, overrides: dict[str, dict]) -> dict:
 
     # The open Pacific XP is an Ashley report. That preserves the coherent,
     # single-XP California State AE groups while satisfying the reporting rule.
-    page["meta"]["Open XP2 (PT)"][0] = "Ashley Hill"
-    page["meta"]["Carolina Prieto"] = ["—", "—", "Team Lead", "Not specified"]
+    page["meta"]["Carolina Prieto"] = ["Savannah Lane", "—", "Team Lead", "Not specified"]
     page["meta"].pop("Carolina Torres", None)
     page["order"] = [xp for xp in page["order"] if xp != "Carolina Torres"]
     for xp in ("Tatiana Montero", "Luis Aguilar", "Ricardo Castro"):
@@ -769,10 +789,31 @@ def apply_assignments(page: dict, overrides: dict[str, dict]) -> dict:
         elif str(meta[2]).strip() in {"", "—", "n/a"}:
             meta[2] = "XP1"
 
+    # meta[0] is the manager on the book check. Julio is on Savannah's team
+    # and holds no accounts, so this row is the reporting line only. Set it
+    # after the blank-level fill so he is not labelled XP1.
+    reports_to = {xp: "Kristen Murphy" for xp in LOCAL_SMG_XPS}
+    reports_to.update({xp: "Savannah Lane" for xp in SAVANNAH_REPORTS})
+    reports_to.update({xp: "Ashley Hill" for xp in ASHLEY_REPORTS})
+    reports_to["Wendy Bhagat"] = "Angy Peterson"
+    reports_to["Jr Wycinsky"] = "Wendy Bhagat"
+    for xp, manager in reports_to.items():
+        meta = page["meta"].setdefault(xp, ["—", "—", "—", "—"])
+        meta[0] = manager
+    page["meta"]["Julio"][1] = "—"
+    page["meta"]["Julio"][2] = "—"
+    page["meta"]["Julio"][3] = "Savannah's team; no accounts on this map"
+
     moved = []
     matched = set()
     for row in rows:
         old = row["newxp"]
+
+        # Federal accounts are a DC book. Robinhood was the one row filed under
+        # Tom Gilliatt in California; the other federal rows were scattered
+        # across MD, VA, NY or a blank state.
+        if row["segment"] == "Federal" and row.get("state") != "DC":
+            row["state"] = "DC"
 
         # Nathan has left. Jr already holds this federal book in the proposal,
         # and the current view should not keep a departed XP on the team.
@@ -1091,6 +1132,19 @@ def apply_assignments(page: dict, overrides: dict[str, dict]) -> dict:
             "Carolina Torres is Carolina Cambronero; stray proposed accounts: "
             + ", ".join(still_torres)
         )
+
+    fed_elsewhere = [
+        f"{r['acct']} ({r.get('state') or 'no state'})"
+        for r in rows
+        if r["segment"] == "Federal" and r.get("state") != "DC"
+    ]
+    if fed_elsewhere:
+        raise RuntimeError(
+            "Federal accounts outside DC: " + ", ".join(fed_elsewhere)
+        )
+    for xp, manager in reports_to.items():
+        if page["meta"].get(xp, [None])[0] != manager:
+            raise RuntimeError(f"{xp} should report to {manager}")
 
     after_edges = proposed_edges(rows)
     pod_load = assign_pods(page, rows)

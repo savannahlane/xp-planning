@@ -64,7 +64,18 @@ The proposed view in `index.html` applies these staffing rules:
 
 - Jake Sager is a VP. Savannah Lane, Kristen Murphy and Ashley Hill are managers.
   None of them carries a proposed account book.
+- Reporting lines, shown in the Manager column: Wendy Bhagat reports to Angy
+  Peterson, and Jr Wycinsky reports to Wendy. Every midmarket XP, including
+  Marcy Castro, reports to Kristen Murphy. Savannah Lane's reports are Colleen
+  Moran, Brooke Minichino, Julio, Paige Wendle, Steffany Amador, Taylor Roman,
+  Carolina Prieto and Ashley Hill. Ashley's reports are Alejandro Solano, Andy
+  O'Brien, Halena Martin, Carolina Cambronero, Cody Nichols, Tatiana Montero
+  and the open Pacific seat. Julio is on Savannah's team and holds no accounts
+  on this map.
 - Nathan Williamson has left the team. His federal accounts sit with Jr Wycinsky.
+  Every federal account is in DC, including Tom Gilliatt's Robinhood account,
+  which had been filed under California. District of Columbia itself stays with
+  Paige Wendle.
 - The proposed FY2027 book adds the visible Q3 committed pipeline in
   `tiering/fy2027_pipeline.csv`. New US state logos join the AE already covering
   that state. Expansion ARR lands on the existing account. Wyoming Department
@@ -72,8 +83,8 @@ The proposed view in `index.html` applies these staffing rules:
   and North Dakota book: it is Scott Mark's first Wyoming account, so it stays
   with him. UK pipeline is left off the US map. The extract is 15 of 35
   opportunities, so it is not the full committed pipeline.
-- Ashley's current Enterprise accounts route only to her direct reports. The open
-  Pacific XP reports to Ashley.
+- Ashley's current Enterprise accounts route to her direct reports, except
+  Columbus, which stays with Steffany Amador. The open Pacific XP reports to Ashley.
 - Non-SAM special districts are Local SMG. SAM special districts stay Enterprise.
   Health Care District of Palm Beach County is the Florida exception: it stays
   Enterprise with Carolina Cambronero.
