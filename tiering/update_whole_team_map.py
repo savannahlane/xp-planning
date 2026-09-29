@@ -57,9 +57,9 @@ ASHLEY_REPORTS = {
 # Canonical Local SMG books. Whole AE groups stay together wherever possible:
 # 16 of the 19 seats work with exactly one XP. California has 47 accounts and
 # must split at the 30-account cap, so its placeholder seat is divided
-# North/Central (Eduardo) and Southern (Tatiana). Luke Mulvaney's national
-# transportation vertical is the other split: its TX account follows Luis,
-# while NJ and OR stay with Carlos.
+# North/Central (Eduardo) and Southern (Marcy, swapped with Tatiana).
+# Luke Mulvaney's national transportation vertical is the other split: its TX
+# account follows Luis, while NJ and OR stay with Carlos.
 LOCAL_SMG_DESTINATION = {
     "Local SMG FL (Ter 4)": "Natalia Sanchez",
     "Local SMG Ter 6 (TX/OK/AR)": "Luis Aguilar",
@@ -86,9 +86,9 @@ LOCAL_SMG_XPS = {
     "Eduardo Ruiz",
     "Kerrian Dailey",
     "Luis Aguilar",
+    "Marcy Castro",
     "Natalia Sanchez",
     "Ricardo Castro",
-    "Tatiana Montero",
 }
 
 # Provisional geographic cut of the four-seat California placeholder. The
@@ -126,6 +126,16 @@ SOUTHERN_CA_LOCAL_SMG = {
     "Victorville, CA",
     "Vista, CA",
     "Westminster, CA",
+}
+
+# Tatiana takes Marcy's enterprise book. These AE groups sit entirely with
+# Marcy. David Cliff and the Farnham seat do not, so only their Marcy accounts
+# are named.
+TATIANA_ENTERPRISE_AES = {"Bettsy Desjarlais", "Bill Pintsak", "Chris Thiers"}
+TATIANA_ENTERPRISE_ACCOUNTS = {
+    "Jackson County MO",
+    "Kansas City, MO, Police Department",
+    "Ohio Workers' Compensation Bureau",
 }
 
 # North Dakota ITD is the billed parent of a statewide enterprise agreement.
@@ -321,7 +331,7 @@ def local_smg_destination(row: dict) -> str:
     """Return the canonical XP for one Local SMG account."""
     if row["person"] in {"Local SMG CA (Ter 8)", "Jaxson McBride"}:
         return (
-            "Tatiana Montero"
+            "Marcy Castro"
             if row["acct"] in SOUTHERN_CA_LOCAL_SMG
             else "Eduardo Ruiz"
         )
@@ -442,7 +452,6 @@ def apply_assignments(page: dict, overrides: dict[str, dict]) -> dict:
     # run, apply the canonical nine-XP Local SMG cut. This is unconditional so
     # reruns converge after older per-account balancing overrides and after the
     # source PAGE has already been rewritten once.
-    enterprise_xps = {r["newxp"] for r in rows if r.get("ent") and not r["alloc"]}
     offloaded = []
     for row in rows:
         if row["segment"] != "Local SMG":
@@ -453,6 +462,20 @@ def apply_assignments(page: dict, overrides: dict[str, dict]) -> dict:
             moved.append((row["acct"], row["newxp"], destination, row["person"]))
             row["newxp"] = destination
 
+    # Tatiana and Marcy swap books. Tatiana takes the enterprise accounts that
+    # had settled with Marcy; Marcy takes Southern California through the Local
+    # SMG cut above. Doing it from the account and AE, not from the current
+    # name, keeps a second run from swapping them back.
+    for row in rows:
+        if row["segment"] == "Local SMG":
+            continue
+        if (
+            row["person"] in TATIANA_ENTERPRISE_AES
+            or row["acct"] in TATIANA_ENTERPRISE_ACCOUNTS
+        ):
+            row["newxp"] = "Tatiana Montero"
+
+    enterprise_xps = {r["newxp"] for r in rows if r.get("ent") and not r["alloc"]}
     hybrid = sorted(
         {
             r["newxp"]
@@ -881,9 +904,10 @@ def update_markup(source: str) -> str:
         "each Local SMG AE group moves whole to a dedicated Local SMG XP, so the "
         "AE works with one XP instead of several.",
         "nine dedicated Local SMG XPs cover whole AE groups wherever the 30-account "
-        "cap permits. Tatiana Montero holds Southern California, Eduardo Ruiz holds "
+        "cap permits. Marcy Castro holds Southern California, Eduardo Ruiz holds "
         "North/Central California, Luis Aguilar holds Texas, and Ricardo Castro "
-        "holds the Southeast and Mid-Atlantic. California's 47 accounts force its "
+        "holds the Southeast and Mid-Atlantic. Tatiana Montero holds Marcy's former "
+        "Missouri, Illinois, Ohio and Nebraska enterprise book. California's 47 accounts force its "
         "placeholder AE seat to split; Luke Mulvaney's Texas account follows Luis "
         "while his New Jersey and Oregon accounts stay with Carlos Torres.",
     )
