@@ -118,6 +118,11 @@ Wycinsky. District of Columbia is a Paige hold in every view (`PAIGE_DC`).
 **Pod-aligned view.** It ignores current and proposed owners completely. Accounts go to a seat by
 state and segment (`pod_seat()`), and each seat has one XP in `POD_ASSIGNED`. Overrides do not
 touch it. US-based XPs must be within one hour of every state on their seat (`US_XP_TZ`).
+The seat count per region is fixed in `REGION_SHAPE`. California's three midmarket seats are North
+(Carlos), LA/Orange (Marcy) and San Diego/Inland (open, the names in `SD_INLAND_CA_LOCAL_SMG`).
+Holds in `pod_seat()` keep the same person across proposed and pod for Kent Hartsfield → Steffany
+(Cook County and the Ohio group), Andrew Wyzkoski → Halena (Pennsylvania), and Washington state
+agencies → Paige (with DC).
 
 ---
 
