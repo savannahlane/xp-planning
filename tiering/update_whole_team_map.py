@@ -308,13 +308,15 @@ def on_gil_roy_sam(row: dict) -> bool:
 # seat id, XP, role, card label, territory filter. Open seats have no XP who fits.
 # Cards are seats, not people: Andy holds both Mid-Atlantic enterprise seats and
 # they stay separate. Halena holds New England. Steffany holds Ohio, Indiana and
-# Pennsylvania, which is where Columbus sits.
+# Pennsylvania, which is where Columbus sits. Colleen holds California enterprise,
+# including Greater LA. Paige holds Northwest enterprise (Oregon is already hers
+# in the proposed book) and Mountain Plains.
 POD_ASSIGNED = [
     ("SAM · Bill Anderson", "Alejandro Solano", "SAM", "State SAM · CA/WA", "State SAM · CA/WA"),
     ("SAM · Farnham", "Open · SAM Farnham", "SAM", "State SAM · Farnham", "State SAM · Farnham"),
     ("SAM · Gil Roy", "Carolina Cambronero", "SAM", "State SAM · TX", "State SAM · TX"),
     ("SAM · Benjamin Shor", "Brooke Minichino", "SAM", "State SAM · MD/NY", "State SAM · MD/NY"),
-    ("Northwest ENT", "Colleen Moran", "ENT", "Northwest · ENT", "Northwest"),
+    ("Northwest ENT", "Paige Wendle", "ENT", "Northwest · ENT", "Northwest"),
     ("Northwest MM", "Open · Northwest MM", "MM", "Northwest · MM", "Northwest"),
     ("Northeast ENT · New England", "Halena Martin", "ENT", "New England · ENT", "Northeast"),
     ("Northeast ENT · OH/IN/PA", "Steffany Amador", "ENT", "Ohio/Indiana/Pennsylvania · ENT", "Northeast"),
@@ -322,7 +324,7 @@ POD_ASSIGNED = [
     ("California MM · South", "Marcy Castro", "MM", "California · LA/Orange", "California"),
     ("California MM · SD/Inland", "Open · California SD/Inland", "MM", "California · SD/Inland", "California"),
     ("California MM · North", "Carlos Torres", "MM", "California · North", "California"),
-    ("California ENT", "Open XP2 (PT)", "ENT", "California · ENT", "California"),
+    ("California ENT", "Colleen Moran", "ENT", "California · ENT", "California"),
     ("Southwest ENT", "Cody Nichols", "ENT", "Southwest · ENT", "Southwest"),
     ("Southwest MM", "David Treminio", "MM", "Southwest · MM", "Southwest"),
     ("Mountain Plains ENT", "Paige Wendle", "ENT", "Mountain Plains · ENT", "Mountain Plains"),
@@ -432,7 +434,8 @@ def pod_seat(row: dict) -> str:
     when geography alone would put the account on another seat: Steffany keeps
     Kent Hartsfield (Cook County and the Ohio group), Halena keeps Andrew
     Wyzkoski in Pennsylvania, and Paige keeps District of Columbia plus every
-    Washington state agency.
+    Washington state agency. California enterprise, including Greater LA, is
+    Colleen's seat, so those accounts stay with her here too.
     """
     if row["acct"] == PAIGE_DC:
         return "Mountain Plains ENT"
@@ -634,6 +637,23 @@ def assign_pods(page: dict, rows: list[dict]) -> dict[str, int]:
     ]
     if not pa_halena or any(r["podxp"] != "Halena Martin" for r in pa_halena):
         raise RuntimeError("Andrew Wyzkoski's Pennsylvania book is not on Halena Martin in the pod model")
+    if pod_xp["California ENT"] != "Colleen Moran":
+        raise RuntimeError("California enterprise is not Colleen Moran's seat")
+    ca_local_off = [
+        r["acct"]
+        for r in rows
+        if r["state"] == "CA"
+        and r["segment"] == "Local ENT"
+        and not r["alloc"]
+        and r["podxp"] != "Colleen Moran"
+    ]
+    if ca_local_off:
+        raise RuntimeError(
+            "California local enterprise off Colleen in the pod model: "
+            + ", ".join(ca_local_off)
+        )
+    if pod_xp["Northwest ENT"] != "Paige Wendle":
+        raise RuntimeError("Northwest enterprise is not Paige Wendle's seat")
 
     unverified = []
     for seat, states in sorted(seat_states.items()):
