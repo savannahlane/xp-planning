@@ -252,41 +252,67 @@ STATE_SAM_SEAT = {
     "Benjamin Shor": "SAM · Benjamin Shor",
 }
 
-# seat id, XP, role, label shown on the node. Open seats have no XP who fits.
+# Gil Roy is the Texas State SAM. His own Louisiana accounts stay on the same
+# seat. Texas rows still filed under Bill Anderson, and the unconfirmed Texas
+# State SAM, move here with him.
+def on_gil_roy_sam(row: dict) -> bool:
+    if row["segment"] == "Local SMG":
+        return False
+    if row["person"] in {"Gil Roy", "TX State SAM (unconfirmed)"}:
+        return True
+    return row["person"] == "Bill Anderson" and row["state"] == "TX"
+
+# seat id, XP, role, card label, territory filter. Open seats have no XP who fits.
+# Cards are seats, not people: Andy holds both Mid-Atlantic enterprise seats and
+# they stay separate. Halena holds New England. Steffany holds Ohio, Indiana and
+# Pennsylvania, which is where Columbus sits.
 POD_ASSIGNED = [
-    ("SAM · Bill Anderson", "Alejandro Solano", "SAM", "State SAM · CA/TX/WA"),
-    ("SAM · Farnham", "Open · SAM Farnham", "SAM", "State SAM · Farnham"),
-    ("SAM · Gil Roy", "Carolina Cambronero", "SAM", "State SAM · AR/LA/TX"),
-    ("SAM · Benjamin Shor", "Brooke Minichino", "SAM", "State SAM · MD/NY"),
-    ("Northwest ENT", "Colleen Moran", "ENT", "Northwest · ENT"),
-    ("Northwest MM", "Open · Northwest MM", "MM", "Northwest · MM"),
-    ("Northeast ENT · New England", "Open · Northeast ENT", "ENT", "New England · ENT"),
-    ("Northeast ENT · OH/IN/PA", "Halena Martin", "ENT", "Ohio/Indiana/Pennsylvania · ENT"),
-    ("Northeast MM", "Carlos Torres", "MM", "Northeast · MM"),
-    ("California MM · LA/OC", "Marcy Castro", "MM", "California · LA/OC"),
-    ("California MM · SD/Inland", "Open · California SD/Inland", "MM", "California · SD/Inland"),
-    ("California MM · North", "Eduardo Ruiz", "MM", "California · North"),
-    ("California ENT", "Open XP2 (PT)", "ENT", "California · ENT"),
-    ("Southwest ENT", "Cody Nichols", "ENT", "Southwest · ENT"),
-    ("Southwest MM", "David Treminio", "MM", "Southwest · MM"),
-    ("Mountain Plains ENT", "Paige Wendle", "ENT", "Mountain Plains · ENT"),
-    ("Mountain Plains MM", "Open · Mountain Plains MM", "MM", "Mountain Plains · MM"),
-    ("Texas ENT", "Open · Texas ENT", "ENT", "Texas · ENT"),
-    ("Texas MM", "Luis Aguilar", "MM", "Texas · MM"),
-    ("Great Lakes ENT", "Tatiana Montero", "ENT", "Great Lakes · ENT"),
-    ("Great Lakes MM · Illinois", "Andrés Pérez", "MM", "Illinois · MM"),
-    ("Great Lakes MM · Upper Midwest", "Kerrian Dailey", "MM", "Upper Midwest · MM"),
-    ("Southeast ENT", "Taylor Roman", "ENT", "Southeast · ENT"),
-    ("Southeast MM · South FL", "Natalia Sanchez", "MM", "South Florida · MM"),
-    ("Southeast MM · North FL", "Open · North Florida MM", "MM", "North Florida · MM"),
-    ("Southeast MM · GA/LA/SC", "Ricardo Castro", "MM", "Georgia/Louisiana/SC · MM"),
-    ("Mid-Atlantic ENT · MD/VA/NC", "Steffany Amador", "ENT", "Mid-Atlantic · MD/VA/NC"),
-    ("Mid-Atlantic ENT · KY/TN", "Andy O'Brien", "ENT", "Mid-Atlantic · KY/TN"),
-    ("Mid-Atlantic MM", "Open · Mid-Atlantic MM", "MM", "Mid-Atlantic · MM"),
-    ("Federal", "Jr Wycinsky", "Federal", "Federal"),
+    ("SAM · Bill Anderson", "Alejandro Solano", "SAM", "State SAM · CA/WA", "State SAM · CA/WA"),
+    ("SAM · Farnham", "Open · SAM Farnham", "SAM", "State SAM · Farnham", "State SAM · Farnham"),
+    ("SAM · Gil Roy", "Carolina Cambronero", "SAM", "State SAM · TX", "State SAM · TX"),
+    ("SAM · Benjamin Shor", "Brooke Minichino", "SAM", "State SAM · MD/NY", "State SAM · MD/NY"),
+    ("Northwest ENT", "Colleen Moran", "ENT", "Northwest · ENT", "Northwest"),
+    ("Northwest MM", "Open · Northwest MM", "MM", "Northwest · MM", "Northwest"),
+    ("Northeast ENT · New England", "Halena Martin", "ENT", "New England · ENT", "Northeast"),
+    ("Northeast ENT · OH/IN/PA", "Steffany Amador", "ENT", "Ohio/Indiana/Pennsylvania · ENT", "Northeast"),
+    ("Northeast MM", "Carlos Torres", "MM", "Northeast · MM", "Northeast"),
+    ("California MM · LA/OC", "Marcy Castro", "MM", "California · LA/OC", "California"),
+    ("California MM · SD/Inland", "Open · California SD/Inland", "MM", "California · SD/Inland", "California"),
+    ("California MM · North", "Eduardo Ruiz", "MM", "California · North", "California"),
+    ("California ENT", "Open XP2 (PT)", "ENT", "California · ENT", "California"),
+    ("Southwest ENT", "Cody Nichols", "ENT", "Southwest · ENT", "Southwest"),
+    ("Southwest MM", "David Treminio", "MM", "Southwest · MM", "Southwest"),
+    ("Mountain Plains ENT", "Paige Wendle", "ENT", "Mountain Plains · ENT", "Mountain Plains"),
+    ("Mountain Plains MM", "Open · Mountain Plains MM", "MM", "Mountain Plains · MM", "Mountain Plains"),
+    ("Texas ENT", "Open · Texas ENT", "ENT", "Texas · ENT", "Texas"),
+    ("Texas MM", "Luis Aguilar", "MM", "Texas · MM", "Texas"),
+    ("Great Lakes ENT", "Tatiana Montero", "ENT", "Great Lakes · ENT", "Great Lakes"),
+    ("Great Lakes MM · Illinois", "Andrés Pérez", "MM", "Illinois · MM", "Great Lakes"),
+    ("Great Lakes MM · Upper Midwest", "Kerrian Dailey", "MM", "Upper Midwest · MM", "Great Lakes"),
+    ("Southeast ENT", "Taylor Roman", "ENT", "Southeast · ENT", "Southeast"),
+    ("Southeast MM · South FL", "Natalia Sanchez", "MM", "South Florida · MM", "Southeast"),
+    ("Southeast MM · North FL", "Open · North Florida MM", "MM", "North Florida · MM", "Southeast"),
+    ("Southeast MM · GA/LA/SC", "Ricardo Castro", "MM", "Georgia/Louisiana/SC · MM", "Southeast"),
+    ("Mid-Atlantic ENT · MD/VA/NC", "Andy O'Brien", "ENT", "Mid-Atlantic · MD/VA/NC", "Mid-Atlantic"),
+    ("Mid-Atlantic ENT · KY/TN", "Andy O'Brien", "ENT", "Mid-Atlantic · KY/TN", "Mid-Atlantic"),
+    ("Mid-Atlantic MM", "Open · Mid-Atlantic MM", "MM", "Mid-Atlantic · MM", "Mid-Atlantic"),
+    ("Federal", "Jr Wycinsky", "Federal", "Federal", "Federal"),
 ]
-SEAT_XP = {seat: xp for seat, xp, _role, _label in POD_ASSIGNED}
-SEAT_ROLE = {seat: role for seat, _xp, role, _label in POD_ASSIGNED}
+# The recommended regional shape. The written "24" is one short of this list.
+REGION_SHAPE = {
+    "Northwest": {"ENT": 1, "MM": 1},
+    "Northeast": {"ENT": 2, "MM": 1},
+    "California": {"ENT": 1, "MM": 3},
+    "Southwest": {"ENT": 1, "MM": 1},
+    "Mountain Plains": {"ENT": 1, "MM": 1},
+    "Texas": {"ENT": 1, "MM": 1},
+    "Great Lakes": {"ENT": 1, "MM": 2},
+    "Southeast": {"ENT": 1, "MM": 3},
+    "Mid-Atlantic": {"ENT": 2, "MM": 1},
+}
+SEAT_XP = {seat: xp for seat, xp, _role, _label, _terr in POD_ASSIGNED}
+SEAT_ROLE = {seat: role for seat, _xp, role, _label, _terr in POD_ASSIGNED}
+SEAT_TERR = {seat: terr for seat, _xp, _role, _label, terr in POD_ASSIGNED}
 # Names published by the first pod view. Drop them once seats are people.
 RETIRED_POD_NAMES = {
     "SAM · Bill Anderson",
@@ -318,15 +344,18 @@ RETIRED_POD_NAMES = {
     "Southeast MM · GA/LA/SC",
     "Mid-Atlantic ENT · MD/VA/NC",
     "Mid-Atlantic ENT · KY/TN",
+    "Mid-Atlantic ENT",
     "Mid-Atlantic MM",
     "Federal",
+    "Open · Northeast ENT",
 }
 
-# Two enterprise seats in one region keep whole states together.
+# Two enterprise seats in a region keep whole states together.
 NORTHEAST_ENT_NEW_ENGLAND = {"ME", "NY", "NJ", "DE", "MA", "RI", "VT", "CT", "NH"}
 NORTHEAST_ENT_OHIO = {"PA", "OH", "IN"}
 MID_ATLANTIC_ENT_COAST = {"MD", "VA", "WV", "NC"}
 MID_ATLANTIC_ENT_INLAND = {"AR", "TN", "KY"}
+COLUMBUS = "Columbus OH"
 
 # California is one state with three midmarket seats, so the split is geographic
 # rather than by AE. Anything in California Local SMG not named here is North.
@@ -391,6 +420,8 @@ def pod_seat(row: dict) -> str:
         return "Mountain Plains ENT"
     if row["segment"] == "Federal" or not row.get("state"):
         return "Federal"
+    if on_gil_roy_sam(row):
+        return "SAM · Gil Roy"
     if row["person"] in STATE_SAM_SEAT:
         return STATE_SAM_SEAT[row["person"]]
     state = row["state"]
@@ -445,21 +476,41 @@ def assign_pods(page: dict, rows: list[dict]) -> dict[str, int]:
     for retired in RETIRED_POD_NAMES:
         page["meta"].pop(retired, None)
     page["order"] = [xp for xp in page["order"] if xp not in RETIRED_POD_NAMES]
-    open_names = [xp for _seat, xp, _role, _label in POD_ASSIGNED if xp.startswith("Open ·")]
+    open_names = [xp for _seat, xp, _role, _label, _terr in POD_ASSIGNED if xp.startswith("Open ·")]
     page["order"] = [xp for xp in page["order"] if xp not in open_names]
+    for key in list(page["meta"]):
+        if key.startswith("Open ·") and key not in open_names:
+            page["meta"].pop(key, None)
+    shape: dict[str, dict[str, int]] = defaultdict(lambda: defaultdict(int))
+    for seat, _xp, role, _label, terr in POD_ASSIGNED:
+        if role in {"ENT", "MM"}:
+            shape[terr][role] += 1
+    if {terr: dict(roles) for terr, roles in shape.items()} != REGION_SHAPE:
+        raise RuntimeError(f"Pod seats do not match the recommendation: { {t: dict(r) for t, r in shape.items()} }")
+    if sum(1 for _s, _x, role, _l, _t in POD_ASSIGNED if role == "SAM") != 4:
+        raise RuntimeError("State SAMs must be 4 seats")
     pod_order = []
     pod_label = {}
     pod_role = {}
-    for _seat, xp, role, label in POD_ASSIGNED:
-        pod_order.append(xp)
-        pod_label[xp] = label
-        pod_role[xp] = role
+    pod_xp = {}
+    territories = []
+    for seat, xp, role, label, terr in POD_ASSIGNED:
+        if seat in pod_label:
+            raise RuntimeError(f"Duplicate pod seat {seat}")
+        pod_order.append(seat)
+        pod_label[seat] = label
+        pod_role[seat] = role
+        pod_xp[seat] = xp
+        if terr not in territories:
+            territories.append(terr)
         if xp.startswith("Open ·"):
             page["meta"][xp] = ["—", "n/a", "Open", label]
             page["order"].append(xp)
     page["podOrder"] = pod_order
     page["podLabel"] = pod_label
     page["podRole"] = pod_role
+    page["podXp"] = pod_xp
+    page["territories"] = territories
 
     named_ca = CA_MM_LA_OC | CA_MM_SD_INLAND
     if CA_MM_LA_OC & CA_MM_SD_INLAND:
@@ -492,7 +543,9 @@ def assign_pods(page: dict, rows: list[dict]) -> dict[str, int]:
     for row in rows:
         seat = pod_seat(row)
         xp = SEAT_XP[seat]
+        row["podseat"] = seat
         row["podxp"] = xp
+        row["podterr"] = SEAT_TERR[seat]
         if row["alloc"]:
             continue
         role = SEAT_ROLE[seat]
@@ -505,22 +558,32 @@ def assign_pods(page: dict, rows: list[dict]) -> dict[str, int]:
         if row["segment"] == "Federal" and row["acct"] != PAIGE_DC and role != "Federal":
             raise RuntimeError(f"{row['acct']} is federal but not on the Federal seat")
         if role == "SAM":
-            owner = next(person for person, sam_seat in STATE_SAM_SEAT.items() if sam_seat == seat)
-            if row["person"] != owner:
-                raise RuntimeError(f"{row['acct']} on {seat} belongs to {row['person']}")
+            if seat == "SAM · Gil Roy":
+                if not on_gil_roy_sam(row):
+                    raise RuntimeError(f"{row['acct']} on Gil Roy's Texas SAM belongs to {row['person']}")
+            else:
+                owner = next(person for person, sam_seat in STATE_SAM_SEAT.items() if sam_seat == seat)
+                if row["person"] != owner:
+                    raise RuntimeError(f"{row['acct']} on {seat} belongs to {row['person']}")
         if row.get("state"):
-            seat_states[xp].add(row["state"])
-        load[xp] += 1
+            seat_states[seat].add(row["state"])
+        load[seat] += 1
 
-    missing = [xp for xp in pod_order if xp not in load]
+    missing = [seat for seat in pod_order if seat not in load]
     if missing:
         raise RuntimeError("Pod seats with no countable accounts: " + ", ".join(missing))
     if PAIGE_DC not in {r["acct"] for r in rows if r["podxp"] == "Paige Wendle"}:
         raise RuntimeError("District of Columbia is not on Paige Wendle's pod seat")
+    columbus = [r for r in rows if r["acct"] == COLUMBUS and not r["alloc"]]
+    if len(columbus) != 1 or columbus[0]["podxp"] != "Steffany Amador" or columbus[0]["podseat"] != "Northeast ENT · OH/IN/PA":
+        raise RuntimeError("Columbus is not on Steffany Amador's Ohio seat in the pod model")
+    if pod_xp["Northeast ENT · New England"] != "Halena Martin":
+        raise RuntimeError("New England is not Halena Martin's seat")
 
     unverified = []
-    for xp, states in sorted(seat_states.items()):
-        if xp in CR_XPS or xp.startswith("Open ·") or pod_role[xp] == "Federal":
+    for seat, states in sorted(seat_states.items()):
+        xp = SEAT_XP[seat]
+        if xp in CR_XPS or xp.startswith("Open") or SEAT_ROLE[seat] == "Federal":
             continue
         if xp not in US_XP_TZ:
             unverified.append(xp)
@@ -1368,8 +1431,8 @@ def main() -> None:
     if pipeline["outside"]:
         print(f"  outside the US book: ${outside_arr:,.0f}")
     print("Pod aligned seats (countable accounts, ignoring current owners):")
-    for _seat, xp, role, label in POD_ASSIGNED:
-        print(f"  {xp} — {label} ({role}): {result['pod_load'].get(xp, 0)}")
+    for seat, xp, role, label, _terr in POD_ASSIGNED:
+        print(f"  {label} — {xp} ({role}): {result['pod_load'].get(seat, 0)}")
     unverified = page.get("podUnverified") or []
     if unverified:
         print(
