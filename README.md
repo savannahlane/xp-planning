@@ -68,8 +68,8 @@ The proposed view in `index.html` applies these staffing rules:
   and North Dakota book: it is Scott Mark's first Wyoming account, so it stays
   with him. UK pipeline is left off the US map. The extract is 15 of 35
   opportunities, so it is not the full committed pipeline.
-- Ashley's current Enterprise accounts route only to her direct reports, with Columbus the
-  one released exception. The open Pacific XP reports to Ashley.
+- Ashley's current Enterprise accounts route only to her direct reports. The open
+  Pacific XP reports to Ashley.
 - Non-SAM special districts are Local SMG. SAM special districts stay Enterprise.
   Health Care District of Palm Beach County is the Florida exception: it stays
   Enterprise with Carolina Cambronero.
@@ -88,8 +88,11 @@ The proposed view in `index.html` applies these staffing rules:
 - Taylor Roman holds Benjamin Shor, Stephanie DelSignore's New York and New Jersey
   accounts, Sarah Duncan, Spencer Ferrell, and Territory 4a. Stephanie's
   Connecticut accounts stay with Halena.
-- Halena Martin holds Kent Hartsfield's whole group: T11b OH/IN/IL plus the
-  Chicago and Columbus SAM accounts.
+- Steffany Amador holds Kent Hartsfield's whole group: T11b OH/IN/IL plus the
+  Chicago and Columbus SAM accounts, so Cook County and Cleveland stay with her.
+  To make room, Gil Roy's Texas accounts join his Louisiana accounts with Carolina
+  Cambronero, and Bill Anderson's Texas accounts join his Washington accounts with
+  Paige Wendle.
 - Carolina Prieto keeps only Idaho and North Dakota state (Scott Mark, including
   the ND enterprise agreement). Andy O'Brien holds Kentucky state.
 
@@ -178,7 +181,7 @@ hypothesis document.
 - Complex accounts (more than 7 capabilities, or Service Cloud Advanced) no more than one third of a book
 - XP time zone plus or minus one hour
 - Holds: San Antonio with Steffany, DC with Paige, Denver with a Savannah report, LA and GLACVCD with Colleen, WA with Paige, CT and ME with Halena
-- Released holds: Columbus, which moved to Halena with Kent Hartsfield's whole group, so it no longer sits with an Ashley report. Named in `ASHLEY_HOLD_RELEASED` in `tiering/update_whole_team_map.py`
+- Released holds: none. Columbus moves with Kent Hartsfield's whole group to Steffany, an Ashley report. Any future exception goes in `ASHLEY_HOLD_RELEASED` in `tiering/update_whole_team_map.py`
 - Local SMG includes special districts except SAM territories
 - Florida Enterprise exception: Health Care District of Palm Beach County stays with
   Carolina Cambronero rather than moving to midmarket
