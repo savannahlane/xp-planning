@@ -174,23 +174,29 @@ AE_OWNER = {
     # AL/GA state book, rather than splitting the two Georgia AEs across XPs.
     "Spencer Ferrell": "Taylor Roman",
     # Steffany already holds San Antonio and VIA from this Texas SAM group.
-    # Consolidating the remaining four accounts with her removes one AE split
-    # and leaves Steffany at the 20-account maximum.
+    # Consolidating the remaining four accounts with her removes one AE split.
     "Cedric Simpkins": "Steffany Amador",
+    # Gil Roy's Texas accounts join his Louisiana accounts with Cambronero, so
+    # the whole SAM group sits with one XP and Steffany has room for Kent.
+    "Gil Roy": "Carolina Cambronero",
     # After the Marcy swap on main, Territory 4a continues to Taylor with the
     # rest of the NY/NJ local-and-state book rather than remaining a Midwest
     # attachment.
     "Territory 4a (open)": "Taylor Roman",
     # Kent's T11b OH/IN/IL territory and the temporary Chicago/Columbus SAM
-    # accounts sit together with Halena rather than splitting the AE group.
-    "Kent Hartsfield": "Halena Martin",
+    # accounts sit together with Steffany, who keeps Cook County and Cleveland,
+    # rather than splitting the AE group.
+    "Kent Hartsfield": "Steffany Amador",
 }
 
-# Columbus is a current Ashley Hill account, so the rule that her Enterprise
-# book routes only to her reports has to give way for Kent's whole group.
-# Named here so the released hold is a deliberate, visible exception rather
-# than silent drift.
-ASHLEY_HOLD_RELEASED = {"Columbus OH"}
+# Bill Anderson's Texas state accounts sit with Paige, who already holds his
+# Washington accounts. His California accounts stay with the open Pacific XP.
+BILL_ANDERSON_TEXAS_XP = "Paige Wendle"
+
+# Current Ashley Hill Enterprise accounts that may leave her reporting line.
+# Name any exception here so it is deliberate rather than silent drift. Columbus
+# no longer needs one: it sits with Steffany, who reports to Ashley.
+ASHLEY_HOLD_RELEASED: set[str] = set()
 
 # New York and New Jersey state agencies sit with Taylor, including the
 # DelSignore rows that would otherwise follow the AE_OWNER rule above.
@@ -631,6 +637,9 @@ def apply_assignments(page: dict, overrides: dict[str, dict]) -> dict:
 
         if row["person"] in AE_OWNER:
             row["newxp"] = AE_OWNER[row["person"]]
+
+        if row["person"] == "Bill Anderson" and row["state"] == "TX":
+            row["newxp"] = BILL_ANDERSON_TEXAS_XP
 
         if row["state"] in {"NY", "NJ"} and row["segment"] == "State":
             row["newxp"] = NY_NJ_STATE_XP
