@@ -99,11 +99,11 @@ The proposed view in `index.html` applies these staffing rules:
 The `Current assignment` view is historical and still shows Savannah, Kristen and Ashley's
 current books.
 
-`Pod aligned` ignores who holds the accounts today. The four State SAM seats each get one
-enterprise XP. Every other account follows its state into a regional pod, with enterprise
-and midmarket seats kept apart. California has three midmarket seats and no enterprise
-seat, so the remaining California enterprise accounts sit on an uncovered seat. Federal
-accounts stay outside the regions.
+`Pod aligned` ignores who holds the accounts today. Each seat is named with an XP. US staff
+stay within an hour of the account's time zone; Costa Rica staff can sit in any region.
+Seats with no XP inside that rule stay open. District of Columbia stays with Paige Wendle.
+Federal accounts stay with Jr Wycinsky. Midmarket XPs have no timezone on the roster, so
+they are named from the territory they hold now.
 
 ## Growth tiering
 
