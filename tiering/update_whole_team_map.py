@@ -99,9 +99,10 @@ LOCAL_SMG_DESTINATION = {
     "Andrew Collinsworth": "Ricardo Castro",
     "Tommy Monaghan": "Eduardo Ruiz",
     "Brittany Greer": "Kerrian Dailey",
-    "John Meah": "Ricardo Castro",
+    # Mid-Atlantic locals sit with Eduardo so Ricardo's Florida book stays at 30
+    # when Prachi Patel's Florida special districts join him.
+    "John Meah": "Eduardo Ruiz",
     "Not on maps provided": "Andrés Pérez",
-    "Prachi Patel": "Eduardo Ruiz",
     "Michelle Cooper seat (open)": "Luis Aguilar",
 }
 
@@ -425,11 +426,25 @@ SE_MM_SOUTH_FL = {
 }
 
 def pod_seat(row: dict) -> str:
-    """Return the pod seat id for one account. Ignores current and proposed owners."""
+    """Return the pod seat id for one account. Ignores current and proposed owners.
+
+    A few holds keep the same person on an account across proposed and pod, even
+    when geography alone would put the account on another seat: Steffany keeps
+    Kent Hartsfield (Cook County and the Ohio group), Halena keeps Andrew
+    Wyzkoski in Pennsylvania, and Paige keeps District of Columbia plus every
+    Washington state agency.
+    """
     if row["acct"] == PAIGE_DC:
         return "Mountain Plains ENT"
     if row["segment"] == "Federal" or not row.get("state"):
         return "Federal"
+    # Holds that must match the proposed book.
+    if row["person"] == "Kent Hartsfield" and row["segment"] != "Local SMG":
+        return "Northeast ENT · OH/IN/PA"
+    if row["person"] == "Andrew Wyzkoski":
+        return "Northeast ENT · New England"
+    if row["state"] == "WA" and row["segment"] == "State":
+        return "Mountain Plains ENT"
     if on_gil_roy_sam(row):
         return "SAM · Gil Roy"
     if row["person"] in STATE_SAM_SEAT:
@@ -587,11 +602,38 @@ def assign_pods(page: dict, rows: list[dict]) -> dict[str, int]:
         raise RuntimeError("Pod seats with no countable accounts: " + ", ".join(missing))
     if PAIGE_DC not in {r["acct"] for r in rows if r["podxp"] == "Paige Wendle"}:
         raise RuntimeError("District of Columbia is not on Paige Wendle's pod seat")
+    wa_state = [
+        r for r in rows
+        if r["state"] == "WA" and r["segment"] == "State" and not r["alloc"]
+    ]
+    if not wa_state or any(r["podxp"] != "Paige Wendle" for r in wa_state):
+        raise RuntimeError("Washington state agencies are not all on Paige Wendle in the pod model")
+    cook = [r for r in rows if r["acct"] == "Cook County, IL" and not r["alloc"]]
+    if len(cook) != 1 or cook[0]["podxp"] != "Steffany Amador":
+        raise RuntimeError("Cook County is not on Steffany Amador in the pod model")
+    kent_off = [
+        r["acct"]
+        for r in rows
+        if r["person"] == "Kent Hartsfield"
+        and r["segment"] != "Local SMG"
+        and not r["alloc"]
+        and r["podxp"] != "Steffany Amador"
+    ]
+    if kent_off:
+        raise RuntimeError(
+            "Kent Hartsfield accounts off Steffany in the pod model: " + ", ".join(kent_off)
+        )
     columbus = [r for r in rows if r["acct"] == COLUMBUS and not r["alloc"]]
     if len(columbus) != 1 or columbus[0]["podxp"] != "Steffany Amador" or columbus[0]["podseat"] != "Northeast ENT · OH/IN/PA":
         raise RuntimeError("Columbus is not on Steffany Amador's Ohio seat in the pod model")
     if pod_xp["Northeast ENT · New England"] != "Halena Martin":
         raise RuntimeError("New England is not Halena Martin's seat")
+    pa_halena = [
+        r for r in rows
+        if r["person"] == "Andrew Wyzkoski" and not r["alloc"]
+    ]
+    if not pa_halena or any(r["podxp"] != "Halena Martin" for r in pa_halena):
+        raise RuntimeError("Andrew Wyzkoski's Pennsylvania book is not on Halena Martin in the pod model")
 
     unverified = []
     for seat, states in sorted(seat_states.items()):
@@ -762,6 +804,10 @@ def local_smg_destination(row: dict) -> str:
         return "Ricardo Castro"
     if row["person"] == "Luke Mulvaney":
         return "Luis Aguilar" if row["state"] == "TX" else "Eduardo Ruiz"
+    if row["person"] == "Prachi Patel":
+        # Florida stays with Ricardo's Florida book. Pennsylvania stays with the
+        # northeast midmarket book that took Carlos's former groups.
+        return "Ricardo Castro" if row["state"] == "FL" else "Eduardo Ruiz"
     try:
         return LOCAL_SMG_DESTINATION[row["person"]]
     except KeyError as exc:
