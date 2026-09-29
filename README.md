@@ -75,10 +75,12 @@ The proposed view in `index.html` applies these staffing rules:
   Enterprise with Carolina Cambronero.
 - Enterprise and Local SMG are separate books. No Enterprise XP carries a Local SMG
   account.
-- Nine dedicated Local SMG XPs cover the midmarket book. Tatiana Montero holds
+- Nine dedicated Local SMG XPs cover the midmarket book. Marcy Castro holds
   Southern California, Eduardo Ruiz holds North/Central California, Luis Aguilar
-  holds Texas, and Ricardo Castro holds the Southeast and Mid-Atlantic. The build
-  reports account count, ARR, tier mix and complex-account count for every SMG XP.
+  holds Texas, and Ricardo Castro holds the Southeast and Mid-Atlantic. Tatiana
+  Montero holds the Missouri, Illinois, Ohio and Nebraska enterprise book that
+  had been Marcy's. The build reports account count, ARR, tier mix and
+  complex-account count for every SMG XP.
 - Carolina Cambronero holds the Florida Enterprise book (Demi Washington, Desmond Davis,
   Bill Marshall) plus Health Care District of Palm Beach County, on top of her
   existing Louisiana book. Cedric Simpkins's Texas SAM group
