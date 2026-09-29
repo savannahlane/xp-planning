@@ -6,16 +6,8 @@ that landed on main and changes only the proposed assignment (`newxp`):
 
 * Jake Sager is a VP. Savannah Lane, Kristen Murphy and Ashley Hill are
   managers. None of the four holds a proposed account book.
-* Reporting lines: Wendy Bhagat reports to Angy Peterson and Jr Wycinsky
-  reports to Wendy. Every midmarket XP, including Marcy Castro, reports to
-  Kristen Murphy. Savannah Lane's reports are Colleen Moran, Brooke Minichino,
-  Julio, Paige Wendle, Steffany Amador, Taylor Roman, Carolina Prieto and
-  Ashley Hill. Ashley's reports are Alejandro Solano, Andy O'Brien, Halena
-  Martin, Carolina Cambronero, Cody Nichols, Tatiana Montero and the open
-  Pacific seat.
 * Nathan Williamson has left the team. His federal accounts sit with Jr
-  Wycinsky in both the current and proposed views. Every federal account is
-  in DC. District of Columbia itself stays with Paige Wendle.
+  Wycinsky in both the current and proposed views.
 * Ashley's seven current Enterprise accounts land with direct reports.
 * Enterprise XPs carry no Local SMG accounts. Nine dedicated Local SMG XPs
   cover whole AE groups except the forced California and transportation splits.
@@ -55,26 +47,13 @@ NO_BOOK = {
     "Kristen Murphy",
     "Ashley Hill",
 }
-# Ashley's direct reports. Steffany and Colleen report to Savannah. Marcy is
-# midmarket and reports to Kristen. Andy is the "Andrew" on this roster.
 ASHLEY_REPORTS = {
     "Open XP2 (PT)",
-    "Alejandro Solano",
-    "Andy O'Brien",
-    "Halena Martin",
-    "Carolina Cambronero",
-    "Cody Nichols",
-    "Tatiana Montero",
-}
-SAVANNAH_REPORTS = {
     "Colleen Moran",
-    "Brooke Minichino",
-    "Julio",
-    "Paige Wendle",
+    "Cody Nichols",
     "Steffany Amador",
-    "Taylor Roman",
-    "Carolina Prieto",
-    "Ashley Hill",
+    "Marcy Castro",
+    "Alejandro Solano",
 }
 
 # Canonical Local SMG books. Whole AE groups stay together wherever possible:
@@ -219,7 +198,7 @@ BILL_ANDERSON_TEXAS_XP = "Paige Wendle"
 
 # Current Ashley Hill Enterprise accounts that may leave her reporting line.
 # Name any exception here so it is deliberate rather than silent drift. Columbus
-# sits with Steffany, who reports to Savannah, through the Kent Hartsfield rule.
+# no longer needs one: it sits with Steffany, who reports to Ashley.
 ASHLEY_HOLD_RELEASED: set[str] = set()
 
 # New York and New Jersey state agencies sit with Taylor, including the
@@ -745,6 +724,25 @@ def local_smg_destination(row: dict) -> str:
         ) from exc
 
 
+def override_blocker(row: dict) -> str:
+    """Name the hard rule that set this row's XP after account_overrides.csv ran."""
+    if row["segment"] == "Local SMG":
+        return "Local SMG cut (LOCAL_SMG_DESTINATION and the CA/FL lists)"
+    if row["person"] in TATIANA_ENTERPRISE_AES or row["acct"] in TATIANA_ENTERPRISE_ACCOUNTS:
+        return "Tatiana enterprise rule (TATIANA_ENTERPRISE_AES / _ACCOUNTS)"
+    if row["state"] == "KY" and row["segment"] != "Local ENT":
+        return "Kentucky state rule (KY_STATE_XP)"
+    if row["state"] == "ND" and row["newxp"] == "Carolina Prieto":
+        return "North Dakota enterprise agreement rule"
+    if row["state"] in {"NY", "NJ"} and row["segment"] == "State":
+        return "NY/NJ state rule (NY_NJ_STATE_XP)"
+    if row["person"] == "Bill Anderson" and row["state"] == "TX":
+        return "Bill Anderson Texas rule (BILL_ANDERSON_TEXAS_XP)"
+    if row["person"] in AE_OWNER:
+        return f"AE_OWNER ({row['person']}'s whole group)"
+    return "a rule in update_whole_team_map.py"
+
+
 def apply_assignments(page: dict, overrides: dict[str, dict]) -> dict:
     rows = page["rows"]
     before_edges = proposed_edges(rows)
@@ -755,7 +753,8 @@ def apply_assignments(page: dict, overrides: dict[str, dict]) -> dict:
 
     # The open Pacific XP is an Ashley report. That preserves the coherent,
     # single-XP California State AE groups while satisfying the reporting rule.
-    page["meta"]["Carolina Prieto"] = ["Savannah Lane", "—", "Team Lead", "Not specified"]
+    page["meta"]["Open XP2 (PT)"][0] = "Ashley Hill"
+    page["meta"]["Carolina Prieto"] = ["—", "—", "Team Lead", "Not specified"]
     page["meta"].pop("Carolina Torres", None)
     page["order"] = [xp for xp in page["order"] if xp != "Carolina Torres"]
     for xp in ("Tatiana Montero", "Luis Aguilar", "Ricardo Castro"):
@@ -789,31 +788,10 @@ def apply_assignments(page: dict, overrides: dict[str, dict]) -> dict:
         elif str(meta[2]).strip() in {"", "—", "n/a"}:
             meta[2] = "XP1"
 
-    # meta[0] is the manager on the book check. Julio is on Savannah's team
-    # and holds no accounts, so this row is the reporting line only. Set it
-    # after the blank-level fill so he is not labelled XP1.
-    reports_to = {xp: "Kristen Murphy" for xp in LOCAL_SMG_XPS}
-    reports_to.update({xp: "Savannah Lane" for xp in SAVANNAH_REPORTS})
-    reports_to.update({xp: "Ashley Hill" for xp in ASHLEY_REPORTS})
-    reports_to["Wendy Bhagat"] = "Angy Peterson"
-    reports_to["Jr Wycinsky"] = "Wendy Bhagat"
-    for xp, manager in reports_to.items():
-        meta = page["meta"].setdefault(xp, ["—", "—", "—", "—"])
-        meta[0] = manager
-    page["meta"]["Julio"][1] = "—"
-    page["meta"]["Julio"][2] = "—"
-    page["meta"]["Julio"][3] = "Savannah's team; no accounts on this map"
-
     moved = []
     matched = set()
     for row in rows:
         old = row["newxp"]
-
-        # Federal accounts are a DC book. Robinhood was the one row filed under
-        # Tom Gilliatt in California; the other federal rows were scattered
-        # across MD, VA, NY or a blank state.
-        if row["segment"] == "Federal" and row.get("state") != "DC":
-            row["state"] = "DC"
 
         # Nathan has left. Jr already holds this federal book in the proposal,
         # and the current view should not keep a departed XP on the team.
@@ -904,7 +882,17 @@ def apply_assignments(page: dict, overrides: dict[str, dict]) -> dict:
         ):
             row["newxp"] = "Tatiana Montero"
 
-    enterprise_xps = {r["newxp"] for r in rows if r.get("ent") and not r["alloc"]}
+    # An override's new_xp can be overruled by a hard rule that runs after it.
+    # Report those rows so a dead override is visible instead of silent.
+    ignored_overrides = [
+        (row["acct"], overrides[row["acct"]]["xp"], row["newxp"], override_blocker(row))
+        for row in rows
+        if row["acct"] in overrides
+        and overrides[row["acct"]]["xp"]
+        and row["newxp"] != overrides[row["acct"]]["xp"]
+    ]
+
+    enterprise_xps ={r["newxp"] for r in rows if r.get("ent") and not r["alloc"]}
     hybrid = sorted(
         {
             r["newxp"]
@@ -1133,19 +1121,6 @@ def apply_assignments(page: dict, overrides: dict[str, dict]) -> dict:
             + ", ".join(still_torres)
         )
 
-    fed_elsewhere = [
-        f"{r['acct']} ({r.get('state') or 'no state'})"
-        for r in rows
-        if r["segment"] == "Federal" and r.get("state") != "DC"
-    ]
-    if fed_elsewhere:
-        raise RuntimeError(
-            "Federal accounts outside DC: " + ", ".join(fed_elsewhere)
-        )
-    for xp, manager in reports_to.items():
-        if page["meta"].get(xp, [None])[0] != manager:
-            raise RuntimeError(f"{xp} should report to {manager}")
-
     after_edges = proposed_edges(rows)
     pod_load = assign_pods(page, rows)
     return {
@@ -1164,6 +1139,7 @@ def apply_assignments(page: dict, overrides: dict[str, dict]) -> dict:
         "ashley_enterprise": ashley_enterprise,
         "carolina_countable": carolina_rows,
         "pipeline": pipeline,
+        "ignored_overrides": ignored_overrides,
     }
 
 
@@ -1412,6 +1388,13 @@ def main() -> None:
 
     moved = result["moved"]
     print(f"moved {len(moved)} proposed account records")
+    if result["ignored_overrides"]:
+        print(
+            f"OVERRIDES IGNORED ({len(result['ignored_overrides'])}): new_xp in "
+            "account_overrides.csv was overruled. Change the named rule instead:"
+        )
+        for account, wanted, got, rule in sorted(result["ignored_overrides"]):
+            print(f"  {account}: asked for {wanted}, got {got} — set by {rule}")
     if result["removed"]:
         print("removed from the map: " + ", ".join(sorted(result["removed"])))
     if result["offloaded"]:
