@@ -6,7 +6,11 @@ GitHub: [savannahlane/xp-planning](https://github.com/savannahlane/xp-planning)
 
 ## Contents
 
-- `index.html`: interactive whole-US-team map across Enterprise, Local SMG and federal books. Toggle between the proposed assignment, the current assignment, and a pod-aligned view, filter by segment, and label each AE with the states they cover. Open it in any browser; it needs no server.
+- `index.html`: interactive whole-US-team map across Enterprise, Local SMG and
+  federal books. Book cards are the default visualization; the original
+  connection diagram remains available when AE fan-out is the question. Toggle
+  between proposed, current and pod-aligned assignments, and filter by segment.
+  Open it in any browser; it needs no server.
 - `XP_AE_Rebalance_Model.xlsx`: the working model. Revised XP assignments (editable dropdown), the holds check, AE fan-out, capacity checks, per-account growth tiers, and the `Growth Tiers` territory sheet.
 - `research/`: the sourced research behind the tiering, plus the tiering hypothesis itself.
 - `tiering/`: the scoring model and its outputs.
@@ -102,8 +106,8 @@ current books.
 `Pod aligned` ignores who holds the accounts today. Each seat is named with an XP. US staff
 stay within an hour of the account's time zone; Costa Rica staff can sit in any region.
 Seats with no XP inside that rule stay open. District of Columbia stays with Paige Wendle.
-Federal accounts stay with Jr Wycinsky. Midmarket XPs have no timezone on the roster, so
-they are named from the territory they hold now.
+Federal accounts stay with Jr Wycinsky. All nine dedicated midmarket XPs are in Costa Rica,
+so none of their pod seats has a timezone restriction.
 
 ## Growth tiering
 

@@ -211,9 +211,8 @@ CAROLINA_BEYOND_ID_ND = {"Wyoming Department of Environmental Quality"}
 # into a regional seat, then the seat is named with an XP.
 #
 # US staff have to sit within one hour of every account on the seat. Costa Rica
-# staff have no timezone requirement. Midmarket XPs have no timezone on the
-# roster, so they are named from the territory they hold now and reported as
-# unchecked. A seat stays Open when no remaining XP fits.
+# staff have no timezone requirement. All nine dedicated midmarket XPs are in
+# Costa Rica. A seat stays Open when no remaining XP fits.
 US_XP_TZ = {
     "Colleen Moran": "PT",
     "Paige Wendle": "MT",
@@ -224,9 +223,9 @@ US_XP_TZ = {
     "Halena Martin": "ET",
     "Open XP2 (PT)": "PT",
 }
-CR_XPS = {
+CR_XPS = LOCAL_SMG_XPS | {
     "Cody Nichols",
-    "Marcy Castro",
+    "Tatiana Montero",
     "Alejandro Solano",
     "Carolina Cambronero",
 }
@@ -704,6 +703,12 @@ def apply_assignments(page: dict, overrides: dict[str, dict]) -> dict:
         page["meta"].setdefault(xp, ["—", "n/a", "—", "—"])
         if xp not in page["order"]:
             page["order"].append(xp)
+    for xp in LOCAL_SMG_XPS:
+        page["meta"].setdefault(xp, ["—", "CT", "XP1", "Costa Rica"])
+        page["meta"][xp][1] = "CT"
+        page["meta"][xp][3] = "Costa Rica"
+    page["meta"]["Tatiana Montero"][1] = "CT"
+    page["meta"]["Tatiana Montero"][3] = "Costa Rica"
     # The seat rename is a text replacement, so an older name and its new name
     # can both survive into the order. Keep the first occurrence.
     page["order"] = list(dict.fromkeys(page["order"]))
