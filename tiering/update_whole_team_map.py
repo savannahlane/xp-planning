@@ -57,27 +57,30 @@ ASHLEY_REPORTS = {
 }
 
 # Canonical Local SMG books. Whole AE groups stay together wherever possible:
-# 16 of the 19 seats work with exactly one XP. California has 47 accounts and
-# must split at the 30-account cap, so its placeholder seat is divided
-# North/Central (Eduardo) and Southern (Marcy, swapped with Tatiana).
-# Luke Mulvaney's national transportation vertical is the other split: its TX
-# account follows Luis, while NJ and OR stay with Carlos.
+# California Local SMG is two books, not three. Carlos keeps every CA account
+# he holds today and the rest of the North/Central seat (Jaxon Sher). Marcy
+# keeps the rest of Tier 8, the southern list, including Jaxson McBride's
+# water account. That puts Carlos over the cap if he also keeps his northeast
+# groups, so those groups move whole to Eduardo. Florida Tier 4 splits the
+# same way the pod does: Natalia keeps South Florida, Ricardo takes the
+# north and central remainder on top of Alejandro's southeast accounts.
+# Luke Mulvaney's Texas account follows Luis; New Jersey and Oregon follow
+# the rest of Carlos's former northeast book to Eduardo.
 LOCAL_SMG_DESTINATION = {
-    "Local SMG FL (Ter 4)": "Natalia Sanchez",
     "Local SMG Ter 6 (TX/OK/AR)": "Luis Aguilar",
     "Caleb Fort Jr": "Ricardo Castro",
-    "Corey Andrade": "Carlos Torres",
+    "Corey Andrade": "Eduardo Ruiz",
     "Emery Herrschel": "Kerrian Dailey",
     "Jared Cummings": "Kerrian Dailey",
     "Jeffrey Johnson": "David Treminio",
     "Kimberley Steelmann": "Andrés Pérez",
     "Amanda Brooks": "David Treminio",
     "Andrew Collinsworth": "Ricardo Castro",
-    "Tommy Monaghan": "Carlos Torres",
+    "Tommy Monaghan": "Eduardo Ruiz",
     "Brittany Greer": "Kerrian Dailey",
     "John Meah": "Ricardo Castro",
     "Not on maps provided": "Andrés Pérez",
-    "Prachi Patel": "Carlos Torres",
+    "Prachi Patel": "Eduardo Ruiz",
     "Michelle Cooper seat (open)": "Luis Aguilar",
 }
 
@@ -93,10 +96,10 @@ LOCAL_SMG_XPS = {
     "Ricardo Castro",
 }
 
-# Provisional geographic cut of the four-seat California placeholder. The
-# source payload does not identify its LA, Bay Area, San Diego and North/Central
-# sub-seats, so this uses account geography and is intentionally explicit for
-# review. Everything not named here goes to Eduardo's North/Central book.
+# Southern half of the California Tier 8 placeholder (LA, Orange County, San
+# Diego and the inland south). Everything else in CA Local SMG is the
+# North/Central seat, Jaxon Sher's book. Carlos's own southern accounts are
+# named in the assignment function so they stay with him.
 SOUTHERN_CA_LOCAL_SMG = {
     "Bell, CA",
     "Brawley CA",
@@ -275,10 +278,9 @@ POD_ASSIGNED = [
     ("Northwest MM", "Open · Northwest MM", "MM", "Northwest · MM", "Northwest"),
     ("Northeast ENT · New England", "Halena Martin", "ENT", "New England · ENT", "Northeast"),
     ("Northeast ENT · OH/IN/PA", "Steffany Amador", "ENT", "Ohio/Indiana/Pennsylvania · ENT", "Northeast"),
-    ("Northeast MM", "Carlos Torres", "MM", "Northeast · MM", "Northeast"),
-    ("California MM · LA/OC", "Marcy Castro", "MM", "California · LA/OC", "California"),
-    ("California MM · SD/Inland", "Open · California SD/Inland", "MM", "California · SD/Inland", "California"),
-    ("California MM · North", "Eduardo Ruiz", "MM", "California · North", "California"),
+    ("Northeast MM", "Eduardo Ruiz", "MM", "Northeast · MM", "Northeast"),
+    ("California MM · South", "Marcy Castro", "MM", "California · South", "California"),
+    ("California MM · North", "Carlos Torres", "MM", "California · North", "California"),
     ("California ENT", "Open XP2 (PT)", "ENT", "California · ENT", "California"),
     ("Southwest ENT", "Cody Nichols", "ENT", "Southwest · ENT", "Southwest"),
     ("Southwest MM", "David Treminio", "MM", "Southwest · MM", "Southwest"),
@@ -291,7 +293,7 @@ POD_ASSIGNED = [
     ("Great Lakes MM · Upper Midwest", "Kerrian Dailey", "MM", "Upper Midwest · MM", "Great Lakes"),
     ("Southeast ENT", "Taylor Roman", "ENT", "Southeast · ENT", "Southeast"),
     ("Southeast MM · South FL", "Natalia Sanchez", "MM", "South Florida · MM", "Southeast"),
-    ("Southeast MM · North FL", "Open · North Florida MM", "MM", "North Florida · MM", "Southeast"),
+    ("Southeast MM · North FL", "Ricardo Castro", "MM", "North Florida · MM", "Southeast"),
     ("Southeast MM · GA/LA/SC", "Ricardo Castro", "MM", "Georgia/Louisiana/SC · MM", "Southeast"),
     ("Mid-Atlantic ENT · MD/VA/NC", "Andy O'Brien", "ENT", "Mid-Atlantic · MD/VA/NC", "Mid-Atlantic"),
     ("Mid-Atlantic ENT · KY/TN", "Andy O'Brien", "ENT", "Mid-Atlantic · KY/TN", "Mid-Atlantic"),
@@ -302,7 +304,7 @@ POD_ASSIGNED = [
 REGION_SHAPE = {
     "Northwest": {"ENT": 1, "MM": 1},
     "Northeast": {"ENT": 2, "MM": 1},
-    "California": {"ENT": 1, "MM": 3},
+    "California": {"ENT": 1, "MM": 2},
     "Southwest": {"ENT": 1, "MM": 1},
     "Mountain Plains": {"ENT": 1, "MM": 1},
     "Texas": {"ENT": 1, "MM": 1},
@@ -326,7 +328,10 @@ RETIRED_POD_NAMES = {
     "Northeast MM",
     "California MM · LA/OC",
     "California MM · SD/Inland",
+    "California MM · South",
     "California MM · North",
+    "Open · California SD/Inland",
+    "Open · North Florida MM",
     "California ENT · uncovered",
     "California ENT",
     "Southwest ENT",
@@ -357,42 +362,8 @@ MID_ATLANTIC_ENT_COAST = {"MD", "VA", "WV", "NC"}
 MID_ATLANTIC_ENT_INLAND = {"AR", "TN", "KY"}
 COLUMBUS = "Columbus OH"
 
-# California is one state with three midmarket seats, so the split is geographic
-# rather than by AE. Anything in California Local SMG not named here is North.
-CA_MM_LA_OC = {
-    "Bell, CA",
-    "Burbank CA",
-    "Chino Valley Independent Fire District",
-    "Culver City, CA",
-    "Eastvale CA",
-    "El Monte, CA",
-    "Fullerton, CA",
-    "La Puente, CA",
-    "Laguna Beach, CA",
-    "Manhattan Beach, CA",
-    "Newport Beach, CA",
-    "Ontario International Airport",
-    "Orange, CA",
-    "Pasadena, CA",
-    "Rancho Santa Margarita, CA",
-    "Santa Margarita Water District",
-    "South Coast Water District",
-    "Tustin, CA",
-    "Westminster, CA",
-}
-CA_MM_SD_INLAND = {
-    "Brawley CA",
-    "Coachella, CA",
-    "Encinitas, CA",
-    "Hesperia, CA",
-    "Imperial Irrigation District",
-    "Metropolitan Water District of Southern California",
-    "Palm Springs, CA",
-    "Perris, CA",
-    "San Diego State University",
-    "Victorville, CA",
-    "Vista, CA",
-}
+# California midmarket is two seats. The southern list is Tier 8 outside
+# Jaxon Sher's North/Central book. North is everything else in the state.
 
 # Southeast midmarket is three seats. South Florida is named; the rest of
 # Florida is the north seat; Georgia, Louisiana, Alabama and South Carolina
@@ -437,10 +408,8 @@ def pod_seat(row: dict) -> str:
     if state == "CA":
         if not mm:
             return "California ENT"
-        if row["acct"] in CA_MM_LA_OC:
-            return "California MM · LA/OC"
-        if row["acct"] in CA_MM_SD_INLAND:
-            return "California MM · SD/Inland"
+        if row["acct"] in SOUTHERN_CA_LOCAL_SMG:
+            return "California MM · South"
         return "California MM · North"
     if state in {"NV", "UT", "CO", "NM", "AZ"}:
         return "Southwest MM" if mm else "Southwest ENT"
@@ -512,9 +481,7 @@ def assign_pods(page: dict, rows: list[dict]) -> dict[str, int]:
     page["podXp"] = pod_xp
     page["territories"] = territories
 
-    named_ca = CA_MM_LA_OC | CA_MM_SD_INLAND
-    if CA_MM_LA_OC & CA_MM_SD_INLAND:
-        raise RuntimeError("California midmarket seats overlap")
+    named_ca = SOUTHERN_CA_LOCAL_SMG
     ca_smg = {
         r["acct"]
         for r in rows
@@ -732,14 +699,23 @@ def apply_pipeline(rows: list[dict], pipeline: list[dict]) -> dict:
 
 def local_smg_destination(row: dict) -> str:
     """Return the canonical XP for one Local SMG account."""
-    if row["person"] in {"Local SMG CA (Ter 8)", "Jaxson McBride"}:
-        return (
-            "Marcy Castro"
-            if row["acct"] in SOUTHERN_CA_LOCAL_SMG
-            else "Eduardo Ruiz"
-        )
+    if row["state"] == "CA" and row["segment"] == "Local SMG":
+        # Two books. Carlos is not pulled off the CA accounts he holds today,
+        # and he also holds the rest of Jaxon Sher's North/Central seat.
+        # Marcy holds the rest of Tier 8 (the southern list), including
+        # Jaxson McBride's water account.
+        if row["cur"] == "Carlos Torres" or row["acct"] not in SOUTHERN_CA_LOCAL_SMG:
+            return "Carlos Torres"
+        return "Marcy Castro"
+    if row["person"] == "Local SMG FL (Ter 4)":
+        # Natalia keeps South Florida. Ricardo takes the north and central
+        # remainder, which includes Alejandro Solano's Flagler accounts, on
+        # top of the southeast groups already moving to him.
+        if row["acct"] in SE_MM_SOUTH_FL:
+            return "Natalia Sanchez"
+        return "Ricardo Castro"
     if row["person"] == "Luke Mulvaney":
-        return "Luis Aguilar" if row["state"] == "TX" else "Carlos Torres"
+        return "Luis Aguilar" if row["state"] == "TX" else "Eduardo Ruiz"
     try:
         return LOCAL_SMG_DESTINATION[row["person"]]
     except KeyError as exc:
@@ -1318,18 +1294,20 @@ def update_markup(source: str) -> str:
         "each Local SMG AE group moves whole to a dedicated Local SMG XP, so the "
         "AE works with one XP instead of several.",
         "nine dedicated Local SMG XPs cover whole AE groups wherever the 30-account "
-        "cap permits. Marcy Castro holds Southern California, Eduardo Ruiz holds "
-        "North/Central California, Luis Aguilar holds Texas, and Ricardo Castro "
-        "holds the Southeast and Mid-Atlantic. Tatiana Montero holds Marcy's former "
-        "Missouri, Illinois, Ohio and Nebraska enterprise book. California's 47 accounts force its "
-        "placeholder AE seat to split; Luke Mulvaney's Texas account follows Luis "
-        "while his New Jersey and Oregon accounts stay with Carlos Torres.",
+        "cap permits. Carlos Torres keeps the California Local SMG accounts he "
+        "holds today and the rest of the North/Central seat. Marcy Castro holds "
+        "the rest of southern Tier 8. Eduardo Ruiz holds the northeast groups "
+        "that had been Carlos's. Luis Aguilar holds Texas. Natalia Sanchez holds "
+        "South Florida, and Ricardo Castro holds north and central Florida plus "
+        "the Southeast and Mid-Atlantic, including Alejandro Solano's accounts "
+        "that move with those groups. Tatiana Montero holds Marcy's former "
+        "Missouri, Illinois, Ohio and Nebraska enterprise book.",
     )
     source = source.replace(
         "Luke Mulvaney's three districts sit with Carlos Torres so Halena is not "
         "paired with that vertical.",
         "Luke Mulvaney's Texas district sits with Luis Aguilar; his New Jersey and "
-        "Oregon districts stay with Carlos Torres.",
+        "Oregon districts sit with Eduardo Ruiz.",
     )
     source = source.replace(
         "County. Taylor Roman holds Benjamin Shor",
