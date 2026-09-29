@@ -153,6 +153,24 @@ SOUTHERN_CA_LOCAL_SMG = {
     "Vista, CA",
     "Westminster, CA",
 }
+# The pod view splits the southern list again so California has three
+# midmarket seats. These are San Diego, Imperial and the Inland Empire; the
+# rest of the southern list is Los Angeles and Orange County.
+SD_INLAND_CA_LOCAL_SMG = {
+    "Brawley CA",
+    "Chino Valley Independent Fire District",
+    "Coachella, CA",
+    "Eastvale CA",
+    "Encinitas, CA",
+    "Hesperia, CA",
+    "Imperial Irrigation District",
+    "Ontario International Airport",
+    "Palm Springs, CA",
+    "Perris, CA",
+    "San Diego State University",
+    "Victorville, CA",
+    "Vista, CA",
+}
 
 # Tatiana takes Marcy's enterprise book. These AE groups sit entirely with
 # Marcy. David Cliff and the Farnham seat do not, so only their Marcy accounts
@@ -300,7 +318,8 @@ POD_ASSIGNED = [
     ("Northeast ENT · New England", "Halena Martin", "ENT", "New England · ENT", "Northeast"),
     ("Northeast ENT · OH/IN/PA", "Steffany Amador", "ENT", "Ohio/Indiana/Pennsylvania · ENT", "Northeast"),
     ("Northeast MM", "Eduardo Ruiz", "MM", "Northeast · MM", "Northeast"),
-    ("California MM · South", "Marcy Castro", "MM", "California · South", "California"),
+    ("California MM · South", "Marcy Castro", "MM", "California · LA/Orange", "California"),
+    ("California MM · SD/Inland", "Open · California SD/Inland", "MM", "California · SD/Inland", "California"),
     ("California MM · North", "Carlos Torres", "MM", "California · North", "California"),
     ("California ENT", "Open XP2 (PT)", "ENT", "California · ENT", "California"),
     ("Southwest ENT", "Cody Nichols", "ENT", "Southwest · ENT", "Southwest"),
@@ -325,7 +344,7 @@ POD_ASSIGNED = [
 REGION_SHAPE = {
     "Northwest": {"ENT": 1, "MM": 1},
     "Northeast": {"ENT": 2, "MM": 1},
-    "California": {"ENT": 1, "MM": 2},
+    "California": {"ENT": 1, "MM": 3},
     "Southwest": {"ENT": 1, "MM": 1},
     "Mountain Plains": {"ENT": 1, "MM": 1},
     "Texas": {"ENT": 1, "MM": 1},
@@ -348,10 +367,8 @@ RETIRED_POD_NAMES = {
     "Northeast ENT · OH/IN/PA",
     "Northeast MM",
     "California MM · LA/OC",
-    "California MM · SD/Inland",
     "California MM · South",
     "California MM · North",
-    "Open · California SD/Inland",
     "Open · North Florida MM",
     "California ENT · uncovered",
     "California ENT",
@@ -383,8 +400,9 @@ MID_ATLANTIC_ENT_COAST = {"MD", "VA", "WV", "NC"}
 MID_ATLANTIC_ENT_INLAND = {"AR", "TN", "KY"}
 COLUMBUS = "Columbus OH"
 
-# California midmarket is two seats. The southern list is Tier 8 outside
-# Jaxon Sher's North/Central book. North is everything else in the state.
+# California midmarket is three seats. The southern list is Tier 8 outside
+# Jaxon Sher's North/Central book, split into LA/Orange and SD/Inland. North
+# is everything else in the state.
 
 # Southeast midmarket is three seats. South Florida is named; the rest of
 # Florida is the north seat; Georgia, Louisiana, Alabama and South Carolina
@@ -429,6 +447,8 @@ def pod_seat(row: dict) -> str:
     if state == "CA":
         if not mm:
             return "California ENT"
+        if row["acct"] in SD_INLAND_CA_LOCAL_SMG:
+            return "California MM · SD/Inland"
         if row["acct"] in SOUTHERN_CA_LOCAL_SMG:
             return "California MM · South"
         return "California MM · North"
@@ -502,6 +522,11 @@ def assign_pods(page: dict, rows: list[dict]) -> dict[str, int]:
     page["podXp"] = pod_xp
     page["territories"] = territories
 
+    if not SD_INLAND_CA_LOCAL_SMG <= SOUTHERN_CA_LOCAL_SMG:
+        raise RuntimeError(
+            "SD/Inland names accounts outside the southern California list: "
+            + ", ".join(sorted(SD_INLAND_CA_LOCAL_SMG - SOUTHERN_CA_LOCAL_SMG))
+        )
     named_ca = SOUTHERN_CA_LOCAL_SMG
     ca_smg = {
         r["acct"]
