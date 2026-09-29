@@ -80,8 +80,13 @@ The proposed view in `index.html` applies these staffing rules:
 - Enterprise and Local SMG are separate books. No Enterprise XP carries a Local SMG
   account.
 - Nine dedicated Local SMG XPs cover the midmarket book. Marcy Castro holds
-  Southern California, Eduardo Ruiz holds North/Central California, Luis Aguilar
-  holds Texas, and Ricardo Castro holds the Southeast and Mid-Atlantic. Tatiana
+  the rest of southern California Tier 8. Carlos Torres keeps every California
+  Local SMG account he holds today and the rest of the North/Central seat
+  (Jaxon Sher). Eduardo Ruiz holds the northeast groups that move off Carlos
+  so both books stay within 30. Luis Aguilar
+  holds Texas. Natalia Sanchez holds South Florida. Ricardo Castro holds north
+  and central Florida plus the Southeast and Mid-Atlantic, including Alejandro
+  Solano's accounts in those groups. Tatiana
   Montero holds the Missouri, Illinois, Ohio and Nebraska enterprise book that
   had been Marcy's. The build reports account count, ARR, tier mix and
   complex-account count for every SMG XP.
@@ -104,7 +109,8 @@ The `Current assignment` view is historical and still shows Savannah, Kristen an
 current books.
 
 `Pod aligned` ignores who holds the accounts today and follows the recommended seats:
-4 State SAMs, then Northwest 2, Northeast 3, California 4, Southwest 2, Mountain Plains 2,
+4 State SAMs, then Northwest 2, Northeast 3, California 3 (one enterprise and two
+midmarket), Southwest 2, Mountain Plains 2,
 Texas 2, Great Lakes 3, Southeast 4 and Mid-Atlantic 3. Each seat stays separate on
 the map and in the legend. When one XP covers two seats, both stay listed and the XP
 is named on each. US staff stay
