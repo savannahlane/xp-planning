@@ -14,6 +14,8 @@ that landed on main and changes only the proposed assignment (`newxp`):
 * Carolina Prieto is labelled Team Lead, not Manager. She keeps only the Idaho
   and North Dakota state book (Scott Mark, including the ND enterprise agreement).
   Kentucky state, including the COT enterprise agreement, sits with Andy O'Brien.
+* `podxp` is a third view. It staffs pods from the account's state and segment
+  and does not change `cur` or `newxp`.
 
 Per-account moves live in account_overrides.csv, which is the file to edit when
 an XP changes. It also carries segment changes and removals.
@@ -198,6 +200,228 @@ NY_NJ_STATE_XP = "Taylor Roman"
 # Dakota. This committed logo is the first account on his mapped Wyoming
 # territory, so it stays with that AE rather than opening a second XP.
 CAROLINA_BEYOND_ID_ND = {"Wyoming Department of Environmental Quality"}
+
+# Pod aligned ignores who holds the accounts today. The four State SAM seats
+# each keep a dedicated enterprise XP. Every other account follows its state
+# into one of the regional pods below. Local SMG is midmarket; State and Local
+# ENT are enterprise. Federal stays outside the regions.
+STATE_SAM_XP = {
+    "Bill Anderson": "SAM · Bill Anderson",
+    "State SAM – Farnham seat (open)": "SAM · Farnham",
+    "Gil Roy": "SAM · Gil Roy",
+    "Benjamin Shor": "SAM · Benjamin Shor",
+}
+
+# Two enterprise seats in one region keep whole states together.
+NORTHEAST_ENT_NEW_ENGLAND = {"ME", "NY", "NJ", "DE", "MA", "RI", "VT", "CT", "NH"}
+NORTHEAST_ENT_OHIO = {"PA", "OH", "IN"}
+MID_ATLANTIC_ENT_COAST = {"MD", "VA", "WV", "NC"}
+MID_ATLANTIC_ENT_INLAND = {"AR", "TN", "KY"}
+
+# California is one state with three midmarket seats, so the split is geographic
+# rather than by AE. Anything in California Local SMG not named here is North.
+CA_MM_LA_OC = {
+    "Bell, CA",
+    "Burbank CA",
+    "Chino Valley Independent Fire District",
+    "Culver City, CA",
+    "Eastvale CA",
+    "El Monte, CA",
+    "Fullerton, CA",
+    "La Puente, CA",
+    "Laguna Beach, CA",
+    "Manhattan Beach, CA",
+    "Newport Beach, CA",
+    "Ontario International Airport",
+    "Orange, CA",
+    "Pasadena, CA",
+    "Rancho Santa Margarita, CA",
+    "Santa Margarita Water District",
+    "South Coast Water District",
+    "Tustin, CA",
+    "Westminster, CA",
+}
+CA_MM_SD_INLAND = {
+    "Brawley CA",
+    "Coachella, CA",
+    "Encinitas, CA",
+    "Hesperia, CA",
+    "Imperial Irrigation District",
+    "Metropolitan Water District of Southern California",
+    "Palm Springs, CA",
+    "Perris, CA",
+    "San Diego State University",
+    "Victorville, CA",
+    "Vista, CA",
+}
+
+# Southeast midmarket is three seats. South Florida is named; the rest of
+# Florida is the north seat; Georgia, Louisiana, Alabama and South Carolina
+# are the third seat.
+SE_MM_SOUTH_FL = {
+    "Aventura, FL",
+    "Boca Raton, FL",
+    "Coral Gables, FL",
+    "Delray Beach, FL",
+    "Doral, FL",
+    "Hallandale Beach, FL",
+    "Miramar, FL",
+    "Palmetto Bay, FL",
+    "Pembroke Pines, FL",
+    "Pinecrest, FL",
+    "Sunrise, FL",
+    "Tamarac, FL",
+    "West Palm Beach, FL",
+    "Weston, FL",
+}
+
+# name, role, region. Role is what the book-check level column shows.
+POD_ROSTER = [
+    ("SAM · Bill Anderson", "SAM", "State SAM"),
+    ("SAM · Farnham", "SAM", "State SAM"),
+    ("SAM · Gil Roy", "SAM", "State SAM"),
+    ("SAM · Benjamin Shor", "SAM", "State SAM"),
+    ("Northwest ENT", "ENT", "Northwest"),
+    ("Northwest MM", "MM", "Northwest"),
+    ("Northeast ENT · New England", "ENT", "Northeast"),
+    ("Northeast ENT · OH/IN/PA", "ENT", "Northeast"),
+    ("Northeast MM", "MM", "Northeast"),
+    ("California MM · LA/OC", "MM", "California"),
+    ("California MM · SD/Inland", "MM", "California"),
+    ("California MM · North", "MM", "California"),
+    ("California ENT · uncovered", "Gap", "California"),
+    ("Southwest ENT", "ENT", "Southwest"),
+    ("Southwest MM", "MM", "Southwest"),
+    ("Mountain Plains ENT", "ENT", "Mountain Plains"),
+    ("Mountain Plains MM", "MM", "Mountain Plains"),
+    ("Texas ENT", "ENT", "Texas"),
+    ("Texas MM", "MM", "Texas"),
+    ("Great Lakes ENT", "ENT", "Great Lakes"),
+    ("Great Lakes MM · Illinois", "MM", "Great Lakes"),
+    ("Great Lakes MM · Upper Midwest", "MM", "Great Lakes"),
+    ("Southeast ENT", "ENT", "Southeast"),
+    ("Southeast MM · South FL", "MM", "Southeast"),
+    ("Southeast MM · North FL", "MM", "Southeast"),
+    ("Southeast MM · GA/LA/SC", "MM", "Southeast"),
+    ("Mid-Atlantic ENT · MD/VA/NC", "ENT", "Mid-Atlantic"),
+    ("Mid-Atlantic ENT · KY/TN", "ENT", "Mid-Atlantic"),
+    ("Mid-Atlantic MM", "MM", "Mid-Atlantic"),
+    ("Federal", "Federal", "Federal"),
+]
+
+
+def pod_xp(row: dict) -> str:
+    """Return the pod seat for one account. Ignores current and proposed owners."""
+    if row["segment"] == "Federal" or not row.get("state"):
+        return "Federal"
+    if row["person"] in STATE_SAM_XP:
+        return STATE_SAM_XP[row["person"]]
+    state = row["state"]
+    mm = row["segment"] == "Local SMG"
+    if state in {"WA", "OR", "AK"}:
+        return "Northwest MM" if mm else "Northwest ENT"
+    if state in NORTHEAST_ENT_NEW_ENGLAND | NORTHEAST_ENT_OHIO:
+        if mm:
+            return "Northeast MM"
+        if state in NORTHEAST_ENT_NEW_ENGLAND:
+            return "Northeast ENT · New England"
+        return "Northeast ENT · OH/IN/PA"
+    if state == "CA":
+        if not mm:
+            return "California ENT · uncovered"
+        if row["acct"] in CA_MM_LA_OC:
+            return "California MM · LA/OC"
+        if row["acct"] in CA_MM_SD_INLAND:
+            return "California MM · SD/Inland"
+        return "California MM · North"
+    if state in {"NV", "UT", "CO", "NM", "AZ"}:
+        return "Southwest MM" if mm else "Southwest ENT"
+    if state in {"ID", "WY", "MT", "SD", "ND", "NE", "KS", "OK"}:
+        return "Mountain Plains MM" if mm else "Mountain Plains ENT"
+    if state == "TX":
+        return "Texas MM" if mm else "Texas ENT"
+    if state in {"MN", "WI", "IA", "MO", "IL", "MI"}:
+        if not mm:
+            return "Great Lakes ENT"
+        return "Great Lakes MM · Illinois" if state == "IL" else "Great Lakes MM · Upper Midwest"
+    if state in {"LA", "FL", "MS", "AL", "GA", "SC"}:
+        if not mm:
+            return "Southeast ENT"
+        if state != "FL":
+            return "Southeast MM · GA/LA/SC"
+        if row["acct"] in SE_MM_SOUTH_FL:
+            return "Southeast MM · South FL"
+        return "Southeast MM · North FL"
+    if state in MID_ATLANTIC_ENT_COAST | MID_ATLANTIC_ENT_INLAND:
+        if mm:
+            return "Mid-Atlantic MM"
+        if state in MID_ATLANTIC_ENT_COAST:
+            return "Mid-Atlantic ENT · MD/VA/NC"
+        return "Mid-Atlantic ENT · KY/TN"
+    raise RuntimeError(
+        f"No pod for {row['acct']!r} ({row['state']}, {row['segment']}, {row['person']})"
+    )
+
+
+def assign_pods(page: dict, rows: list[dict]) -> dict[str, int]:
+    """Staff podxp from geography. A second run assigns the same seats."""
+    roster = {name: role for name, role, _region in POD_ROSTER}
+    page["order"] = [xp for xp in page["order"] if xp not in roster]
+    for name, role, region in POD_ROSTER:
+        page["meta"][name] = ["—", "n/a", role, region]
+        page["order"].append(name)
+
+    named_ca = CA_MM_LA_OC | CA_MM_SD_INLAND
+    if CA_MM_LA_OC & CA_MM_SD_INLAND:
+        raise RuntimeError("California midmarket seats overlap")
+    ca_smg = {
+        r["acct"]
+        for r in rows
+        if r["state"] == "CA" and r["segment"] == "Local SMG" and not r["alloc"]
+    }
+    missing_ca = sorted(named_ca - ca_smg)
+    if missing_ca:
+        raise RuntimeError(
+            "California midmarket cut names accounts that are not CA Local SMG: "
+            + ", ".join(missing_ca)
+        )
+    fl_smg = {
+        r["acct"]
+        for r in rows
+        if r["state"] == "FL" and r["segment"] == "Local SMG" and not r["alloc"]
+    }
+    missing_fl = sorted(SE_MM_SOUTH_FL - fl_smg)
+    if missing_fl:
+        raise RuntimeError(
+            "South Florida cut names accounts that are not FL Local SMG: "
+            + ", ".join(missing_fl)
+        )
+
+    load: dict[str, int] = defaultdict(int)
+    for row in rows:
+        seat = pod_xp(row)
+        row["podxp"] = seat
+        if row["alloc"]:
+            continue
+        role = roster[seat]
+        if role == "MM" and row["segment"] != "Local SMG":
+            raise RuntimeError(f"{row['acct']} is {row['segment']} on midmarket seat {seat}")
+        if role in {"ENT", "SAM", "Gap"} and row["segment"] == "Local SMG":
+            raise RuntimeError(f"{row['acct']} is Local SMG on {seat}")
+        if role == "Federal" and row["segment"] != "Federal":
+            raise RuntimeError(f"{row['acct']} is {row['segment']} on the Federal seat")
+        if role == "SAM":
+            owner = next(person for person, xp in STATE_SAM_XP.items() if xp == seat)
+            if row["person"] != owner:
+                raise RuntimeError(f"{row['acct']} on {seat} belongs to {row['person']}")
+        if role == "Gap" and (row["state"] != "CA" or row["segment"] not in ENTERPRISE_SEGMENTS):
+            raise RuntimeError(f"{row['acct']} does not belong on the uncovered California seat")
+        load[seat] += 1
+
+    empty = [name for name, _role, _region in POD_ROSTER if name not in load]
+    if empty:
+        raise RuntimeError("Pod seats with no countable accounts: " + ", ".join(empty))
+    return dict(load)
 
 
 def load_overrides(path: Path) -> dict[str, dict]:
@@ -705,6 +929,7 @@ def apply_assignments(page: dict, overrides: dict[str, dict]) -> dict:
         )
 
     after_edges = proposed_edges(rows)
+    pod_load = assign_pods(page, rows)
     return {
         "moved": moved,
         "removed": removed,
@@ -717,6 +942,7 @@ def apply_assignments(page: dict, overrides: dict[str, dict]) -> dict:
         "over_target": over_target,
         "before_edges": before_edges,
         "after_edges": after_edges,
+        "pod_load": pod_load,
         "ashley_enterprise": ashley_enterprise,
         "carolina_countable": carolina_rows,
         "pipeline": pipeline,
@@ -1016,6 +1242,9 @@ def main() -> None:
     outside_arr = sum(record["nnarr"] for record in pipeline["outside"])
     if pipeline["outside"]:
         print(f"  outside the US book: ${outside_arr:,.0f}")
+    print("Pod aligned seats (countable accounts, ignoring current owners):")
+    for name, _role, region in POD_ROSTER:
+        print(f"  {name} ({region}): {result['pod_load'].get(name, 0)}")
     print("Carolina countable consolidated accounts:")
     for row in result["carolina_countable"]:
         print(f"  {row['acct']} ${row['arr'] + row.get('fy27', 0):,.0f}")
