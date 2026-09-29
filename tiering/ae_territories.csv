@@ -18,7 +18,7 @@
 # Sources: State territory map 6/12/26, Local ENT and Local SMG maps 6/30/26,
 # vertical maps 7/2/26.
 ae,states,note
-Allison Hamilton,,"Federal seat, national"
+Allison Hamilton,DC,"Federal seat, aligned to DC"
 Amanda Brooks,"OR, WA",
 Andrew Collinsworth,"AL, NC, SC, WV",
 Andrew Murray,CA,
@@ -29,11 +29,11 @@ Bettsy Desjarlais,"IN, OH, PA",
 Bill Anderson,"CA, TX, WA",
 Bill Marshall,FL,
 Bill Pintsak,"IL, MO",
-Brenna Casey,,"Federal seat, national"
+Brenna Casey,DC,"Federal seat, aligned to DC"
 Brittany Greer,"IA, IN, MI, WI",
 Caleb Fort Jr,"GA, KY, LA, MS",
 Cameron Chadsey,"AZ, NM, NV",
-Carmel Hinkle,,"Federal seat, national"
+Carmel Hinkle,DC,"Federal seat, aligned to DC"
 Carrie Breedlove,"AK, HI, OR, WA",
 Carter Bradford,,Local ENT T15; the Local ENT map does not list its states
 Cedric Simpkins,TX,
@@ -46,14 +46,14 @@ Davis Keeter,TX,
 Demi Washington,"FL, LA",
 Desmond Davis,FL,
 Emery Herrschel,"CO, ID, MO, NE, WY",
-Emily Boldt,,"Federal seat, national"
+Emily Boldt,DC,"Federal seat, aligned to DC"
 Gil Roy,"AR, LA, TX",
 Grant Samson,"MD, NC, SC, VA, WV",State Tier 2; holds no accounts in this book
 Jared Cummings,"KS, MN, ND, SD",
 Jaxson McBride,,Utilities and Water vertical (West); not a state territory
 Jeff Gaisford,,Local ENT SAM 16; the Local ENT map does not list its states
 Jeffrey Johnson,"AK, AZ, HI, NM, NV, UT",
-Joe Chang,,"Federal seat, national"
+Joe Chang,DC,"Federal seat, aligned to DC"
 Joe Spair,"MN, WI",
 Joel Parris,,Local ENT T3; the Local ENT map does not list its states
 John Meah,"MD, TN, VA",
@@ -79,6 +79,6 @@ Stephen Allen,,Local ENT T7a; the Local ENT map does not list its states
 TX State SAM (unconfirmed),TX,
 Territory 4a (open),"CT, MA, ME, NH, NY, RI, VT",
 Todd Bowers,"AK, OR, WA",
-Tom Gilliatt,,
+Tom Gilliatt,DC,"Federal seat, aligned to DC"
 Tommy Monaghan,"DE, NJ, OH, PA",
 Tyler Carlson,,Local ENT T10; the Local ENT map does not list its states
