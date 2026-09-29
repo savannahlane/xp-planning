@@ -273,7 +273,7 @@ dl.kv dd{margin:0}
       </div>
       <div class="tscroll"><table id="books"></table></div>
     </div>
-    <p class="hint" id="podnote" style="margin-top:10px" hidden>Pod aligned follows the recommended seats and keeps each one separate, even when one XP is named on two of them. Halena Martin holds New England. Steffany Amador holds Ohio, Indiana and Pennsylvania, including Columbus. Andy O'Brien holds both Mid-Atlantic enterprise seats. Gil Roy is the Texas State SAM. US staff stay within an hour of the account’s time zone. Costa Rica staff have no timezone restriction. An open seat names the AE in the legend. District of Columbia stays with Paige Wendle. Federal accounts stay with Jr Wycinsky.</p>
+    <p class="hint" id="podnote" style="margin-top:10px" hidden>Pod aligned follows the recommended seats. When one XP holds two seats, both are listed. An open seat has no XP within an hour of its time zone; Costa Rica staff can sit anywhere. DC stays with Paige Wendle, and federal accounts stay with Jr Wycinsky.</p>
     <details class="notes">
       <summary>How tiers, caps and counts work</summary>
       <div class="notegrid">
@@ -281,7 +281,7 @@ dl.kv dd{margin:0}
         <div class="note"><h3><span class="chip t2">2</span>Tier 2 — Defend and convert</h3><p class="st">CA, NY, IL, OH, WA, VA, MD, PA, NJ, MA, CT, CO, MN, MO, MI, WI, DC</p><p>Where the money already is, and where FY27 deficits are worst (CA, WA, MD, CO, IL, NY, PA, MN). Growth comes from cross-sell into existing estates — AI, accessibility, records — not from new logos. Renewal risk is the thing to manage.</p></div>
         <div class="note"><h3><span class="chip t3">3</span>Tier 3 — Steady</h3><p class="st">ID, MT, WY, ND, SD, NE, KS, IA, UT, NV, NM, OK, AR, LA, MS, AL, KY, WV, IN, ME, NH, VT, RI, AK, HI</p><p>Low ARR per account (North Dakota at $57K, Nevada $55K, New Mexico $59K, Kentucky $78K), thin capability counts, small transformation budgets and few grant programs to lean on. Louisiana and New Mexico also carry real fiscal gaps and flat or falling population. These are high-touch, high-count renewal books rather than growth books.</p></div>
       </div>
-      <p class="hint">Counts exclude allocated child records. "AEs today" is the same count under current assignments. Complex means more than 7 capabilities. The proposed view removes account books from Jake Sager, Savannah Lane, Kristen Murphy and Ashley Hill; the current view remains historical. Nathan Williamson has left the team, and his federal accounts sit with Jr Wycinsky. The proposed view adds the US state logos and expansion ARR from the visible Q3 FY2027 pipeline extract. UK pipeline stays off this map.</p>
+      <p class="hint">Counts exclude allocated child records. "AEs today" is the same count under current assignments. The proposed view removes account books from Jake Sager, Savannah Lane, Kristen Murphy and Ashley Hill; the current view remains historical. Nathan Williamson has left the team, and his federal accounts sit with Jr Wycinsky. The proposed view adds the US state logos and expansion ARR from the visible Q3 FY2027 pipeline extract. UK pipeline stays off this map.</p>
       <p class="hint">Caps: Enterprise books target 17 countable accounts with a hard maximum of 20; Local SMG books cap at 30 with no more than a third complex. Fit flags: Stretch when more than a third of the book is complex, or an XP1/XP2 carries mostly Tier 2 defense above $3M; Watch when an XP1 carries mostly Tier 1 expansion; Under-leveraged when an XP3 carries mostly Tier 3 renewal work.</p>
       <p class="hint">Sources for the outside signals: Census population estimates through July 2025; Pew, NCSL and MultiState FY26–27 state fiscal outlooks; NASCIO 2026 State CIO Top 10 (AI first, budget and cost control third); DOJ interim final rule of April 2026 moving ADA Title II compliance to April 2027 and April 2028; Treasury's December 31, 2026 ARPA spending deadline.</p>
     </details>
@@ -325,7 +325,7 @@ dl.kv dd{margin:0}
     <div class="panel">
       <div class="panelhead">
         <h2>AE coverage and load</h2>
-        <p class="hint">Territory is the assigned map and does not move. States in this view are counted from the accounts, so they follow the book and segment toggles.</p>
+        <p class="hint">Territory is the assigned map.</p>
       </div>
       <div class="tscroll"><table id="aes"></table></div>
     </div>
@@ -600,7 +600,7 @@ function renderBooks(stats){
   document.getElementById("books-title").textContent = scn==="pod" ? "Pod seats" : scn==="new" ? "Proposed books" : "Current books";
   document.getElementById("podnote").hidden = scn!=="pod";
   const list = sortBy(stats.filter(b=>b.hit), "books", {name:b=>b.name.toLowerCase(), tiers:b=>b.n?(b.t[1]*2+b.t[2])/b.n:0, fit:b=>b.fitRank});
-  const cols=[["name", scn==="pod"?"Seat":"XP"],["segment","Book"],["n","Accounts",1],["arr","ARR",1],["tiers","Tier mix 1/2/3"],["aes","AEs",1],["complex","Complex",1]];
+  const cols=[["name", scn==="pod"?"Seat":"XP"],["segment","Book"],["n","Accounts",1],["arr","ARR",1],["tiers","Tier mix 1/2/3"],["aes","AEs",1]];
   if(scn==="new") cols.push(["moved","New to XP",1]);
   cols.push(["fit","Fit"]);
   const body = list.length ? list.map(b=>`<tr class="click${focusXp===b.x?" on":""}" data-xp="${esc(b.x)}" tabindex="0">
@@ -610,7 +610,6 @@ function renderBooks(stats){
       <td class="n">${fmt$(b.arr)}</td>
       <td>${tierCell(b.t,b.n)}</td>
       <td class="n" title="${b.aesToday} under current assignments">${b.aes}${scn==="new"?`<span class="sub">${b.aesToday} today</span>`:""}</td>
-      <td class="n">${b.complex||"–"}</td>
       ${scn==="new"?`<td class="n">${b.moved||"–"}</td>`:""}
       <td><span class="chip ${b.fit[0]}" title="${esc(b.fit[2])}">${b.fit[1]}</span></td>
     </tr>`).join("") : `<tr><td colspan="${cols.length}" class="empty">No books match.</td></tr>`;
@@ -662,7 +661,7 @@ function renderAccts(){
   document.getElementById("acctcount").textContent=`${rows.length.toLocaleString()} of ${total.toLocaleString()}`;
   rows=sortBy(rows,"accts",{acct:r=>r.acct.toLowerCase(), person:r=>r.person.toLowerCase(), cur:r=>String(r.cur).toLowerCase(), newxp:r=>String(r.newxp).toLowerCase(), pod:r=>String(seatTitlePod(r)).toLowerCase(), segment:r=>r.segment, state:r=>r.state||"~"});
   const active = k => (scn==="cur"&&k==="cur")||(scn==="new"&&k==="newxp")||(scn==="pod"&&k==="pod") ? ' style="font-weight:600"' : "";
-  const cols=[["acct","Account"],["state","State"],["segment","Segment"],["person","AE / seat"],["cur","Current XP"],["newxp","Proposed XP"],["pod","Pod seat"],["arr","ARR",1],["tier","Tier",1]];
+  const cols=[["acct","Account"],["state","State"],["segment","Segment"],["person","AE / seat"],["cur","Current XP"],["newxp","Proposed XP"],["arr","ARR",1],["tier","Tier",1]];
   const shown=rows.slice(0,600);
   const body = shown.length ? shown.map(r=>{
     const mv = r.newxp!==r.cur;
@@ -671,11 +670,10 @@ function renderAccts(){
       <td>${esc(r.state||"—")}</td><td>${esc(r.segment)}</td><td>${esc(r.person)}</td>
       <td${active("cur")}>${esc(r.pipe?"—":r.cur)}</td>
       <td${active("newxp")}>${esc(r.newxp)}${mv&&!r.pipe?` <span class="chip warn">moves</span>`:""}</td>
-      <td${active("pod")}>${esc(seatTitlePod(r))}</td>
       <td class="n">${fmt$(r.arr)}${r.fy27&&scn!=="cur"?`<span class="sub">incl. ${fmt$(r.fy27)} FY27</span>`:""}</td>
       <td class="n">${tierChip(r.tier)}</td></tr>`;
   }).join("") : `<tr><td colspan="${cols.length}" class="empty">No accounts match.</td></tr>`;
-  document.getElementById("accts").innerHTML = sortHead("accts", cols) + `<tbody>${body}</tbody>` + (rows.length>shown.length?`<tfoot><tr><td colspan="9" class="empty">Showing the first ${shown.length}. Narrow the search to see the rest.</td></tr></tfoot>`:"");
+  document.getElementById("accts").innerHTML = sortHead("accts", cols) + `<tbody>${body}</tbody>` + (rows.length>shown.length?`<tfoot><tr><td colspan="${cols.length}" class="empty">Showing the first ${shown.length}. Narrow the search to see the rest.</td></tr></tfoot>`:"");
   document.getElementById("ct-accts").textContent=total;
 }
 function seatTitlePod(r){ const lab=PAGE.podLabel?.[r.podseat]; return lab ? `${lab} · ${String(r.podxp).startsWith("Open")?"Open":r.podxp}` : (r.podseat||"—"); }
@@ -692,17 +690,16 @@ function aeRows(){
 function renderAes(){
   let rows=aeRows().filter(o=>!q || norm(o.p+" "+[...o.xps].join(" ")+" "+territoryText(o.p)).includes(q) || o.rows.some(rowHit));
   rows=sortBy(rows,"aes",{p:o=>o.p.toLowerCase(), nxp:o=>o.xps.size, side:o=>o.side});
-  const cols=[["p","AE / seat"],["side","Map"],["terr","Territory"],["states","States in this view"],["nxp","XPs",1],["n","Accounts",1],["arr","ARR",1]];
+  const cols=[["p","AE / seat"],["side","Map"],["terr","Territory"],["nxp","XPs",1],["n","Accounts",1],["arr","ARR",1]];
   const body = rows.length ? rows.map(o=>{
     const t=territoryOf(o.p);
     return `<tr class="click" data-ae="${esc(o.p)}" tabindex="0">
       <td><span class="who">${esc(o.p)}</span>${o.gap?` <span class="chip warn">Open / unmapped</span>`:""}<span class="sub">${esc([...o.segs].join(", "))}</span></td>
       <td>${esc(o.side)}</td>
       <td>${t.states.length?esc(t.states.join(", ")):`<span class="muted">${esc(t.note||"Not listed")}</span>`}</td>
-      <td>${esc(stateText(o.rows)||"—")}</td>
       <td class="n" title="${esc([...o.xps].join(", "))}">${o.xps.size}<span class="sub">${esc([...o.xps].slice(0,3).join(", "))}${o.xps.size>3?"…":""}</span></td>
       <td class="n">${o.n}</td><td class="n">${fmt$(o.arr)}</td></tr>`;
-  }).join("") : `<tr><td colspan="7" class="empty">No AEs match.</td></tr>`;
+  }).join("") : `<tr><td colspan="${cols.length}" class="empty">No AEs match.</td></tr>`;
   document.getElementById("aes").innerHTML = sortHead("aes", cols) + `<tbody>${body}</tbody>`;
   document.getElementById("ct-aes").textContent=aeRows().length;
 }
@@ -804,7 +801,7 @@ function showXp(x){
   const blk = l => groupBlock(esc(l.person), isGapName(l.person)?"g":l.side==="State"?"s":"l",
       `${plural(l.n,"account")} · ${fmt$(l.arr)}`,
       `${esc(l.terr||"")}${l.terr?" · ":""}Territory ${esc(territoryText(l.person))}`, l.rows, r=>(r.state||"—")+" · ");
-  const body=`<div class="dstats"><div><b>${b.n}${b.cap?`<small class="muted" style="font-size:13px">/${b.cap.max}</small>`:""}</b><span>Accounts</span></div><div><b>${fmt$(b.arr)}</b><span>ARR</span></div><div><b>${b.aes}</b><span>AEs</span></div><div><b>${b.complex}</b><span>Complex</span></div></div>
+  const body=`<div class="dstats"><div><b>${b.n}${b.cap?`<small class="muted" style="font-size:13px">/${b.cap.max}</small>`:""}</b><span>Accounts</span></div><div><b>${fmt$(b.arr)}</b><span>ARR</span></div><div><b>${b.aes}</b><span>AEs</span></div></div>
     <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><span class="chip ${b.fit[0]}">${b.fit[1]}</span><span class="hint">${esc(b.fit[2])}</span></div>
     <div style="margin-top:10px">${tierCell(b.t,b.n)}</div>
     <div class="hint" style="margin-top:8px">States: ${esc(stateText(ROWS.filter(r=>r.xp===x))||"none")}</div>
@@ -823,10 +820,8 @@ function showState(stc){
 }
 function showAe(p){
   const mine=L.filter(l=>l.person===p).sort((a,b)=>b.arr-a.arr); if(!mine.length) return;
-  const rows=mine.flatMap(l=>l.rows), here=stateCodes(rows), t=territoryOf(p);
-  const unworked=t.states.filter(s=>!here.includes(s));
+  const t=territoryOf(p);
   const body=`<dl class="kv"><dt>Territory</dt><dd>${esc(territoryText(p))}${t.states.length&&t.note?` · ${esc(t.note)}`:""}</dd>
-    <dt>States in this view</dt><dd>${esc(stateText(rows)||"none")}${unworked.length?` · <span style="color:var(--gap)">no accounts in ${unworked.join(", ")}</span>`:""}</dd>
     <dt>Works with</dt><dd>${plural(new Set(mine.map(l=>xpPerson(l.xp))).size,"XP")}</dd></dl>
     <div class="dsec">${mine.map(l=>groupBlock(`<button type="button" class="link-btn" data-xp="${esc(l.xp)}">${esc(seatTitle(l.xp))}</button>`,"",`${plural(l.n,"account")} · ${fmt$(l.arr)}`,"",l.rows,r=>(r.state||"—")+" · ")).join("")}</div>`;
   openDrawer(p, `${esc(mine[0].side)} · ${esc(mine[0].terr||"")}`, body);

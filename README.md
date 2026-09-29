@@ -112,8 +112,8 @@ and an `ae` who already has accounts on the map. The XP comes from `AE_OWNER` if
 Taylor for NY/NJ, otherwise the `xp` column. A name already on the map is treated as expansion:
 `nnarr` is added to its proposed ARR and nothing else changes.
 
-**Federal and DC.** Federal accounts sit on the Federal pod seat with Jr Wycinsky. District of
-Columbia is a Paige hold in every view (`PAIGE_DC`).
+**Federal and DC.** Every federal account is in DC and sits on the Federal pod seat with Jr
+Wycinsky. District of Columbia is a Paige hold in every view (`PAIGE_DC`).
 
 **Pod-aligned view.** It ignores current and proposed owners completely. Accounts go to a seat by
 state and segment (`pod_seat()`), and each seat has one XP in `POD_ASSIGNED`. Overrides do not
