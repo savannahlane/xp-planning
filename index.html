@@ -108,6 +108,14 @@ select,.pick>button,input[type="search"]{
 .detailpane li{margin:2px 0;font-size:13.5px}
 .detailpane li span{color:var(--muted)}
 .blank{padding:16px;color:var(--muted)}
+.theory{margin-top:22px}
+.theory h2{font:600 18px/1.25 Barlow,sans-serif;margin:26px 0 8px}
+.theory h2:first-child{margin-top:0}
+.theory p{margin:0 0 10px;max-width:66ch}
+.theory ul{margin:0 0 10px;padding-left:18px;max-width:66ch}
+.theory li{margin:4px 0}
+.theory .card{margin-top:12px}
+#seats tr.band td{font-weight:600;background:var(--bg)}
 .more{margin-top:28px}
 .more>summary{cursor:pointer;font-weight:600;color:var(--accent)}
 .more section{margin-top:22px}
@@ -167,6 +175,7 @@ td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
         <option value="new" selected>Proposed plan</option>
         <option value="cur">Who holds them today</option>
         <option value="pod">Recommended seats</option>
+        <option value="theory">The approach</option>
       </select>
     </label>
     <button type="button" class="textbtn" id="filterbtn" aria-expanded="false" aria-controls="filters">Filter</button>
@@ -215,6 +224,29 @@ td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
     </aside>
   </div>
   <div class="detail" id="detail" hidden></div>
+
+  <article id="theory" class="theory" hidden>
+    <h2>No one is assigned here</h2>
+    <p>The other views put a person on every book. This one is the design those views are measured against. Seats, states, and limits only.</p>
+    <h2>One relationship</h2>
+    <p>An account executive should work with one experience partner. Enterprise accounts and local midmarket accounts are different work, so they never share a book. A state-agency group stays whole, on a state seat of its own. Federal accounts are one book, and every federal account is in Washington, DC.</p>
+    <h2>How big a book is</h2>
+    <p>An enterprise book aims for 17 accounts and stops at 20. A local midmarket book stops at 30, and no more than a third of it should be complex, which means more than seven products on the account. A partner based in the US has to be within an hour of every state on an enterprise seat. If no one can sit that close, the seat stays empty. Midmarket partners are not held to that time-zone rule.</p>
+    <h2>Where growth sits</h2>
+    <p>States fall into three bands. A book is not reshuffled just to give every seat the same mix.</p>
+    <ul>
+      <li><strong>Expand.</strong> Texas, Florida, Georgia, North Carolina, South Carolina, Tennessee, Arizona. Population is still growing, a lot of governments face the 2027 accessibility deadline, and the footprint here is thin. New logos are realistic.</li>
+      <li><strong>Defend and convert.</strong> California, New York, Illinois, Ohio, Washington, Virginia, Maryland, Pennsylvania, New Jersey, Massachusetts, Connecticut, Colorado, Minnesota, Missouri, Michigan, Wisconsin, and DC. The money is already here, and so are the worst budget gaps. Growth is another product in an account we already have.</li>
+      <li><strong>Steady.</strong> The remaining states. Smaller budgets, fewer grants, renewal work.</li>
+    </ul>
+    <h2>How a seat is drawn</h2>
+    <p>An account follows its state into a region, then into a seat by the kind of work. Each region has a fixed number of enterprise seats and midmarket seats. A second enterprise seat in a region is a whole set of states, not leftover accounts. California midmarket is north and south. Southeast midmarket is South Florida, North Florida, and Georgia with its neighbors. Great Lakes midmarket is Illinois, and the states around it. Northeast enterprise is New England on one seat and Ohio, Indiana, and Pennsylvania on the other. Mid-Atlantic enterprise is the coastal states on one seat and Kentucky and Tennessee on the other.</p>
+    <p>Four state seats cover the state-agency groups, separate from the regional enterprise seats. A few accounts stay on the seat that already works them even when the state line points somewhere else. When that happens, the state shows up on a seat outside its region.</p>
+    <h2>The seats</h2>
+    <p>Counts below are the recommended cut, with no one named. A red number is past the limit. Filters change the counts. They do not change the rules.</p>
+    <div class="card tscroll"><table id="seats"></table></div>
+    <p class="hint" id="theoryfit"></p>
+  </article>
 
   <details class="more">
     <summary>Tables, tiers, and sources</summary>
@@ -676,12 +708,82 @@ function filterLabel(){
   btn.textContent=parts.length ? parts.join(" · ") : "Filter";
   btn.classList.toggle("on", parts.length>0);
 }
+const HOME_REGION = {
+  WA:"Northwest", OR:"Northwest", AK:"Northwest",
+  ME:"Northeast", NY:"Northeast", NJ:"Northeast", DE:"Northeast", MA:"Northeast", RI:"Northeast", VT:"Northeast", CT:"Northeast", NH:"Northeast", PA:"Northeast", OH:"Northeast", IN:"Northeast",
+  CA:"California",
+  NV:"Southwest", UT:"Southwest", CO:"Southwest", NM:"Southwest", AZ:"Southwest",
+  ID:"Mountain Plains", WY:"Mountain Plains", MT:"Mountain Plains", SD:"Mountain Plains", ND:"Mountain Plains", NE:"Mountain Plains", KS:"Mountain Plains", OK:"Mountain Plains",
+  TX:"Texas",
+  MN:"Great Lakes", WI:"Great Lakes", IA:"Great Lakes", MO:"Great Lakes", IL:"Great Lakes", MI:"Great Lakes",
+  LA:"Southeast", FL:"Southeast", MS:"Southeast", AL:"Southeast", GA:"Southeast", SC:"Southeast",
+  AR:"Mid-Atlantic", TN:"Mid-Atlantic", KY:"Mid-Atlantic", NC:"Mid-Atlantic", VA:"Mid-Atlantic", WV:"Mid-Atlantic", MD:"Mid-Atlantic"
+};
+function theorySeatName(seat){
+  const label=(PAGE.podLabel && PAGE.podLabel[seat]) || seat;
+  return /farnham/i.test(label) ? "State SAM" : label;
+}
+function renderTheory(){
+  const rows=ROWS_ALL.filter(r=>!r.alloc && segMatch(r) && terrMatch(r) && r.podseat);
+  const by={};
+  for(const r of rows) (by[r.podseat]||=[]).push(r);
+  const roleName={ENT:"Enterprise", MM:"Local midmarket", SAM:"State SAM", Federal:"Federal"};
+  const capOf=role=>role==="MM"?30:role==="Federal"?null:20;
+  const bandOf=seat=>{
+    const role=PAGE.podRole && PAGE.podRole[seat];
+    if(role==="SAM") return "State agencies";
+    if(role==="Federal") return "Federal";
+    return (rows.find(r=>r.podseat===seat)||{}).podterr || "Other";
+  };
+  let html=`<thead><tr><th>Seat</th><th>Kind</th><th>States</th><th class="n">Accounts</th><th class="n">Limit</th></tr></thead><tbody>`;
+  let band="";
+  const over=[];
+  const away=[];
+  for(const seat of (PAGE.podOrder||[])){
+    const list=by[seat];
+    if(!list) continue;
+    const role=(PAGE.podRole&&PAGE.podRole[seat])||"";
+    const next=bandOf(seat);
+    if(next!==band){ band=next; html+=`<tr class="band"><td colspan="5">${esc(band)}</td></tr>`; }
+    const codes=[...new Set(list.map(r=>r.state).filter(Boolean))];
+    const tally={}; for(const r of list) if(r.state) tally[r.state]=(tally[r.state]||0)+1;
+    codes.sort((a,b)=>(tally[b]-tally[a]) || a.localeCompare(b));
+    const cap=capOf(role);
+    const n=list.length;
+    if(cap!=null && n>cap) over.push(`${theorySeatName(seat)} has ${n}, past ${cap}`);
+    if(role==="ENT" || role==="MM"){
+      const terr=list[0].podterr;
+      const outside=codes.filter(st=>HOME_REGION[st] && HOME_REGION[st]!==terr);
+      const fedHere=[...new Set(list.filter(r=>r.segment==="Federal").map(r=>r.state).filter(Boolean))];
+      const kept=[...new Set([...outside, ...fedHere])];
+      if(kept.length) away.push(`${kept.map(st=>STATE_NAME[st]||st).join(" and ")} on ${theorySeatName(seat)}`);
+    }
+    html+=`<tr><td>${esc(theorySeatName(seat))}</td><td>${esc(roleName[role]||role)}</td><td>${esc(codes.join(", ")||"—")}</td><td class="n${cap!=null&&n>cap?" over":""}">${n}</td><td class="n">${cap==null?"—":cap}</td></tr>`;
+  }
+  html+="</tbody>";
+  document.getElementById("seats").innerHTML=html;
+  const bits=[];
+  if(over.length) bits.push(`Past the limit: ${over.join("; ")}. A region that large needs another seat along a line the work already follows, such as north and south, coast and inland, or state agencies beside local accounts.`);
+  else bits.push("Every seat in this filter is within its limit.");
+  if(away.length) bits.push(`Kept with the seat that already works them, rather than the state line: ${away.join("; ")}.`);
+  document.getElementById("theoryfit").textContent=bits.join(" ");
+}
 function render(){
-  const links=layout==="links";
+  const theory=scn==="theory";
+  const links=!theory && layout==="links";
+  document.getElementById("theory").hidden=!theory;
+  document.getElementById("stage").hidden=theory;
+  document.querySelector("h1").textContent=theory?"How the coverage is designed":"Who covers the US";
+  document.querySelector(".lede").textContent=theory
+    ? "The rules, the bands, and the seats. No one is named."
+    : "Choose a person. Their states light up, and their accounts are listed beside the map.";
+  document.querySelector(".more").hidden=theory;
+  document.getElementById("modebtn").hidden=theory;
   document.getElementById("stage").classList.toggle("links", links);
   document.getElementById("modebtn").textContent=links?"Back to the map":"Who works with whom";
   document.getElementById("linkbar").hidden=!links;
   document.getElementById("glance").hidden=links;
+  if(theory){ document.getElementById("detail").hidden=true; renderTheory(); glance(); filterLabel(); return; }
   if(!XP_ORDER.length){
     document.getElementById("board").innerHTML=`<p class="blank">Nothing to show. Try another plan or clear the filter.</p>`;
     document.getElementById("list").innerHTML="";
