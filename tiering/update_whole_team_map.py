@@ -432,10 +432,11 @@ def pod_seat(row: dict) -> str:
 
     A few holds keep the same person on an account across proposed and pod, even
     when geography alone would put the account on another seat: Steffany keeps
-    Kent Hartsfield (Cook County and the Ohio group), Halena keeps Andrew
-    Wyzkoski in Pennsylvania, and Paige keeps District of Columbia plus every
-    Washington state agency. California enterprise, including Greater LA, is
-    Colleen's seat, so those accounts stay with her here too.
+    Kent Hartsfield (Cook County and the Ohio group), Halena keeps Allegheny
+    County, and Paige keeps District of Columbia plus every Washington state
+    agency. Philadelphia stays on the Ohio, Indiana, and Pennsylvania seat.
+    California enterprise, including Greater LA, is Colleen's seat, so those
+    accounts stay with her here too.
     """
     if row["acct"] == PAIGE_DC:
         return "Mountain Plains ENT"
@@ -444,7 +445,8 @@ def pod_seat(row: dict) -> str:
     # Holds that must match the proposed book.
     if row["person"] == "Kent Hartsfield" and row["segment"] != "Local SMG":
         return "Northeast ENT · OH/IN/PA"
-    if row["person"] == "Andrew Wyzkoski":
+    # Allegheny County stays with Halena. Philadelphia does not.
+    if row["person"] == "Andrew Wyzkoski" and row["acct"] != "Philadelphia, PA":
         return "Northeast ENT · New England"
     if row["state"] == "WA" and row["segment"] == "State":
         return "Mountain Plains ENT"
@@ -631,12 +633,17 @@ def assign_pods(page: dict, rows: list[dict]) -> dict[str, int]:
         raise RuntimeError("Columbus is not on Steffany Amador's Ohio seat in the pod model")
     if pod_xp["Northeast ENT · New England"] != "Halena Martin":
         raise RuntimeError("New England is not Halena Martin's seat")
-    pa_halena = [
-        r for r in rows
-        if r["person"] == "Andrew Wyzkoski" and not r["alloc"]
-    ]
-    if not pa_halena or any(r["podxp"] != "Halena Martin" for r in pa_halena):
-        raise RuntimeError("Andrew Wyzkoski's Pennsylvania book is not on Halena Martin in the pod model")
+    allegheny = [r for r in rows if r["acct"] == "Allegheny County Treasurer Office" and not r["alloc"]]
+    if len(allegheny) != 1 or allegheny[0]["podxp"] != "Halena Martin":
+        raise RuntimeError("Allegheny County is not on Halena Martin in the pod model")
+    philly = [r for r in rows if r["acct"] == "Philadelphia, PA" and not r["alloc"]]
+    if (
+        len(philly) != 1
+        or philly[0]["newxp"] == "Halena Martin"
+        or philly[0]["podxp"] == "Halena Martin"
+        or philly[0]["podseat"] != "Northeast ENT · OH/IN/PA"
+    ):
+        raise RuntimeError("Philadelphia must stay off Halena and on the Ohio seat")
     if pod_xp["California ENT"] != "Colleen Moran":
         raise RuntimeError("California enterprise is not Colleen Moran's seat")
     ca_local_off = [
