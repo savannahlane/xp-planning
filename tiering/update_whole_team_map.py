@@ -24,6 +24,9 @@ that landed on main and changes only the proposed assignment (`newxp`):
   Kentucky state, including the COT enterprise agreement, sits with Andy O'Brien.
 * `podxp` is a third view. It staffs pods from the account's state and segment
   and does not change `cur` or `newxp`.
+* `mterr` is the territory model: 16 local enterprise territories, 20 state
+  territories, and 37 local midmarket territories. It does not change who
+  holds a seat.
 
 Per-account moves live in account_overrides.csv, which is the file to edit when
 an XP changes. It also carries segment changes and removals.
@@ -499,6 +502,370 @@ def pod_seat(row: dict) -> str:
     raise RuntimeError(
         f"No pod for {row['acct']!r} ({row['state']}, {row['segment']}, {row['person']})"
     )
+
+
+# Territory model. These are account-executive territories, not partner seats.
+# Local enterprise is one territory per group, with one-account verticals folded
+# into the state they sit in, and California's two lists kept as one territory.
+# State is one territory per group, except the named-account list that sits in
+# California, Texas, and Washington at once: those states do not touch, so it
+# is three territories. Midmarket follows the lines already on the map, then
+# splits a state again only when it is still too big for one territory.
+# Federal stays one book and is not part of the 16 / 20 / 37 counts.
+MODEL_TERRITORIES = [
+    ("lent-oh-in-il", "Ohio, Indiana, and Illinois", "Local enterprise"),
+    ("lent-upper-midwest", "Wisconsin, Minnesota, Michigan, and Iowa", "Local enterprise"),
+    ("lent-sfl", "South Florida", "Local enterprise"),
+    ("lent-nfl", "North Florida", "Local enterprise"),
+    ("lent-tx", "Texas", "Local enterprise"),
+    ("lent-ca", "California", "Local enterprise"),
+    ("lent-la-ok", "Louisiana and Oklahoma", "Local enterprise"),
+    ("lent-mo-co", "Missouri, Colorado, and Nebraska", "Local enterprise"),
+    ("lent-va-md", "Virginia and Maryland", "Local enterprise"),
+    ("lent-nc-sc", "North Carolina and South Carolina", "Local enterprise"),
+    ("lent-ga-al", "Georgia and Alabama", "Local enterprise"),
+    ("lent-az-nm", "Arizona and New Mexico", "Local enterprise"),
+    ("lent-tn-ky", "Tennessee and Kentucky", "Local enterprise"),
+    ("lent-ny", "New York", "Local enterprise"),
+    ("lent-pa", "Pennsylvania", "Local enterprise"),
+    ("lent-or", "Oregon", "Local enterprise"),
+    ("st-sw", "Arizona, Nevada, and New Mexico", "State"),
+    ("st-ca", "California state agencies", "State"),
+    ("st-ca-sam", "California named accounts", "State"),
+    ("st-tx-sam", "Texas named accounts", "State"),
+    ("st-wa-sam", "Washington named accounts", "State"),
+    ("st-named-east", "Named accounts, East and Iowa", "State"),
+    ("st-nw", "Oregon and Washington", "State"),
+    ("st-mn-wi", "Minnesota and Wisconsin", "State"),
+    ("st-ks-ok", "Kansas and Oklahoma", "State"),
+    ("st-la-tx", "Louisiana and Texas", "State"),
+    ("st-ga-al", "Georgia and Alabama", "State"),
+    ("st-ct-ny-nj", "Connecticut, New York, and New Jersey", "State"),
+    ("st-co-ut", "Colorado and Utah", "State"),
+    ("st-mo-il", "Missouri and Illinois", "State"),
+    ("st-fl", "Florida", "State"),
+    ("st-tx-open", "Texas, unconfirmed list", "State"),
+    ("st-ky-tn", "Kentucky and Tennessee", "State"),
+    ("st-id-nd-wy", "Idaho, North Dakota, and Wyoming", "State"),
+    ("st-md-ny", "Maryland and New York named accounts", "State"),
+    ("st-oh", "Ohio", "State"),
+    ("smg-ca-bay", "Bay Area", "Midmarket"),
+    ("smg-ca-north", "North and Sacramento", "Midmarket"),
+    ("smg-ca-central", "Central coast and valley", "Midmarket"),
+    ("smg-ca-la", "Los Angeles", "Midmarket"),
+    ("smg-ca-oc-coast", "Orange County coast", "Midmarket"),
+    ("smg-ca-oc-north", "North Orange County", "Midmarket"),
+    ("smg-ca-sd", "San Diego", "Midmarket"),
+    ("smg-ca-ie", "Inland Empire", "Midmarket"),
+    ("smg-ca-desert", "Desert and Imperial", "Midmarket"),
+    ("smg-fl-dade", "Miami-Dade", "Midmarket"),
+    ("smg-fl-broward", "Broward", "Midmarket"),
+    ("smg-fl-palm", "Palm Beach", "Midmarket"),
+    ("smg-fl-gulf", "Tampa Bay, Sarasota, and Collier", "Midmarket"),
+    ("smg-fl-central", "Central Florida and the Treasure Coast", "Midmarket"),
+    ("smg-il-north", "North Cook County", "Midmarket"),
+    ("smg-il-west", "West suburbs", "Midmarket"),
+    ("smg-il-south", "South and southwest suburbs", "Midmarket"),
+    ("smg-il-down", "Bloomington", "Midmarket"),
+    ("smg-tx-north", "North and West Texas", "Midmarket"),
+    ("smg-tx-central", "Austin and central Texas", "Midmarket"),
+    ("smg-tx-gulf", "Houston and the Gulf", "Midmarket"),
+    ("smg-ga-atl", "Metro Atlanta", "Midmarket"),
+    ("smg-ga-rest", "Rest of Georgia and Louisiana", "Midmarket"),
+    ("smg-az", "Arizona", "Midmarket"),
+    ("smg-az-rest", "New Mexico, Utah, and Alaska", "Midmarket"),
+    ("smg-wa", "Washington", "Midmarket"),
+    ("smg-or", "Oregon", "Midmarket"),
+    ("smg-mn", "Minnesota", "Midmarket"),
+    ("smg-ks", "Kansas and South Dakota", "Midmarket"),
+    ("smg-mi", "Michigan", "Midmarket"),
+    ("smg-wi-ia", "Wisconsin and Iowa", "Midmarket"),
+    ("smg-mtn", "Colorado, Nebraska, Missouri, and Montana", "Midmarket"),
+    ("smg-ne", "New England and New York", "Midmarket"),
+    ("smg-oh", "Ohio", "Midmarket"),
+    ("smg-pa-nj", "Pennsylvania and New Jersey", "Midmarket"),
+    ("smg-carolinas", "North Carolina and South Carolina", "Midmarket"),
+    ("smg-midatl", "Maryland, Virginia, and Tennessee", "Midmarket"),
+    ("fed", "Federal", "Federal"),
+]
+MODEL_LABEL = {tid: label for tid, label, _kind in MODEL_TERRITORIES}
+MODEL_SEG = {tid: kind for tid, _label, kind in MODEL_TERRITORIES}
+MODEL_COUNTS = {"Local enterprise": 16, "State": 20, "Midmarket": 37}
+
+LOCAL_ENT_BY_PERSON = {
+    "Kent Hartsfield": "lent-oh-in-il",
+    "Tyler Carlson": "lent-upper-midwest",
+    "Bill Marshall": "lent-sfl",
+    "Prachi Patel": "lent-sfl",
+    "Desmond Davis": "lent-nfl",
+    "Cedric Simpkins": "lent-tx",
+    "Michelle Cooper seat (open)": "lent-tx",
+    "Davis Keeter": "lent-tx",
+    "Austin Goodman": "lent-la-ok",
+    "David Cliff": "lent-mo-co",
+    "Chris Thiers": "lent-mo-co",
+    "Josh Gondwe": "lent-va-md",
+    "Joel Parris": "lent-nc-sc",
+    "Spencer Ferrell": "lent-ga-al",
+    "Stephen Allen": "lent-az-nm",
+    "Conrad Taylor": "lent-az-nm",
+    "Carter Bradford": "lent-tn-ky",
+    "Territory 4a (open)": "lent-ny",
+    "Andrew Wyzkoski": "lent-pa",
+    "Carrie Breedlove": "lent-or",
+}
+STATE_BY_PERSON = {
+    "Cameron Chadsey": "st-sw",
+    "State AE – CA/HI": "st-ca",
+    "State SAM – Farnham seat (open)": "st-named-east",
+    "Todd Bowers": "st-nw",
+    "Joe Spair": "st-mn-wi",
+    "Matt Russell": "st-ks-ok",
+    "Gil Roy": "st-la-tx",
+    "Sarah Duncan": "st-ga-al",
+    "Stephanie DelSignore": "st-ct-ny-nj",
+    "Che Bustos": "st-co-ut",
+    "Bill Pintsak": "st-mo-il",
+    "Demi Washington": "st-fl",
+    "TX State SAM (unconfirmed)": "st-tx-open",
+    "State AE – KY/TN/AR": "st-ky-tn",
+    "Scott Mark": "st-id-nd-wy",
+    "Benjamin Shor": "st-md-ny",
+    "Bettsy Desjarlais": "st-oh",
+}
+BILL_ANDERSON_STATE = {"CA": "st-ca-sam", "TX": "st-tx-sam", "WA": "st-wa-sam"}
+SMG_BY_STATE = {
+    "WA": "smg-wa",
+    "OR": "smg-or",
+    "MN": "smg-mn",
+    "KS": "smg-ks",
+    "SD": "smg-ks",
+    "MI": "smg-mi",
+    "WI": "smg-wi-ia",
+    "IA": "smg-wi-ia",
+    "CO": "smg-mtn",
+    "NE": "smg-mtn",
+    "MO": "smg-mtn",
+    "MT": "smg-mtn",
+    "MA": "smg-ne",
+    "ME": "smg-ne",
+    "NY": "smg-ne",
+    "CT": "smg-ne",
+    "OH": "smg-oh",
+    "PA": "smg-pa-nj",
+    "NJ": "smg-pa-nj",
+    "NC": "smg-carolinas",
+    "SC": "smg-carolinas",
+    "MD": "smg-midatl",
+    "VA": "smg-midatl",
+    "TN": "smg-midatl",
+}
+
+
+def _smg_index(groups: dict[str, set[str]]) -> dict[str, str]:
+    index: dict[str, str] = {}
+    for tid, names in groups.items():
+        for name in names:
+            if name in index:
+                raise RuntimeError(f"{name} is listed in two midmarket territories")
+            index[name] = tid
+    return index
+
+
+SMG_BY_ACCOUNT = _smg_index({
+    "smg-ca-bay": {
+        "Belmont, CA", "Cupertino, CA", "Dublin, CA", "Livermore, CA",
+        "Mountain View, CA", "Santa Cruz, CA",
+    },
+    "smg-ca-north": {
+        "City of Napa, CA", "Napa County CA", "Mendocino County CA",
+        "Rohnert Park, CA", "Sonoma Marin Area Rail Transit District (SMART)",
+        "West Sacramento, CA", "San Juan Unified School District",
+    },
+    "smg-ca-central": {
+        "Bear Valley Community Services District", "Merced, CA",
+        "Pismo Beach, CA", "Salinas, CA",
+    },
+    "smg-ca-la": {
+        "Bell, CA", "Burbank CA", "Culver City, CA", "El Monte, CA",
+        "La Puente, CA", "Manhattan Beach, CA",
+        "Metropolitan Water District of Southern California", "Pasadena, CA",
+    },
+    "smg-ca-oc-coast": {
+        "Laguna Beach, CA", "Newport Beach, CA", "South Coast Water District",
+        "Rancho Santa Margarita, CA", "Santa Margarita Water District",
+    },
+    "smg-ca-oc-north": {
+        "Fullerton, CA", "Orange, CA", "Tustin, CA", "Westminster, CA",
+    },
+    "smg-ca-sd": {
+        "Encinitas, CA", "San Diego State University", "Vista, CA",
+    },
+    "smg-ca-ie": {
+        "Chino Valley Independent Fire District", "Eastvale CA", "Hesperia, CA",
+        "Ontario International Airport", "Perris, CA", "Victorville, CA",
+    },
+    "smg-ca-desert": {
+        "Brawley CA", "Coachella, CA", "Imperial Irrigation District",
+        "Palm Springs, CA",
+    },
+    "smg-fl-dade": {
+        "Aventura, FL", "Coral Gables, FL", "Doral, FL", "Palmetto Bay, FL",
+        "Pinecrest, FL",
+    },
+    "smg-fl-broward": {
+        "Hallandale Beach, FL", "Miramar, FL", "Pembroke Pines, FL",
+        "Sunrise, FL", "Tamarac, FL", "Weston, FL",
+    },
+    "smg-fl-palm": {
+        "Boca Raton, FL", "Delray Beach, FL", "West Palm Beach, FL",
+    },
+    "smg-fl-gulf": {
+        "Clearwater, FL", "Dunedin, FL",
+        "Hillsborough County FL, Environmental Protection Commission",
+        "North Collier Fire Control and Rescue District", "Sarasota, FL",
+        "Sarasota County/Clerk of the Circuit Court - FL", "Venice, FL",
+    },
+    "smg-fl-central": {
+        "Flagler County FL", "Flagler County FL Elections", "Martin County FL",
+        "Ocala, FL", "Polk State College", "St Lucie West Services District",
+    },
+    "smg-il-north": {
+        "Des Plaines, IL", "Norridge, IL", "Northbrook, IL", "Oak Park, IL",
+        "Addison, IL",
+    },
+    "smg-il-west": {
+        "Lombard, IL", "Naperville, IL", "St Charles, IL", "West Chicago, IL",
+        "Lemont, IL",
+    },
+    "smg-il-south": {
+        "Berwyn, IL", "Joliet, IL", "Mokena, IL", "Orland Park, IL",
+        "Plainfield, IL", "Oswego, IL",
+    },
+    "smg-il-down": {
+        "Bloomington IL", "City of Bloomington Board of Election Commissioners",
+    },
+    "smg-tx-north": {
+        "Carrollton-Farmers Branch Independent School District",
+        "North Central Texas Council of Governments", "Horizon City, TX",
+        "Reeves County TX", "Tyler, TX",
+    },
+    "smg-tx-central": {
+        "Capital Metropolitan Transportation Authority TX",
+        "Central Texas Regional Mobility Authority", "New Braunfels, TX",
+        "Sunset Valley, TX", "UTIMCO", "Waco, TX",
+    },
+    "smg-tx-gulf": {
+        "Cypress-Fairbanks Independent School District", "Dayton, TX",
+        "Galveston County Consolidated Drainage District",
+        "Houston Independent School District",
+        "Corpus Christi Independent School District",
+    },
+    "smg-ga-atl": {
+        "Alpharetta, GA", "Canton, GA", "Douglasville, GA", "Johns Creek, GA",
+        "Lawrenceville, GA",
+    },
+    "smg-ga-rest": {
+        "Albany, GA", "Catoosa County GA", "Macon-Bibb, GA", "Valdosta, GA",
+        "St. John the Baptist Parish LA",
+    },
+    "smg-az": {
+        "Buckeye, AZ", "City of Maricopa, AZ", "Eloy AZ", "Florence, AZ",
+        "Goodyear, AZ", "Payson, AZ",
+    },
+    "smg-az-rest": {
+        "Carlsbad, NM", "San Juan County, NM", "Sandy City, UT",
+        "Ketchikan, AK",
+    },
+})
+
+
+def model_territory(row: dict) -> str:
+    """Return the territory id for one account. Does not look at who holds the seat."""
+    segment = row["segment"]
+    if segment == "Federal" or not row.get("state"):
+        return "fed"
+    if segment == "Local ENT":
+        if row["state"] == "CA":
+            return "lent-ca"
+        try:
+            return LOCAL_ENT_BY_PERSON[row["person"]]
+        except KeyError as exc:
+            raise RuntimeError(
+                f"No local enterprise territory for {row['acct']!r} ({row['person']})"
+            ) from exc
+    if segment == "State":
+        if row["person"] == "Bill Anderson":
+            try:
+                return BILL_ANDERSON_STATE[row["state"]]
+            except KeyError as exc:
+                raise RuntimeError(
+                    f"Bill Anderson's {row['state']} account {row['acct']!r} is not "
+                    "California, Texas, or Washington"
+                ) from exc
+        try:
+            return STATE_BY_PERSON[row["person"]]
+        except KeyError as exc:
+            raise RuntimeError(
+                f"No state territory for {row['acct']!r} ({row['person']})"
+            ) from exc
+    if segment == "Local SMG":
+        if row["acct"] in SMG_BY_ACCOUNT:
+            return SMG_BY_ACCOUNT[row["acct"]]
+        try:
+            return SMG_BY_STATE[row["state"]]
+        except KeyError as exc:
+            raise RuntimeError(
+                f"No midmarket territory for {row['acct']!r} ({row['state']})"
+            ) from exc
+    # Allocated children that are not one of the four segments travel with the
+    # state group they already sit on. They do not count as a territory.
+    if row["alloc"] and row["person"] in STATE_BY_PERSON:
+        return STATE_BY_PERSON[row["person"]]
+    if row["alloc"] and row["person"] == "Bill Anderson":
+        return BILL_ANDERSON_STATE[row["state"]]
+    raise RuntimeError(f"No territory for {row['acct']!r} ({segment})")
+
+
+def assign_model_territories(page: dict, rows: list[dict]) -> dict[str, int]:
+    """Stamp `mterr` and publish the 16 / 20 / 37 territory model."""
+    page["modelOrder"] = [tid for tid, _label, _kind in MODEL_TERRITORIES]
+    page["modelLabel"] = dict(MODEL_LABEL)
+    page["modelSeg"] = dict(MODEL_SEG)
+    load: dict[str, int] = defaultdict(int)
+    for row in rows:
+        tid = model_territory(row)
+        if tid not in MODEL_LABEL:
+            raise RuntimeError(f"{row['acct']} landed on unknown territory {tid}")
+        row["mterr"] = tid
+        if not row["alloc"]:
+            load[tid] += 1
+    empty = [tid for tid, _label, _kind in MODEL_TERRITORIES if tid not in load]
+    if empty:
+        raise RuntimeError("Territories with no countable accounts: " + ", ".join(empty))
+    counts: dict[str, int] = defaultdict(int)
+    for tid, n in load.items():
+        if n:
+            counts[MODEL_SEG[tid]] += 1
+    for kind, expected in MODEL_COUNTS.items():
+        if counts[kind] != expected:
+            raise RuntimeError(
+                f"{kind} has {counts[kind]} territories, and the model is {expected}"
+            )
+    philly = next(r for r in rows if r["acct"] == "Philadelphia, PA" and not r["alloc"])
+    allegheny = next(
+        r for r in rows if r["acct"] == "Allegheny County Treasurer Office" and not r["alloc"]
+    )
+    if philly["mterr"] != "lent-pa" or allegheny["mterr"] != "lent-pa":
+        raise RuntimeError("Philadelphia and Allegheny County must share the Pennsylvania territory")
+    ca_local = {
+        r["mterr"]
+        for r in rows
+        if r["segment"] == "Local ENT" and r["state"] == "CA" and not r["alloc"]
+    }
+    if ca_local != {"lent-ca"}:
+        raise RuntimeError(f"California local enterprise is not one territory: {sorted(ca_local)}")
+    return dict(load)
 
 
 def assign_pods(page: dict, rows: list[dict]) -> dict[str, int]:
@@ -1275,6 +1642,7 @@ def apply_assignments(page: dict, overrides: dict[str, dict]) -> dict:
 
     after_edges = proposed_edges(rows)
     pod_load = assign_pods(page, rows)
+    model_load = assign_model_territories(page, rows)
     return {
         "moved": moved,
         "removed": removed,
@@ -1288,6 +1656,7 @@ def apply_assignments(page: dict, overrides: dict[str, dict]) -> dict:
         "before_edges": before_edges,
         "after_edges": after_edges,
         "pod_load": pod_load,
+        "model_load": model_load,
         "ashley_enterprise": ashley_enterprise,
         "carolina_countable": carolina_rows,
         "pipeline": pipeline,
@@ -1597,6 +1966,12 @@ def main() -> None:
     outside_arr = sum(record["nnarr"] for record in pipeline["outside"])
     if pipeline["outside"]:
         print(f"  outside the US book: ${outside_arr:,.0f}")
+    print(
+        "Territory model: "
+        + ", ".join(f"{kind} {n}" for kind, n in MODEL_COUNTS.items())
+    )
+    for tid, _label, kind in MODEL_TERRITORIES:
+        print(f"  {MODEL_LABEL[tid]} ({kind}): {result['model_load'].get(tid, 0)}")
     print("Pod aligned seats (countable accounts, ignoring current owners):")
     for seat, xp, role, label, _terr in POD_ASSIGNED:
         print(f"  {label} — {xp} ({role}): {result['pod_load'].get(seat, 0)}")
