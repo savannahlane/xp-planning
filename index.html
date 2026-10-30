@@ -235,6 +235,8 @@ td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
     <h2>Enterprise</h2>
     <p id="entlede"></p>
     <div class="card tscroll"><table id="entnums"></table></div>
+    <h2>Another enterprise seat</h2>
+    <div id="headcount"></div>
     <h2>Midmarket</h2>
     <p id="smglede"></p>
     <div class="card tscroll"><table id="smgnums"></table></div>
@@ -781,6 +783,46 @@ function renderNumbers(){
   }</tbody><tfoot><tr><td>Total</td><td class="n">${smgN}</td></tr></tfoot>`;
   document.getElementById("entlede").textContent=`${entState+entLocal} accounts in ${entRows.length} books. ${entState} are state agencies and ${entLocal} are local enterprise. A book stops at 20.`;
   document.getElementById("smglede").textContent=`${smgN} accounts in ${smgRows.length} books. A book stops at 30.`;
+  renderHeadcount(ent);
+}
+function bookStats(accts){
+  return {
+    n: accts.length,
+    complex: accts.filter(r=>r.ncap>7).length,
+    arr: accts.reduce((a,r)=>a+(r.arr||0)+(r.fy27||0),0),
+    tier1: accts.filter(r=>r.tier===1).length,
+  };
+}
+function renderHeadcount(ent){
+  const books=Object.entries(ent).map(([xp,accts])=>({
+    xp, accts, place: bookPlaces(accts), level: (PAGE.meta[xp]||[])[2]||"", ...bookStats(accts),
+  }));
+  const hard=books.slice().sort((a,b)=>b.complex-a.complex || b.arr-a.arr || b.n-a.n)[0];
+  const byState={};
+  for(const r of hard.accts) (byState[r.state]||=[]).push(r);
+  const halves=Object.entries(byState).sort((a,b)=>b[1].length-a[1].length);
+  const lead=halves[0][1];
+  const rest=halves.slice(1).flatMap(([,rs])=>rs);
+  const leadName=STATE_NAME[halves[0][0]]||halves[0][0];
+  const restName=placeList(rest.reduce((m,r)=>{ m[r.state]=(m[r.state]||0)+1; return m; }, {}));
+  const leadS=bookStats(lead), restS=bookStats(rest);
+  const xp1=books.filter(b=>b.level==="XP1").sort((a,b)=>b.arr-a.arr);
+  const xp1n=xp1.map(b=>b.n);
+  const xp1arr=xp1.map(b=>b.arr);
+  const xp1cx=Math.max(...xp1.map(b=>b.complex));
+  const xp1cxText=xp1cx===0?"no complex accounts":xp1cx===1?"at most one complex account":`at most ${xp1cx} complex accounts`;
+  const box=document.getElementById("headcount");
+  const row=(name,s)=>`<tr><td>${esc(name)}</td><td class="n">${s.n}</td><td class="n">${s.complex}</td><td class="n">${s.tier1}</td><td class="n">${fmt$(s.arr)}</td></tr>`;
+  box.innerHTML=`
+    <p>The most complex enterprise book is ${esc(hard.place)}. It holds ${hard.n} accounts, which is the stop, and ${fmt$(hard.arr)}, the largest enterprise book. ${hard.complex===4?"Four":hard.complex} of its accounts have more than seven products. Every other enterprise book has one such account, or none.</p>
+    <p>The book already breaks in two. ${esc(leadName)} is ${leadS.n} accounts, ${leadS.tier1} of them tier 1, and ${leadS.complex===1?"one complex account":leadS.complex+" complex accounts"}. ${esc(restName)} are ${restS.n} accounts and ${fmt$(restS.arr)}, with ${restS.complex===1?"1 complex account":restS.complex+" complex accounts"}.</p>
+    <div class="card tscroll"><table>
+      <thead><tr><th>Places</th><th class="n">Accounts</th><th class="n">Complex</th><th class="n">Tier 1</th><th class="n">ARR</th></tr></thead>
+      <tbody>${row(leadName, leadS)}${row(restName, restS)}</tbody>
+      <tfoot><tr><td>Together</td><td class="n">${hard.n}</td><td class="n">${hard.complex}</td><td class="n">${hard.tier1}</td><td class="n">${fmt$(hard.arr)}</td></tr></tfoot>
+    </table></div>
+    <p>An XP1 in enterprise today holds ${Math.min(...xp1n)} to ${Math.max(...xp1n)} accounts and ${fmt$(Math.min(...xp1arr))} to ${fmt$(Math.max(...xp1arr))}, with ${xp1cxText}. Those books are ${xp1.map(b=>b.place).join("; ")}.</p>
+    <p>Moving an XP1 onto this book would put that level on ${fmt$(hard.arr)} and ${hard.complex} complex accounts, or onto ${esc(restName)}, which is still ${fmt$(restS.arr)} and ${restS.complex} complex accounts. One more enterprise seat is the split. Both halves stay inside the stop.</p>`;
 }
 function glance(){
   if(scn==="numbers"){
