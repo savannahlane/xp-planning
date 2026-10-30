@@ -558,11 +558,34 @@ const territoryText = p => {
 };
 
 
-let SEAT_LABEL={}, SEAT_ORDER=[], SEAT_PIECES=[], SEAT_WHERE={}, ROOM_PACK=null;
+let SEAT_LABEL={}, SEAT_ORDER=[], SEAT_PIECES=[], SEAT_WHERE={}, SEAT_AE={}, ROOM_PACK=null;
+function roomMidmarketAeSeats(modelTerrs){
+  const byAe={};
+  for(const r of ROWS_ALL){
+    if(r.alloc || r.segment!=="Local SMG" || !r.person) continue;
+    (byAe[r.person] ||= []).push(r);
+  }
+  const lookup=Object.fromEntries(modelTerrs.map(t=>[t.id,t]));
+  return Object.entries(byAe).map(([ae,rows],i)=>{
+    const states={};
+    for(const r of rows) if(r.state) states[r.state]=(states[r.state]||0)+1;
+    // Carry every state on the seller map, including coverage with no cloud account.
+    for(const st of territoryOf(ae).states) states[st]=states[st]||0;
+    // Alaska and Hawaii stay together when they are on the same seller map.
+    if(states.AK && territoryOf(ae).states.includes("HI")) states.HI=states.HI||0;
+    const ids=[...new Set(rows.map(r=>r.mterr).filter(Boolean))];
+    const terr=ids.flatMap(id=>modelTerrs.filter(t=>t.id===id || t.id.startsWith(id+"~")));
+    return {id:"smg-ae-"+(i+1), band:"smg", level:"XP1", n:rows.length, terr, label:"XP1", where:roomStateLabel(Object.keys(states)), states, ae};
+  }).sort((a,b)=>b.n-a.n || a.where.localeCompare(b.where));
+}
 function assignSeats(){
-  SEAT_LABEL={}; SEAT_ORDER=[]; SEAT_PIECES=[]; SEAT_WHERE={};
+  SEAT_LABEL={}; SEAT_ORDER=[]; SEAT_PIECES=[]; SEAT_WHERE={}; SEAT_AE={};
   const modelTerrs=roomWithCoverage(roomTerritories());
-  ROOM_PACK={modelTerrs, ...roomSeats(modelTerrs)};
+  const packed=roomSeats(modelTerrs);
+  const entSeats=packed.seats.filter(s=>s.band==="ent");
+  const smgSeats=roomMidmarketAeSeats(modelTerrs);
+  for(const s of smgSeats) SEAT_AE[s.ae]=s.id;
+  ROOM_PACK={modelTerrs, seats:entSeats.concat(smgSeats), byTerr:packed.byTerr};
   for(const s of ROOM_PACK.seats){
     SEAT_LABEL[s.id]=s.label;
     SEAT_WHERE[s.id]=s.where||"";
@@ -572,6 +595,7 @@ function assignSeats(){
 }
 function seatFor(r){
   if(!r.mterr || r.mterr==="fed") return "";
+  if(r.segment==="Local SMG") return SEAT_AE[r.person]||"";
   const mine=SEAT_PIECES.filter(p=>p.id===r.mterr || p.id.startsWith(r.mterr+"~"));
   if(!mine.length) return "";
   if(r.state){
@@ -1447,7 +1471,10 @@ function roomXpName(xp){
   return String(xp).startsWith("Open") ? "Open seat" : xp;
 }
 function roomLinks(t, byTerr){
-  if(bookView==="adj") return [byTerr[t.id].id];
+  if(bookView==="adj"){
+    if(t.band==="smg") return [...new Set(Object.keys(t.aes).map(ae=>SEAT_AE[ae]).filter(Boolean))];
+    return [byTerr[t.id].id];
+  }
   return Object.entries(t.xps).sort((a,b)=>b[1]-a[1] || a[0].localeCompare(b[0])).map(([xp])=>xp);
 }
 function roomStats(terrs, byTerr, mode){
@@ -1463,8 +1490,9 @@ function roomStats(terrs, byTerr, mode){
         (partnerTo[p] ||= new Set()).add(ae);
       }
     } else {
-      const p = byTerr[t.id].id;
       for(const ae of Object.keys(t.aes)){
+        const p=t.band==="smg" ? SEAT_AE[ae] : byTerr[t.id].id;
+        if(!p) continue;
         (aeTo[ae] ||= new Set()).add(p);
         (partnerTo[p] ||= new Set()).add(ae);
       }
@@ -1603,9 +1631,9 @@ function renderRoom(){
     document.getElementById("roomnote").textContent = "Territory lines are not on this page yet.";
     return;
   }
-  const modelTerrs = roomWithCoverage(roomTerritories());
+  const modelTerrs = ROOM_PACK.modelTerrs;
   const curTerrs = roomCurrentTerritories();
-  const {seats, byTerr} = roomSeats(modelTerrs);
+  const {seats, byTerr} = ROOM_PACK;
   const cur = roomStats(curTerrs, byTerr, "cur");
   const adj = roomStats(modelTerrs, byTerr, "adj");
   const active = bookView==="adj" ? adj : cur;
