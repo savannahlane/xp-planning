@@ -1027,18 +1027,52 @@ function roomAvg(xs){ return xs.reduce((a,b)=>a+b,0) / (xs.length || 1); }
 function roomPrimary(t){
   return Object.entries(t.aes).sort((a,b)=>b[1]-a[1] || a[0].localeCompare(b[0]))[0][0];
 }
+function roomAccumulate(by, id, label, seg, r){
+  const t = by[id] ||= {
+    id, label, seg,
+    band: seg==="Midmarket" ? "smg" : "ent",
+    n:0, aes:{}, states:{}, xps:{}, pairs:[]
+  };
+  t.n++;
+  t.aes[r.person] = (t.aes[r.person]||0) + 1;
+  if(r.state) t.states[r.state] = (t.states[r.state]||0) + 1;
+  t.xps[r.cur] = (t.xps[r.cur]||0) + 1;
+  const pk = r.cur+"\0"+r.person;
+  if(!t.pairKeys) t.pairKeys = new Set();
+  if(!t.pairKeys.has(pk)){ t.pairKeys.add(pk); t.pairs.push([r.cur, r.person]); }
+  return t;
+}
 function roomTerritories(){
   const by = {};
   for(const r of ROWS_ALL){
     if(r.alloc || !r.mterr || r.mterr==="fed") continue;
     if(r.segment!=="Local ENT" && r.segment!=="State" && r.segment!=="Local SMG") continue;
     const seg = PAGE.modelSeg[r.mterr];
-    const t = by[r.mterr] ||= {
-      id:r.mterr, label:PAGE.modelLabel[r.mterr], seg,
-      band: seg==="Midmarket" ? "smg" : "ent",
-      n:0, aes:{}, states:{}, xps:{}, pairs:[]
+    roomAccumulate(by, r.mterr, PAGE.modelLabel[r.mterr], seg, r);
+  }
+  return (PAGE.modelOrder||[]).filter(id=>by[id]).map(id=>by[id]);
+}
+function roomSegOf(counts, label){
+  const ent = counts["Local ENT"]||0, st = counts["State"]||0, smg = counts["Local SMG"]||0;
+  const best = Math.max(ent, st, smg);
+  const hits = [];
+  if(ent===best) hits.push("Local enterprise");
+  if(st===best) hits.push("State");
+  if(smg===best) hits.push("Midmarket");
+  if(hits.length===1) return hits[0];
+  if(/Local ENT/.test(label)) return "Local enterprise";
+  return hits[0];
+}
+function roomCurrentTerritories(){
+  const by = {};
+  for(const r of ROWS_ALL){
+    if(r.alloc || !r.terr) continue;
+    if(r.segment!=="Local ENT" && r.segment!=="State" && r.segment!=="Local SMG") continue;
+    const t = by[r.terr] ||= {
+      id:r.terr, label:r.terr, n:0, aes:{}, states:{}, xps:{}, pairs:[], segCounts:{}
     };
     t.n++;
+    t.segCounts[r.segment] = (t.segCounts[r.segment]||0) + 1;
     t.aes[r.person] = (t.aes[r.person]||0) + 1;
     if(r.state) t.states[r.state] = (t.states[r.state]||0) + 1;
     t.xps[r.cur] = (t.xps[r.cur]||0) + 1;
@@ -1046,7 +1080,22 @@ function roomTerritories(){
     if(!t.pairKeys) t.pairKeys = new Set();
     if(!t.pairKeys.has(pk)){ t.pairKeys.add(pk); t.pairs.push([r.cur, r.person]); }
   }
-  return (PAGE.modelOrder||[]).filter(id=>by[id]).map(id=>by[id]);
+  return Object.values(by).map(t=>{
+    t.seg = roomSegOf(t.segCounts, t.label);
+    t.band = t.seg==="Midmarket" ? "smg" : "ent";
+    return t;
+  }).sort((a,b)=>b.n-a.n || a.label.localeCompare(b.label));
+}
+function roomCurrentTerritories(){
+  const by = {};
+  const segOf = {"Local ENT":"Local enterprise", "State":"State", "Local SMG":"Midmarket"};
+  for(const r of ROWS_ALL){
+    if(r.alloc || !r.terr) continue;
+    const seg = segOf[r.segment];
+    if(!seg) continue;
+    roomAccumulate(by, r.segment+"::"+r.terr, r.terr, seg, r);
+  }
+  return Object.values(by).sort((a,b)=>a.label.localeCompare(b.label) || a.seg.localeCompare(b.seg));
 }
 function roomBundles(terrs, band){
   const cap = ROOM_AIM[band];
@@ -1179,16 +1228,18 @@ function renderRoom(){
     document.getElementById("roomnote").textContent = "Territory lines are not on this page yet.";
     return;
   }
-  const terrs = roomTerritories();
-  const {seats, byTerr} = roomSeats(terrs);
-  const cur = roomStats(terrs, byTerr, "cur");
-  const adj = roomStats(terrs, byTerr, "adj");
+  const modelTerrs = roomTerritories();
+  const curTerrs = roomCurrentTerritories();
+  const {seats, byTerr} = roomSeats(modelTerrs);
+  const cur = roomStats(curTerrs, byTerr, "cur");
+  const adj = roomStats(modelTerrs, byTerr, "adj");
   const active = bookView==="adj" ? adj : cur;
   const other = bookView==="adj" ? cur : adj;
   const otherName = bookView==="adj" ? "Current book" : "Adjusted book";
-  const nLent = terrs.filter(t=>t.seg==="Local enterprise").length;
-  const nState = terrs.filter(t=>t.seg==="State").length;
-  const nSmg = terrs.filter(t=>t.seg==="Midmarket").length;
+  const countTerrs = bookView==="adj" ? modelTerrs : curTerrs;
+  const nLent = countTerrs.filter(t=>t.seg==="Local enterprise").length;
+  const nState = countTerrs.filter(t=>t.seg==="State").length;
+  const nSmg = countTerrs.filter(t=>t.seg==="Midmarket").length;
   const entSeats = seats.filter(s=>s.band==="ent");
   const smgSeats = seats.filter(s=>s.band==="smg");
   const levelRule = "XP1 partners hold midmarket, and XP2, XP3, and XP4 partners hold local enterprise and state. Federal stays one book.";
@@ -1217,8 +1268,9 @@ function renderRoom(){
   document.getElementById("maplegend").textContent = bookView==="cur"
     ? "Shading shows how many partners hold a territory in that state."
     : "Shading shows how many seats hold a territory in that state.";
-  renderRoomMap(terrs, byTerr);
-  renderRoomDiagram(terrs, seats, byTerr);
+  const showTerrs = bookView==="adj" ? modelTerrs : curTerrs;
+  renderRoomMap(showTerrs, byTerr);
+  renderRoomDiagram(showTerrs, seats, byTerr);
   applyRoomSel();
 }
 function renderRoomDiagram(terrs, seats, byTerr){
@@ -1229,7 +1281,13 @@ function renderRoomDiagram(terrs, seats, byTerr){
   const order = {};
   (PAGE.modelOrder||[]).forEach((id,i)=>{ order[id]=i; });
   const htmlOut = bands.map(band=>{
-    const mine = terrs.filter(t=>band.segs.includes(t.seg)).slice().sort((a,b)=>(order[a.id]-order[b.id]));
+    const mine = terrs.filter(t=>band.segs.includes(t.seg)).slice().sort((a,b)=>{
+      const ai = order[a.id], bi = order[b.id];
+      if(ai!=null && bi!=null) return ai-bi;
+      if(ai!=null) return -1;
+      if(bi!=null) return 1;
+      return a.label.localeCompare(b.label) || a.seg.localeCompare(b.seg);
+    });
     let body, aside;
     if(bookView==="adj"){
       const bandSeats = seats.filter(s=>s.band===band.id).slice().sort((a,b)=>{
