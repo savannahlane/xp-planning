@@ -333,7 +333,7 @@ td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
           <option value="arr">By ARR</option>
         </select>
       </label>
-      <label class="fld">AE labels
+      <label class="fld" id="aelabels">AE labels
         <select id="labelby">
           <option value="st" selected>By state</option>
           <option value="terr">By territory</option>
@@ -551,6 +551,11 @@ function stateTally(rows){
 }
 // Alphabetical where no count is shown, so the order does not look arbitrary.
 const stateCodes = rows => stateTally(rows).map(t=>t.state).sort();
+function wingLabel(rows, side){
+  const codes = stateCodes(rows);
+  if(codes.length) return codes.join(", ");
+  return side==="State" ? "State" : "Local";
+}
 const stateText = rows => stateTally(rows).map(t=>t.n?`${t.state} (${t.n})`:t.state).join(", ");
 const territoryText = p => {
   const t = territoryOf(p);
@@ -804,10 +809,15 @@ function bookPane(x){
   const by={};
   for(const r of rows) (by[r.person]||=[]).push(r);
   const aes=Object.entries(by).sort((a,c)=>c[1].length-a[1].length);
-  const blocks=aes.map(([ae,list])=>{
-    const items=list.map(r=>`<li>${esc(r.acct)} <span>${esc(r.state||"")} · ${fmt$(r.arr)}</span></li>`).join("");
-    return `<details><summary><span>${esc(ae)}</span><span>${list.length}</span></summary><ul>${items}</ul></details>`;
-  }).join("");
+  const blocks=bookView==="adj"
+    ? Object.entries(rows.reduce((by,r)=>((by[r.state||""]||=[]).push(r), by), {})).sort((a,c)=>c[1].length-a[1].length || a[0].localeCompare(c[0])).map(([st,list])=>{
+        const items=list.map(r=>`<li>${esc(r.acct)} <span>${fmt$(r.arr)}</span></li>`).join("");
+        return `<details><summary><span>${esc(st ? (STATE_NAME[st]||st) : "No state")}</span><span>${list.length}</span></summary><ul>${items}</ul></details>`;
+      }).join("")
+    : aes.map(([ae,list])=>{
+        const items=list.map(r=>`<li>${esc(r.acct)} <span>${esc(r.state||"")} · ${fmt$(r.arr)}</span></li>`).join("");
+        return `<details><summary><span>${esc(ae)}</span><span>${list.length}</span></summary><ul>${items}</ul></details>`;
+      }).join("");
   const cap=capFor(x);
   return `<div class="detailpane">
     <button type="button" class="back" id="back">${scn==="model"?"Back to all territories":"Back to all books"}</button>
@@ -817,7 +827,7 @@ function bookPane(x){
     <p class="places">${esc(b.where || whereFull(b.codes))}</p>
     ${b.over?`<p class="cap over">Over the ${cap}-account limit</p>`:""}
     ${mgr?`<p class="mgr">Reports to ${esc(mgr)}</p>`:""}
-    <h3>Account executives</h3>
+    <h3>${bookView==="adj"?"Accounts":"Account executives"}</h3>
     ${blocks || "<p class=\"places\">No accounts.</p>"}
   </div>`;
 }
@@ -881,21 +891,27 @@ function renderLinks(){
     const place = xpPlace(l.xp);
     const markets=marketCount(l.xp);
     const titled = place ? `${xpName(l.xp)} (${place}) · ${markets} market${markets===1?"":"s"}` : xpName(l.xp);
-    s += `<path class="link ${cls}" data-xp="${esc(l.xp)}" data-ae="${esc(l.person)}" stroke-width="${wOf(l).toFixed(1)}" d="M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}"><title>${esc(titled)} ↔ ${esc(l.person)}: ${l.n} accounts, ${fmt$(l.arr)}</title></path>`;
+    const wing = bookView==="adj" ? wingLabel(l.rows, l.side) : l.person;
+    s += `<path class="link ${cls}" data-xp="${esc(l.xp)}" data-ae="${esc(l.person)}" stroke-width="${wOf(l).toFixed(1)}" d="M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}"><title>${esc(titled)} ↔ ${esc(wing)}: ${l.n} accounts, ${fmt$(l.arr)}</title></path>`;
   }
   s += `</g>`;
   const aeNode = (n,left)=>{
     const y=pos[(left?"L|":"R|")+n.person], gap=isGapName(n.person);
     const terr = n.terr || "";
     const here = stateCodes(n.rows).join(", ");
-    const sub = lbl==="st" ? (here || territoryOf(n.person).states.join(", ") || terr) : terr;
+    const side = left ? "State" : "Local";
+    const named = bookView==="adj" ? wingLabel(n.rows, side) : n.person;
+    const sub = bookView==="adj"
+      ? `${n.rows.filter(r=>!r.alloc).length} accounts`
+      : (lbl==="st" ? (here || territoryOf(n.person).states.join(", ") || terr) : terr);
     const tx = left? xL-4 : xR+4, anchor = left?"end":"start";
     const cx = left? xL+4 : xR-4;
-    return `<g class="node ae ${gap?"gapnode":""}" tabindex="0" role="button" data-ae="${esc(n.person)}" aria-label="${esc(n.person)}">
-      <title>${esc(n.person)} — ${esc(territoryText(n.person))}</title>
+    const tip = bookView==="adj" ? `${named} · ${sub}` : `${n.person} — ${territoryText(n.person)}`;
+    return `<g class="node ae ${gap?"gapnode":""}" tabindex="0" role="button" data-ae="${esc(n.person)}" aria-label="${esc(named)}">
+      <title>${esc(tip)}</title>
       <rect class="pill ${gap?"gap":""}" x="${left?xL-236:xR-8}" y="${y-15}" width="244" height="30" rx="6"/>
       <circle cx="${cx}" cy="${y}" r="3.5" fill="${gap?"var(--gap)":left?"var(--state)":"var(--local)"}"/>
-      <text class="nm" x="${left?tx-8:tx+8}" y="${y-1}" text-anchor="${anchor}">${esc(n.person)}</text>
+      <text class="nm" x="${left?tx-8:tx+8}" y="${y-1}" text-anchor="${anchor}">${esc(named.length>32?named.slice(0,31)+"…":named)}</text>
       <text class="sub" x="${left?tx-8:tx+8}" y="${y+11}" text-anchor="${anchor}">${esc(sub.length>40?sub.slice(0,39)+"…":sub)}</text>
     </g>`;
   };
@@ -1936,7 +1952,10 @@ function bookCard(x){
   const title=bookView==="adj"?seatTitle(x):x;
   const where=bookView==="adj"&&SEAT_WHERE[x]?SEAT_WHERE[x]:(stateText(rows)||"No state listed");
   const role=xp1ent?"XP1 on enterprise":level;
-  const aeLine=l=>`<div class="flowae${isGapName(l.person)?" gapname":""}" title="${esc(l.n+" accounts, "+fmt$(l.arr))}"><span>${esc(l.person)}</span><b>${l.n}</b></div>`;
+  const aeLine=l=>{
+    const name=bookView==="adj" ? wingLabel(l.rows, l.side) : l.person;
+    return `<div class="flowae${bookView==="adj"?"":(isGapName(l.person)?" gapname":"")}" title="${esc(l.n+" accounts, "+fmt$(l.arr))}"><span>${esc(name)}</span><b>${l.n}</b></div>`;
+  };
   const sides=band==="smg"
     ? `<div><div class="flowh">Account executives</div>${localAes.concat(stateAes).map(aeLine).join("")||"<div class=\"flowae quiet\">None</div>"}</div>`
     : `<div><div class="flowh">State and federal</div>${stateAes.map(aeLine).join("")||"<div class=\"flowae quiet\">None</div>"}</div><div><div class="flowh">Local</div>${localAes.map(aeLine).join("")||"<div class=\"flowae quiet\">None</div>"}</div>`;
@@ -1990,6 +2009,7 @@ function render(){
   stage.classList.toggle("links", lines);
   stage.classList.toggle("books", books);
   document.getElementById("linkbar").hidden=!lines;
+  document.getElementById("aelabels").hidden=bookView==="adj";
   document.getElementById("roomtable").hidden=!table;
   layout = lines ? "links" : books ? "cards" : "map";
   if(table){
@@ -2069,8 +2089,9 @@ function applySel(){
     const mine=L.filter(l=>l.person===sel.ae).sort((a,b)=>b.arr-a.arr);
     if(!mine.length){ detail.hidden=true; return; }
     const rows=mine.flatMap(l=>l.rows);
-    detail.innerHTML=`<div class="card full"><h3>${esc(sel.ae)}</h3>
-      <p class="stat">${esc(territoryText(sel.ae))}</p>
+    const aeHead=bookView==="adj" ? wingLabel(rows, mine[0].side) : sel.ae;
+    detail.innerHTML=`<div class="card full"><h3>${esc(aeHead)}</h3>
+      ${bookView==="adj"?"":`<p class="stat">${esc(territoryText(sel.ae))}</p>`}
       <p class="stat">Accounts in this view: ${esc(stateText(rows)||"none")}. Works with ${new Set(mine.map(l=>xpPerson(l.xp))).size}.</p>
       ${mine.map(l=>partnerBlock(l,true)).join("")}</div>`;
   }
@@ -2078,14 +2099,15 @@ function applySel(){
 function partnerBlock(l, showXp){
   const gap=isGapName(l.person);
   const cls = gap?"g":l.side==="State"?"s":"l";
-  const flags=[...new Set(l.rows.map(r=>r.flag).filter(Boolean))];
+  const flags=bookView==="adj" ? [] : [...new Set(l.rows.map(r=>r.flag).filter(Boolean))];
   const alloc=l.rows.filter(r=>r.alloc).length;
   const list=l.rows.filter(r=>!r.alloc).sort((a,b)=>b.arr-a.arr).map(r=>`<li>${esc(r.acct)} <span class="v">${esc(r.state)}, ${fmt$(r.arr)}</span></li>`).join("");
   const states=stateText(l.rows);
+  const who=showXp ? seatTitle(l.xp) : (bookView==="adj" ? wingLabel(l.rows, l.side) : l.person);
   return `<div class="partner">
-    <div class="pname ${cls}">${esc(showXp? seatTitle(l.xp) : l.person)}</div>
-    ${showXp? "" : `<div class="pmeta">${l.side==="Neither map"?"":esc(l.side)+" · "}${esc(l.terr||"")}</div>`}
-    ${showXp? "" : `<div class="pmeta">Territory: ${esc(territoryText(l.person))}</div>`}
+    <div class="pname ${cls}">${esc(who)}</div>
+    ${showXp || bookView==="adj" ? "" : `<div class="pmeta">${l.side==="Neither map"?"":esc(l.side)+" · "}${esc(l.terr||"")}</div>`}
+    ${showXp || bookView==="adj" ? "" : `<div class="pmeta">Territory: ${esc(territoryText(l.person))}</div>`}
     ${states? `<div class="pmeta">States: ${esc(states)}</div>` : ""}
     <div class="pmeta">${l.n} accounts, ${fmt$(l.arr)}${alloc?` (plus ${alloc} allocated)`:""}</div>
     <ul class="accts">${list}</ul>
