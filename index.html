@@ -80,6 +80,32 @@ select,.pick>button,input[type="search"]{
 #board svg{display:block;width:100%;height:auto}
 .stage.links #board{overflow:auto}
 .stage.links #board svg{min-width:900px}
+.stage.books{grid-template-columns:1fr}
+.stage.books .side{display:none}
+#board.cards{background:transparent;border:0;overflow:visible}
+.bookband{font:600 22px/1.2 Fraunces,Georgia,serif;margin:18px 0 10px}
+.bookgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:12px}
+.bookcard{display:block;width:100%;background:var(--card);border:1px solid var(--line);border-top:3px solid var(--accent);border-radius:12px;padding:14px 14px 12px;text-align:left;cursor:pointer}
+.bookcard.local{border-top-color:var(--local)}
+.bookcard.mixed{border-top-color:var(--over)}
+.bookcard:hover,.bookcard.on{box-shadow:0 0 0 2px color-mix(in srgb,var(--accent) 35%,transparent)}
+.bookhead{display:flex;gap:12px;align-items:flex-start;justify-content:space-between}
+.bookname{font-weight:600;font-size:17px;line-height:1.25}
+.bookrole{color:var(--muted);font-size:12.5px;text-align:right}
+.bookrole.mark{color:var(--over);font-weight:600}
+.bookstats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0 8px}
+.bookstat{border-left:2px solid var(--line);padding-left:8px}
+.bookstat strong{display:block;font-size:16px;line-height:1.1;font-variant-numeric:lining-nums tabular-nums}
+.bookstat strong.mark{color:var(--over)}
+.bookstat span{color:var(--muted);font-size:11px;letter-spacing:.04em;text-transform:uppercase}
+.bookstates{font-weight:600;font-size:13px;line-height:1.35;margin-bottom:8px}
+.bookflow{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.bookcard.local .bookflow{grid-template-columns:1fr}
+.flowh{color:var(--muted);font-size:11px;letter-spacing:.04em;text-transform:uppercase;margin-bottom:4px}
+.flowae{display:flex;justify-content:space-between;gap:8px;font-size:13.5px;line-height:1.35}
+.flowae b{font-weight:600;font-variant-numeric:tabular-nums}
+.flowae.gapname{color:var(--over)}
+.flowae.quiet{color:var(--muted)}
 .st{fill:var(--cover);stroke:var(--card);stroke-width:1.25;cursor:pointer}
 .st.empty{fill:var(--empty);cursor:default}
 .st.dim{fill:var(--empty)}
@@ -255,6 +281,7 @@ td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
   .cols2{display:none}
   .rule{width:28px;margin:2px 0}
   .fangap{display:none}
+  .bookgrid,.bookflow{grid-template-columns:1fr}
 }
 </style>
 </head>
@@ -267,7 +294,7 @@ td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
     </nav>
     <div class="switch" role="tablist" aria-label="View">
       <button type="button" id="viewmap" role="tab" aria-selected="true">Map</button>
-      <button type="button" id="viewlines" role="tab" aria-selected="false">Lines</button>
+      <button type="button" id="viewlines" role="tab" aria-selected="false">Books</button>
       <button type="button" id="viewtable" role="tab" aria-selected="false">Table</button>
     </div>
   </div>
@@ -1852,6 +1879,63 @@ function pageLede(){
   return "Choose a person. Their states light up, and their accounts are listed beside the map.";
 }
 let ROOM_VIEW=null;
+function bookBand(x){
+  if(bookView==="adj"){
+    const s=(ROOM_PACK&&ROOM_PACK.seats||[]).find(s=>s.id===x);
+    return s?s.band:"ent";
+  }
+  const rows=bookRows(x);
+  if(rows.some(r=>r.segment==="State"||r.segment==="Local ENT")) return "ent";
+  if(rows.some(r=>r.segment==="Local SMG")) return "smg";
+  return "ent";
+}
+function bookCard(x){
+  const rows=bookRows(x);
+  const band=bookBand(x);
+  const links=L.filter(l=>l.xp===x);
+  const stateAes=links.filter(l=>l.side==="State").sort((a,b)=>b.n-a.n||a.person.localeCompare(b.person));
+  const localAes=links.filter(l=>l.side!=="State").sort((a,b)=>b.n-a.n||a.person.localeCompare(b.person));
+  const n=rows.length;
+  const arr=rows.reduce((a,r)=>a+r.arr,0);
+  const aes=new Set(links.map(l=>l.person));
+  const hasEnt=rows.some(r=>r.segment==="State"||r.segment==="Local ENT"||r.segment==="Federal");
+  const hasSmg=rows.some(r=>r.segment==="Local SMG");
+  const cls=hasEnt&&hasSmg?"mixed":hasSmg?"local":"state";
+  const meta=XPMETA[xpPerson(x)];
+  const level=bookView==="adj"?(band==="smg"?"XP1":"XP2–4"):(meta&&meta[2]&&meta[2]!=="—"&&meta[2]!=="n/a"?meta[2]:"");
+  const xp1ent=bookView!=="adj"&&level==="XP1"&&hasEnt;
+  const cap=band==="smg"?ROOM_CAP.smg:ROOM_CAP.ent;
+  const over=n>cap;
+  const title=bookView==="adj"?seatTitle(x):x;
+  const where=bookView==="adj"&&SEAT_WHERE[x]?SEAT_WHERE[x]:(stateText(rows)||"No state listed");
+  const role=xp1ent?"XP1 on enterprise":level;
+  const aeLine=l=>`<div class="flowae${isGapName(l.person)?" gapname":""}" title="${esc(l.n+" accounts, "+fmt$(l.arr))}"><span>${esc(l.person)}</span><b>${l.n}</b></div>`;
+  const sides=band==="smg"
+    ? `<div><div class="flowh">Account executives</div>${localAes.concat(stateAes).map(aeLine).join("")||"<div class=\"flowae quiet\">None</div>"}</div>`
+    : `<div><div class="flowh">State and federal</div>${stateAes.map(aeLine).join("")||"<div class=\"flowae quiet\">None</div>"}</div><div><div class="flowh">Local</div>${localAes.map(aeLine).join("")||"<div class=\"flowae quiet\">None</div>"}</div>`;
+  return `<button type="button" class="bookcard ${cls}${sel&&sel.xp===x?" on":""}" data-xp="${esc(x)}">
+    <div class="bookhead"><span class="bookname">${esc(title)}</span><span class="bookrole${xp1ent?" mark":""}">${esc(role)}</span></div>
+    <div class="bookstats">
+      <span class="bookstat"><strong class="${over?"mark":""}">${n}</strong><span>Accounts</span></span>
+      <span class="bookstat"><strong>${fmt$(arr)}</strong><span>ARR</span></span>
+      <span class="bookstat"><strong>${aes.size}</strong><span>${aes.size===1?"AE":"AEs"}</span></span>
+    </div>
+    <div class="bookstates">${esc(where)}</div>
+    <div class="bookflow">${sides}</div>
+  </button>`;
+}
+function renderBookCards(){
+  const board=document.getElementById("board");
+  board.className="cards";
+  const bands=[{id:"ent", title:"Local enterprise and state"},{id:"smg", title:"Midmarket"}];
+  board.innerHTML=bands.map(band=>{
+    const ids=XP_ORDER.filter(x=>bookBand(x)===band.id).slice().sort((a,b)=>bookRows(b).length-bookRows(a).length||seatTitle(a).localeCompare(seatTitle(b)));
+    if(!ids.length) return "";
+    const head=bookView==="adj"?`<h2 class="bookband">${esc(band.title)}</h2>`:"";
+    return `${head}<div class="bookgrid">${ids.map(bookCard).join("")}</div>`;
+  }).join("");
+  board.querySelectorAll(".bookcard").forEach(el=>el.addEventListener("click",()=>select({xp:el.dataset.xp})));
+}
 function render(){
   assignSeats();
   recompute();
@@ -1875,17 +1959,18 @@ function render(){
   const lines=roomPane==="lines", table=roomPane==="table";
   const stage=document.getElementById("stage");
   stage.hidden=table;
-  stage.classList.toggle("links", lines);
-  document.getElementById("linkbar").hidden=!lines;
+  stage.classList.toggle("links", false);
+  stage.classList.toggle("books", lines);
+  document.getElementById("linkbar").hidden=true;
   document.getElementById("roomtable").hidden=!table;
-  layout = lines ? "links" : "map";
+  layout = lines ? "cards" : "map";
   if(table){
     document.getElementById("detail").hidden=true;
     const showTerrs=bookView==="adj" ? ROOM_VIEW.modelTerrs : ROOM_VIEW.curTerrs;
     renderRoomTable(showTerrs, ROOM_VIEW.seats);
     return;
   }
-  if(lines) renderLinks();
+  if(lines) renderBookCards();
   else renderMap();
   applySel();
 }
@@ -1896,6 +1981,23 @@ function select(t){
 }
 function applySel(){
   const detail=document.getElementById("detail");
+  if(layout==="cards"){
+    document.querySelectorAll(".bookcard.on").forEach(el=>el.classList.remove("on"));
+    if(!sel || !sel.xp){ detail.hidden=true; detail.innerHTML=""; return; }
+    const card=document.querySelector(`.bookcard[data-xp="${CSS.escape(sel.xp)}"]`);
+    if(card) card.classList.add("on");
+    const mine=L.filter(l=>l.xp===sel.xp).sort((a,b)=>b.arr-a.arr);
+    const st=mine.filter(l=>l.side==="State"), lo=mine.filter(l=>l.side!=="State");
+    const n=mine.reduce((a,l)=>a+l.n,0), arr=mine.reduce((a,l)=>a+l.arr,0);
+    const heading=bookView==="adj"?seatTitle(sel.xp):sel.xp;
+    const band=bookBand(sel.xp);
+    detail.hidden=false;
+    detail.innerHTML=band==="smg"
+      ? `<div class="card full"><h3>${esc(heading)}</h3><p class="stat">${n} accounts, ${fmt$(arr)}</p>${lo.concat(st).map(l=>partnerBlock(l,false)).join("")||'<p class="stat">None.</p>'}</div>`
+      : `<div class="card"><h3>${esc(heading)}</h3><p class="stat">State and federal · ${st.length}</p>${st.map(l=>partnerBlock(l,false)).join("")||'<p class="stat">None.</p>'}</div>
+      <div class="card"><h3>Local</h3><p class="stat">${lo.length} · ${n} accounts, ${fmt$(arr)}</p>${lo.map(l=>partnerBlock(l,false)).join("")||'<p class="stat">None.</p>'}</div>`;
+    return;
+  }
   if(layout!=="links"){
     detail.hidden=true;
     document.querySelectorAll("#board .st").forEach(el=>{
