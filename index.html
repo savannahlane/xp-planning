@@ -1016,7 +1016,8 @@ function renderTheory(){
   document.getElementById("theoryfit").textContent=bits.join(" ");
 }
 const ROOM_CAP = {ent:20, smg:30};
-const ROOM_SEATS = {ent:10, smg:9};
+const ROOM_AIM = {ent:17, smg:30};
+const ROOM_SEATS = {ent:12, smg:9};
 
 function roomNum(n){
   const r = Math.round(n*10)/10;
@@ -1048,7 +1049,7 @@ function roomTerritories(){
   return (PAGE.modelOrder||[]).filter(id=>by[id]).map(id=>by[id]);
 }
 function roomBundles(terrs, band){
-  const cap = ROOM_CAP[band];
+  const cap = ROOM_AIM[band];
   const groups = {};
   for(const t of terrs){
     if(t.band!==band) continue;
@@ -1078,7 +1079,7 @@ function roomRegions(states){
   return s;
 }
 function roomPack(items, band){
-  const cap = ROOM_CAP[band];
+  const cap = ROOM_AIM[band];
   const sorted = items.slice().sort((a,b)=>b.n-a.n || a.terr[0].id.localeCompare(b.terr[0].id));
   const bins = Array.from({length:ROOM_SEATS[band]}, ()=>({n:0, aes:[], terr:[], states:{}}));
   for(const b of sorted){
@@ -1190,13 +1191,15 @@ function renderRoom(){
   const nSmg = terrs.filter(t=>t.seg==="Midmarket").length;
   const entSeats = seats.filter(s=>s.band==="ent");
   const smgSeats = seats.filter(s=>s.band==="smg");
-  document.querySelector(".lede").textContent =
-    `Each account executive works with one partner, and each partner works with as few account executives as the stops allow. XP1 partners hold the ${nSmg} midmarket territories. XP2, XP3, and XP4 partners hold the ${nLent} local enterprise territories and the ${nState} state territories. Federal accounts stay on the federal book.`;
+  const levelRule = "XP1 partners hold midmarket, and XP2, XP3, and XP4 partners hold local enterprise and state. Federal stays one book.";
+  document.querySelector(".lede").textContent = bookView==="cur"
+    ? levelRule
+    : `I would recommend ${entSeats.length} seats for local enterprise and state, and ${smgSeats.length} seats for midmarket. An enterprise seat aims at ${ROOM_AIM.ent} and stops at ${ROOM_CAP.ent}. A midmarket seat stops at ${ROOM_CAP.smg}.`;
   document.getElementById("bookcur").setAttribute("aria-selected", bookView==="cur" ? "true" : "false");
   document.getElementById("bookadj").setAttribute("aria-selected", bookView==="adj" ? "true" : "false");
   document.getElementById("roomnote").textContent = bookView==="cur"
-    ? "Who holds the accounts today. A line runs from a territory to every partner on it."
-    : `Each territory has one seat, named for its largest territory. ${entSeats.length} seats hold local enterprise and state, and a seat stops at ${ROOM_CAP.ent} accounts. ${smgSeats.length} seats hold midmarket, and a seat stops at ${ROOM_CAP.smg} accounts. An account executive stays on one seat unless those accounts do not fit under the stop.`;
+    ? "An XP1 on local enterprise or state is marked."
+    : levelRule;
   document.getElementById("counts").innerHTML = [
     [nLent, "Local enterprise"],
     [nState, "State"],
@@ -1213,7 +1216,7 @@ function renderRoom(){
   ].join("");
   document.getElementById("maplegend").textContent = bookView==="cur"
     ? "Shading shows how many partners hold a territory in that state."
-    : "Shading shows how many seats hold a territory in that state. Each territory has one seat.";
+    : "Shading shows how many seats hold a territory in that state.";
   renderRoomMap(terrs, byTerr);
   renderRoomDiagram(terrs, seats, byTerr);
   applyRoomSel();
