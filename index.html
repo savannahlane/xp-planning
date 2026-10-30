@@ -866,7 +866,7 @@ function wireSide(){
 function renderLinks(){
   const board=document.getElementById("board");
   board.className="board";
-  xpW = scn==="model" ? 460 : scn==="pod" ? 500 : (bookView==="adj" ? 480 : 280);
+  xpW = scn==="model" ? 460 : scn==="pod" ? 500 : 280;
   H = TOP + Math.max(leftN.length,rightN.length,XP_ORDER.length)*ROW + 20;
   const maxN = Math.max(...L.map(l=>l.n), 1), maxA = Math.max(...L.map(l=>l.arr), 1);
   const wOf = l => weight==="n" ? 1.5+13*(l.n/maxN) : 1.5+14*Math.sqrt(l.arr/maxA);
@@ -874,8 +874,16 @@ function renderLinks(){
   leftN.forEach((n,i)=>pos["L|"+n.person]=yFor(leftN,i));
   rightN.forEach((n,i)=>pos["R|"+n.person]=yFor(rightN,i));
   XP_ORDER.forEach((x,i)=>pos["X|"+x]=yFor(XP_ORDER,i));
-  const centerHead = scn==="model" ? "Territories" : (bookView==="adj" ? "Seats" : "Experience Partners");
-  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Links between ${bookView==="adj"?"seats":"Experience Partners"} and account executives">`;
+  const xpName = x => bookView==="adj"
+    ? (SEAT_LABEL[x]==="XP1" ? "XP1" : "XP2–4")
+    : (scn==="pod" && PAGE.podLabel && PAGE.podLabel[x] ? PAGE.podLabel[x] : x);
+  const xpPlace = x => {
+    if(bookView!=="adj") return "";
+    const label = SEAT_LABEL[x] || "";
+    return label && label!=="XP1" ? label : (SEAT_WHERE[x] || "");
+  };
+  const centerHead = scn==="model" ? "Territories" : "Experience Partners";
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Links between ${centerHead} and account executives">`;
   s += `<text class="colhead" x="${xL}" y="28" text-anchor="end">State and federal</text>`;
   s += `<text class="colhead" x="${xC}" y="28" text-anchor="middle">${centerHead}</text>`;
   s += `<text class="colhead" x="${xR}" y="28">Local, SAM and vertical AEs</text>`;
@@ -886,7 +894,9 @@ function renderLinks(){
     const x1 = left? xL+8 : xR-8, x2 = left? xC-xpW/2 : xC+xpW/2;
     const mx=(x1+x2)/2;
     const cls = isGapName(l.person)?"none":(l.side==="State"?"state":"local");
-    s += `<path class="link ${cls}" data-xp="${esc(l.xp)}" data-ae="${esc(l.person)}" stroke-width="${wOf(l).toFixed(1)}" d="M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}"><title>${esc(l.xp)} ↔ ${esc(l.person)}: ${l.n} accounts, ${fmt$(l.arr)}</title></path>`;
+    const place = xpPlace(l.xp);
+    const titled = place ? `${xpName(l.xp)} (${place})` : xpName(l.xp);
+    s += `<path class="link ${cls}" data-xp="${esc(l.xp)}" data-ae="${esc(l.person)}" stroke-width="${wOf(l).toFixed(1)}" d="M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}"><title>${esc(titled)} ↔ ${esc(l.person)}: ${l.n} accounts, ${fmt$(l.arr)}</title></path>`;
   }
   s += `</g>`;
   const aeNode = (n,left)=>{
@@ -912,8 +922,8 @@ function renderLinks(){
     const people=new Set(mine.map(l=>l.person)).size;
     const n=mine.reduce((a,l)=>a+l.n,0);
     const cap = capFor(x);
-    const shown=bookView==="adj" && SEAT_LABEL[x] ? SEAT_LABEL[x] : scn==="pod" && PAGE.podLabel && PAGE.podLabel[x] ? PAGE.podLabel[x] : x;
-    const where=bookView==="adj" && SEAT_WHERE[x] ? SEAT_WHERE[x] : "";
+    const shown=xpName(x);
+    const where=xpPlace(x);
     const person=xpPerson(x);
     const who=bookView==="adj" ? "" : scn==="pod" ? (String(person).startsWith("Open") ? "Open" : person) : (XPMETA[x] && XPMETA[x][1]!=="n/a" ? XPMETA[x][1] : "");
     const aside=`${who?who+" · ":""}${people} AEs · ${n}${cap!=null && n>cap?" ⚠":""}`;
