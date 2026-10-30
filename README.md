@@ -34,6 +34,7 @@ tiering/
 | Say someone **holds no book** (manager, departed) | `NO_BOOK` | `update_whole_team_map.py` |
 | Change **book-size caps** | `ENTERPRISE_TARGET`, `ENTERPRISE_MAX`, `LOCAL_SMG_MAX` | `update_whole_team_map.py` |
 | Change the **pod-aligned** view (seats, who sits in them) | `POD_ASSIGNED`, `REGION_SHAPE`, `pod_seat()` | `update_whole_team_map.py` |
+| Change the **territory model** (16 local enterprise, 20 state, 37 midmarket) | `MODEL_TERRITORIES` and the account lists in `model_territory()` | `update_whole_team_map.py` |
 | Change an **AE's territory** | `ae_territories.csv` | `update_ae_territories.py` |
 | Change a **state's** purchasing access, IT signal, etc. | `state_overlay.csv` | `build_tiering.py` → `inject_html.py` |
 | Change **growth-tier weights** | `W_STATE_SIDE`, `W_LOCAL_SIDE`, bands, blend in `build_tiering.py` | `build_tiering.py` → `inject_html.py` |
@@ -121,8 +122,14 @@ touch it. US-based XPs must be within one hour of every state on their seat (`US
 The seat count per region is fixed in `REGION_SHAPE`. California's three midmarket seats are North
 (Carlos), LA/Orange (Marcy) and San Diego/Inland (open, the names in `SD_INLAND_CA_LOCAL_SMG`).
 Holds in `pod_seat()` keep the same person across proposed and pod for Kent Hartsfield → Steffany
-(Cook County and the Ohio group), Andrew Wyzkoski → Halena (Pennsylvania), and Washington state
-agencies → Paige (with DC).
+(Cook County and the Ohio group), Allegheny County → Halena (Philadelphia stays on the Ohio seat),
+and Washington state agencies → Paige (with DC).
+
+**Territory model.** A separate view, not a new set of seats. `assign_model_territories()` stamps
+`mterr` on every account: 16 local enterprise territories, 20 state territories, and 37 midmarket
+territories. Federal stays one book. It does not change `cur`, `newxp`, or `podxp`. Philadelphia
+and Allegheny County share the Pennsylvania local enterprise territory, and every California local
+enterprise account shares the one California territory.
 
 ---
 

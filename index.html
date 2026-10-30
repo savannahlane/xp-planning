@@ -251,6 +251,7 @@ body[data-view="room"] .lede{max-width:44rem;font-size:16px;line-height:1.5}
         <option value="new">Proposed plan</option>
         <option value="cur">Who holds them today</option>
         <option value="pod">Recommended seats</option>
+        <option value="model">Territory model</option>
         <option value="theory">The approach</option>
       </select>
     </label>
@@ -376,6 +377,11 @@ body[data-view="room"] .lede{max-width:44rem;font-size:16px;line-height:1.5}
       <li><strong>California local midmarket, 47.</strong> Two seats fit only if the south holds 30, which leaves no room. A third seat splits Los Angeles and Orange County from San Diego and the inland counties. Carlos keeps the accounts he already has.</li>
       <li><strong>Florida local midmarket, 27.</strong> Already two seats, 14 in the south and 13 in the north. Ricardo keeps the ten Florida accounts already on his book.</li>
     </ul>
+    <h2>The territory model</h2>
+    <p>The seats above are partner books. The territory model is the account-executive map underneath them: 16 local enterprise territories, 20 state territories, and 37 midmarket territories. Federal stays one book. It is its own view, and it does not move anyone between seats.</p>
+    <p>Local enterprise is one territory per group that already works together. A single account on a vertical or an open seat folds into the state it sits in. California’s two local enterprise lists are the same state, so they are one territory. Oregon is one account and stays its own territory, because nothing else in the Northwest is local enterprise.</p>
+    <p>State is one territory per group as well. One named-account list sits in California, Texas, and Washington at the same time. Those states do not touch, so that list is three territories. Every other state group stays whole.</p>
+    <p>Midmarket starts from the lines on the current map, then splits a state again only when it is still too big for one territory. California is nine: the Bay Area, the north and Sacramento, the central coast and valley, Los Angeles, the Orange County coast, north Orange County, San Diego, the Inland Empire, and the desert. Florida is five: Miami-Dade, Broward, Palm Beach, the Gulf, and central Florida with the Treasure Coast. Illinois is four: the north suburbs, the west suburbs, the south and southwest suburbs, and Bloomington. Texas stays the three seats already on the map: north and west, Austin and central, and Houston and the Gulf. Arizona stays whole, and New Mexico, Utah, and Alaska are the second territory in that group. Everywhere else the split is the state line, or the group stays one territory.</p>
     <h2>The seats</h2>
     <p>Counts below are the recommended cut. No one is named in the table. A red number is past the limit. Filters change the counts. They do not change the rules.</p>
     <div class="card tscroll"><table id="seats"></table></div>
@@ -514,9 +520,10 @@ const territoryText = p => {
 };
 
 
-function xpOf(r){ return scn==="pod" ? r.podseat : (scn==="new" || scn==="numbers") ? r.newxp : r.cur; }
+function xpOf(r){ return scn==="model" ? r.mterr : scn==="pod" ? r.podseat : (scn==="new" || scn==="numbers") ? r.newxp : r.cur; }
 function xpPerson(x){ return scn==="pod" && PAGE.podXp && PAGE.podXp[x] ? PAGE.podXp[x] : x; }
 function seatTitle(x){
+  if(scn==="model" && PAGE.modelLabel && PAGE.modelLabel[x]) return PAGE.modelLabel[x];
   if(scn!=="pod" || !PAGE.podLabel || !PAGE.podLabel[x]) return x;
   const person=xpPerson(x);
   const who=String(person).startsWith("Open") ? "Open" : person;
@@ -547,8 +554,14 @@ ROWS = ROWS_ALL.filter(r => segMatch(r) && !(scn==="cur" && r.pipe) && terrMatch
 ROWS = ROWS.map(r => (scn==="new" || scn==="pod") && r.fy27 ? {...r, arr: r.arr + r.fy27} : r);
 for (const r of ROWS) r.xp = xpOf(r);
 const podnote=document.getElementById("podnote");
-if(podnote) podnote.hidden = scn!=="pod";
-const order = scn==="pod" && PAGE.podOrder ? PAGE.podOrder : ORDER_ALL;
+if(podnote){
+  podnote.hidden = scn!=="pod" && scn!=="model";
+  if(scn==="pod") podnote.textContent="These are the recommended seats. One person may hold more than one.";
+  if(scn==="model") podnote.textContent="16 local enterprise territories, 20 state, and 37 midmarket. Federal stays one book.";
+}
+const findInput=document.getElementById("q");
+if(findInput) findInput.placeholder = scn==="model" ? "Find a territory" : "Find a person";
+const order = scn==="model" && PAGE.modelOrder ? PAGE.modelOrder : scn==="pod" && PAGE.podOrder ? PAGE.podOrder : ORDER_ALL;
 XP_ORDER = order.filter(x=>ROWS.some(r=>r.xp===x));
 const links = {};
 for (const r of ROWS){
@@ -592,6 +605,7 @@ const bookRows = x => ROWS.filter(r => r.xp===x && !r.alloc);
 function capFor(x){
   const rows=bookRows(x);
   if(!rows.length) return null;
+  if(scn==="model") return null;
   if(scn==="pod"){
     const role=PAGE.podRole && PAGE.podRole[x];
     if(role==="MM") return 30;
@@ -621,10 +635,10 @@ function bookInfo(x){
   const rows=bookRows(x);
   const person=xpPerson(x);
   const open=String(person).startsWith("Open");
-  const label=scn==="pod" && PAGE.podLabel && PAGE.podLabel[x] ? PAGE.podLabel[x] : x;
+  const label=scn==="model" && PAGE.modelLabel && PAGE.modelLabel[x] ? PAGE.modelLabel[x] : scn==="pod" && PAGE.podLabel && PAGE.podLabel[x] ? PAGE.podLabel[x] : x;
   const who=scn==="pod" ? (open ? "Open seat" : person) : "";
   const codes=stateCodes(rows);
-  const terr=scn==="pod" ? (ROWS.find(r=>r.xp===x)?.podterr || "") : "";
+  const terr=scn==="model" ? ((PAGE.modelSeg && PAGE.modelSeg[x]) || "") : scn==="pod" ? (ROWS.find(r=>r.xp===x)?.podterr || "") : "";
   const hay=[label, who, person, terr, ...codes, ...codes.map(c=>STATE_NAME[c]||"")].join(" ").toLowerCase();
   return {x, title:label, who, n:rows.length, arr:rows.reduce((a,r)=>a+r.arr,0), codes, terr, hay, over: (capFor(x)!=null && rows.length>capFor(x))};
 }
@@ -696,16 +710,17 @@ function renderSide(){
   const query=q.trim().toLowerCase();
   let books=XP_ORDER.map(bookInfo).filter(b=>!query || b.hay.includes(query));
   books.sort((a,b)=>b.n-a.n || a.title.localeCompare(b.title));
-  const head=`<div class="listhead"><span>${scn==="pod"?"Seat":"Person"}</span><span>Accounts</span></div>`;
+  const grouped=scn==="pod" || scn==="model";
+  const head=`<div class="listhead"><span>${scn==="model"?"Territory":scn==="pod"?"Seat":"Person"}</span><span>Accounts</span></div>`;
   if(!books.length){ list.innerHTML=head+`<p class="blank">No one matches.</p>`; return; }
-  if(scn!=="pod"){ list.innerHTML=head+books.map(rowButton).join(""); wireSide(); return; }
-  const order=[...TERRITORIES];
+  if(!grouped){ list.innerHTML=head+books.map(rowButton).join(""); wireSide(); return; }
+  const order=scn==="model" ? ["Local enterprise","State","Midmarket","Federal"] : [...TERRITORIES];
   for(const b of books) if(!order.includes(b.terr)) order.push(b.terr);
   const chunks=[];
   for(const t of order){
     const items=books.filter(b=>b.terr===t);
     if(!items.length) continue;
-    const headless=items.length===1 && items[0].title===t;
+    const headless=scn!=="model" && items.length===1 && items[0].title===t;
     chunks.push((headless?"":`<div class="group">${esc(t||"Other")}</div>`)+items.map(rowButton).join(""));
   }
   list.innerHTML=head+chunks.join("");
@@ -726,7 +741,7 @@ function bookPane(x){
   }).join("");
   const cap=capFor(x);
   return `<div class="detailpane">
-    <button type="button" class="back" id="back">Back to all books</button>
+    <button type="button" class="back" id="back">${scn==="model"?"Back to all territories":"Back to all books"}</button>
     <h2>${esc(b.title)}</h2>
     ${b.who?`<p class="places">${esc(b.who)}</p>`:""}
     <p class="big">${b.n} accounts · ${fmt$(b.arr)}</p>
@@ -743,7 +758,7 @@ function statePane(st){
   const seats=XP_ORDER.filter(x=>rows.some(r=>r.xp===x)).map(bookInfo).sort((a,b)=>b.n-a.n);
     const lines=seats.map(b=>`<button type="button" class="row" data-xp="${esc(b.x)}"><span><span class="nm">${esc(b.title)}</span>${b.who&&b.who!==b.title?`<span class="sub">${esc(b.who)}</span>`:""}</span><span class="num">${rows.filter(r=>r.xp===b.x).length}</span></button>`).join("");
   return `<div class="detailpane">
-    <button type="button" class="back" id="back">Back to all books</button>
+    <button type="button" class="back" id="back">${scn==="model"?"Back to all territories":"Back to all books"}</button>
     <h2>${esc(STATE_NAME[st]||st)}</h2>
     <p class="big">${rows.length} account${rows.length===1?"":"s"} · ${fmt$(arr)}</p>
     <h3>Covered by</h3>
@@ -759,7 +774,7 @@ function wireSide(){
 function renderLinks(){
   const board=document.getElementById("board");
   board.className="board";
-  xpW = scn==="pod" ? 500 : 280;
+  xpW = scn==="model" ? 460 : scn==="pod" ? 500 : 280;
   H = TOP + Math.max(leftN.length,rightN.length,XP_ORDER.length)*ROW + 20;
   const maxN = Math.max(...L.map(l=>l.n), 1), maxA = Math.max(...L.map(l=>l.arr), 1);
   const wOf = l => weight==="n" ? 1.5+13*(l.n/maxN) : 1.5+14*Math.sqrt(l.arr/maxA);
@@ -769,7 +784,7 @@ function renderLinks(){
   XP_ORDER.forEach((x,i)=>pos["X|"+x]=yFor(XP_ORDER,i));
   let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Links between Experience Partners and account executives">`;
   s += `<text class="colhead" x="${xL}" y="28" text-anchor="end">State and federal</text>`;
-  s += `<text class="colhead" x="${xC}" y="28" text-anchor="middle">Experience Partners</text>`;
+  s += `<text class="colhead" x="${xC}" y="28" text-anchor="middle">${scn==="model"?"Territories":"Experience Partners"}</text>`;
   s += `<text class="colhead" x="${xR}" y="28">Local, SAM and vertical AEs</text>`;
   s += `<g id="links">`;
   for(const l of L){
@@ -1389,7 +1404,9 @@ function render(){
     ? "Enterprise is every state account and every local enterprise account. Midmarket is local SMG. Each row is the places in one book. Federal accounts stay on the federal book."
     : theory
     ? "The rules, the bands, and the seats. A person is named only for a carve-out."
-    : "Choose a person. Their states light up, and their accounts are listed beside the map.";
+    : scn==="model"
+      ? "Choose a territory. Its states light up, and its accounts are listed beside the map."
+      : "Choose a person. Their states light up, and their accounts are listed beside the map.";
   document.querySelector(".more").hidden=quiet;
   document.getElementById("modebtn").hidden=quiet;
   document.getElementById("filterbtn").hidden=numbers || room;
@@ -1566,6 +1583,18 @@ document.addEventListener("keydown", e=>{
 render(); tables(); summary(); tiers();
 
 function summary(){
+  if(scn==="model"){
+    const rows=XP_ORDER.map(x=>{
+      const c=ROWS.filter(r=>r.xp===x && !r.alloc);
+      if(!c.length) return "";
+      const label=(PAGE.modelLabel&&PAGE.modelLabel[x])||x;
+      const kind=(PAGE.modelSeg&&PAGE.modelSeg[x])||"";
+      const codes=[...new Set(c.map(r=>r.state).filter(Boolean))];
+      return `<tr><td>${esc(label)}</td><td>${esc(kind)}</td><td>${esc(codes.join(", "))}</td><td class="n">${c.length}</td><td class="n">${fmt$(c.reduce((a,r)=>a+r.arr,0))}</td></tr>`;
+    });
+    document.getElementById("sum").innerHTML=`<thead><tr><th>Territory</th><th>Kind</th><th>States</th><th class="n">Accounts</th><th class="n">ARR</th></tr></thead><tbody>${rows.join("")}</tbody>`;
+    return;
+  }
   const rows=XP_ORDER.map(x=>{
     const mine=ROWS.filter(r=>r.xp===x), c=mine.filter(r=>!r.alloc);
     if(!mine.length) return "";
@@ -1612,7 +1641,7 @@ function tables(){
   for(const l of L){ if(isGapName(l.person)) continue; (m[l.person] ||= {p:l.person, side:l.side, seg:[...new Set(l.rows.map(r=>r.segment))].join(', '), xps:new Set(), n:0, arr:0, rows:[]}); m[l.person].xps.add(seatTitle(l.xp)); m[l.person].n+=l.n; m[l.person].arr+=l.arr; m[l.person].rows.push(...l.rows); }
   const rows=Object.values(m).sort((a,b)=>b.xps.size-a.xps.size||b.arr-a.arr);
   const terrCell=p=>{const t=territoryOf(p); return t.states.length? t.states.join(", ") : `<span style="color:var(--muted)">${t.note||"Not listed"}</span>`;};
-  document.getElementById("load").innerHTML=`<thead><tr><th>AE</th><th>Map</th><th>Segment</th><th>Territory</th><th>States in this view</th><th>XPs</th><th class="n">Accounts</th><th class="n">ARR</th></tr></thead><tbody>`+
+  document.getElementById("load").innerHTML=`<thead><tr><th>AE</th><th>Map</th><th>Segment</th><th>Territory</th><th>States in this view</th><th>${scn==="model"?"Territories":"XPs"}</th><th class="n">Accounts</th><th class="n">ARR</th></tr></thead><tbody>`+
     rows.map(r=>`<tr><td>${r.p}</td><td>${r.side}</td><td>${r.seg}</td><td>${terrCell(r.p)}</td><td>${stateText(r.rows)||"—"}</td><td>${[...r.xps].join(", ")}</td><td class="n">${r.n}</td><td class="n">${fmt$(r.arr)}</td></tr>`).join("")+`</tbody>`;
 }
 </script>

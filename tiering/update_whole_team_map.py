@@ -25,8 +25,8 @@ that landed on main and changes only the proposed assignment (`newxp`):
 * `podxp` is a third view. It staffs pods from the account's state and segment
   and does not change `cur` or `newxp`.
 * `mterr` is the territory model: 16 local enterprise territories, 20 state
-  territories, and 37 midmarket territories. Federal stays one book. It does
-  not change who holds an account.
+  territories, and 37 local midmarket territories. Federal stays one book. It
+  does not change who holds a seat.
 
 Per-account moves live in account_overrides.csv, which is the file to edit when
 an XP changes. It also carries segment changes and removals.
@@ -1966,6 +1966,12 @@ def main() -> None:
     outside_arr = sum(record["nnarr"] for record in pipeline["outside"])
     if pipeline["outside"]:
         print(f"  outside the US book: ${outside_arr:,.0f}")
+    print(
+        "Territory model: "
+        + ", ".join(f"{kind} {n}" for kind, n in MODEL_COUNTS.items())
+    )
+    for tid, _label, kind in MODEL_TERRITORIES:
+        print(f"  {MODEL_LABEL[tid]} ({kind}): {result['model_load'].get(tid, 0)}")
     print("Pod aligned seats (countable accounts, ignoring current owners):")
     for seat, xp, role, label, _terr in POD_ASSIGNED:
         print(f"  {label} — {xp} ({role}): {result['pod_load'].get(seat, 0)}")
@@ -1975,13 +1981,6 @@ def main() -> None:
             "Pod timezone not on the roster, so the one-hour rule was not applied: "
             + ", ".join(unverified)
         )
-    print("Territory model:")
-    model_counts: dict[str, int] = defaultdict(int)
-    for tid, n in result["model_load"].items():
-        if n:
-            model_counts[page["modelSeg"][tid]] += 1
-    for kind in ("Local enterprise", "State", "Midmarket", "Federal"):
-        print(f"  {kind}: {model_counts[kind]} territories")
     print("Carolina countable consolidated accounts:")
     for row in result["carolina_countable"]:
         print(f"  {row['acct']} ${row['arr'] + row.get('fy27', 0):,.0f}")
