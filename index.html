@@ -80,6 +80,32 @@ select,.pick>button,input[type="search"]{
 #board svg{display:block;width:100%;height:auto}
 .stage.links #board{overflow:auto}
 .stage.links #board svg{min-width:900px}
+.stage.books{grid-template-columns:1fr}
+.stage.books .side{display:none}
+#board.cards{background:transparent;border:0;overflow:visible}
+.bookband{font:600 22px/1.2 Fraunces,Georgia,serif;margin:18px 0 10px}
+.bookgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:12px}
+.bookcard{display:block;width:100%;background:var(--card);border:1px solid var(--line);border-top:3px solid var(--accent);border-radius:12px;padding:14px 14px 12px;text-align:left;cursor:pointer}
+.bookcard.local{border-top-color:var(--local)}
+.bookcard.mixed{border-top-color:var(--over)}
+.bookcard:hover,.bookcard.on{box-shadow:0 0 0 2px color-mix(in srgb,var(--accent) 35%,transparent)}
+.bookhead{display:flex;gap:12px;align-items:flex-start;justify-content:space-between}
+.bookname{font-weight:600;font-size:17px;line-height:1.25}
+.bookrole{color:var(--muted);font-size:12.5px;text-align:right}
+.bookrole.mark{color:var(--over);font-weight:600}
+.bookstats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0 8px}
+.bookstat{border-left:2px solid var(--line);padding-left:8px}
+.bookstat strong{display:block;font-size:16px;line-height:1.1;font-variant-numeric:lining-nums tabular-nums}
+.bookstat strong.mark{color:var(--over)}
+.bookstat span{color:var(--muted);font-size:11px;letter-spacing:.04em;text-transform:uppercase}
+.bookstates{font-weight:600;font-size:13px;line-height:1.35;margin-bottom:8px}
+.bookflow{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.bookcard.local .bookflow{grid-template-columns:1fr}
+.flowh{color:var(--muted);font-size:11px;letter-spacing:.04em;text-transform:uppercase;margin-bottom:4px}
+.flowae{display:flex;justify-content:space-between;gap:8px;font-size:13.5px;line-height:1.35}
+.flowae b{font-weight:600;font-variant-numeric:tabular-nums}
+.flowae.gapname{color:var(--over)}
+.flowae.quiet{color:var(--muted)}
 .st{fill:var(--cover);stroke:var(--card);stroke-width:1.25;cursor:pointer}
 .st.empty{fill:var(--empty);cursor:default}
 .st.dim{fill:var(--empty)}
@@ -96,6 +122,8 @@ select,.pick>button,input[type="search"]{
 }
 .side{background:var(--card);border:1px solid var(--line);border-radius:12px;max-height:min(540px,calc(100vh - 180px));display:flex;flex-direction:column;overflow:hidden;position:sticky;top:68px}
 .filters .find{padding:0;min-width:14rem}
+.side .find{padding:10px 10px 0}
+.side .find input{min-width:0}
 .find input{width:100%;border-radius:8px;min-width:14rem}
 #list{overflow:auto;flex:1 1 auto;min-height:0;padding:4px 6px 10px}
 .listhead,.row{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
@@ -253,6 +281,7 @@ td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
   .cols2{display:none}
   .rule{width:28px;margin:2px 0}
   .fangap{display:none}
+  .bookgrid,.bookflow{grid-template-columns:1fr}
 }
 </style>
 </head>
@@ -266,6 +295,7 @@ td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
     <div class="switch" role="tablist" aria-label="View">
       <button type="button" id="viewmap" role="tab" aria-selected="true">Map</button>
       <button type="button" id="viewlines" role="tab" aria-selected="false">Lines</button>
+      <button type="button" id="viewbooks" role="tab" aria-selected="false">Books</button>
       <button type="button" id="viewtable" role="tab" aria-selected="false">Table</button>
     </div>
   </div>
@@ -292,37 +322,33 @@ td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
         </div>
       </div>
     </div>
-    <label class="fld find">Find
-      <input id="q" type="search" placeholder="Find a person" aria-label="Find a person">
-    </label>
   </div>
-  <div class="filters" id="linkbar" hidden>
-    <label class="fld">Line thickness
-      <select id="weight">
-        <option value="n" selected>By number of accounts</option>
-        <option value="arr">By ARR</option>
-      </select>
-    </label>
-    <label class="fld">AE labels
-      <select id="labelby">
-        <option value="st" selected>By state</option>
-        <option value="terr">By territory</option>
-      </select>
-    </label>
-  </div>
-
-  <div class="stage" id="stage" hidden>
-    <div id="board"></div>
-    <aside class="side">
-      <div id="list"></div>
-    </aside>
-  </div>
-  <div class="detail" id="detail" hidden></div>
-
   <article id="room" class="room">
     <p class="roomnote" id="roomnote"></p>
     <div class="figures" id="stats"></div>
-    <div class="roomstage" id="roomstage">
+    <div class="filters" id="linkbar" hidden>
+      <label class="fld">Line thickness
+        <select id="weight">
+          <option value="n" selected>By number of accounts</option>
+          <option value="arr">By ARR</option>
+        </select>
+      </label>
+      <label class="fld">AE labels
+        <select id="labelby">
+          <option value="st" selected>By state</option>
+          <option value="terr">By territory</option>
+        </select>
+      </label>
+    </div>
+    <div class="stage" id="stage">
+      <div id="board"></div>
+      <aside class="side">
+        <div class="find"><input id="q" type="search" placeholder="Find a person" aria-label="Find a person"></div>
+        <div id="list"></div>
+      </aside>
+    </div>
+    <div class="detail" id="detail" hidden></div>
+    <div class="roomstage" id="roomstage" hidden>
       <div class="mapcard" id="mapcard">
         <div class="maphead"><h2>Territories</h2><p id="maplegend"></p></div>
         <div id="roommap"></div>
@@ -532,9 +558,60 @@ const territoryText = p => {
 };
 
 
-function xpOf(r){ return scn==="model" ? r.mterr : scn==="pod" ? r.podseat : (scn==="new" || scn==="numbers") ? r.newxp : r.cur; }
+let SEAT_LABEL={}, SEAT_ORDER=[], SEAT_PIECES=[], SEAT_WHERE={}, SEAT_AE={}, ROOM_PACK=null;
+function roomMidmarketAeSeats(modelTerrs){
+  const byAe={};
+  for(const r of ROWS_ALL){
+    if(r.alloc || r.segment!=="Local SMG" || !r.person) continue;
+    (byAe[r.person] ||= []).push(r);
+  }
+  const lookup=Object.fromEntries(modelTerrs.map(t=>[t.id,t]));
+  return Object.entries(byAe).map(([ae,rows],i)=>{
+    const states={};
+    for(const r of rows) if(r.state) states[r.state]=(states[r.state]||0)+1;
+    // Carry every state on the seller map, including coverage with no cloud account.
+    for(const st of territoryOf(ae).states) states[st]=states[st]||0;
+    // Alaska and Hawaii stay together when they are on the same seller map.
+    if(states.AK && territoryOf(ae).states.includes("HI")) states.HI=states.HI||0;
+    const ids=[...new Set(rows.map(r=>r.mterr).filter(Boolean))];
+    const terr=ids.flatMap(id=>modelTerrs.filter(t=>t.id===id || t.id.startsWith(id+"~")));
+    return {id:"smg-ae-"+(i+1), band:"smg", level:"XP1", n:rows.length, terr, label:"XP1", where:roomStateLabel(Object.keys(states)), states, ae};
+  }).sort((a,b)=>b.n-a.n || a.where.localeCompare(b.where));
+}
+function assignSeats(){
+  SEAT_LABEL={}; SEAT_ORDER=[]; SEAT_PIECES=[]; SEAT_WHERE={}; SEAT_AE={};
+  const modelTerrs=roomWithCoverage(roomTerritories());
+  const packed=roomSeats(modelTerrs);
+  const entSeats=packed.seats.filter(s=>s.band==="ent");
+  const smgSeats=roomMidmarketAeSeats(modelTerrs);
+  for(const s of smgSeats) SEAT_AE[s.ae]=s.id;
+  ROOM_PACK={modelTerrs, seats:entSeats.concat(smgSeats), byTerr:packed.byTerr};
+  for(const s of ROOM_PACK.seats){
+    SEAT_LABEL[s.id]=s.label;
+    SEAT_WHERE[s.id]=s.where||"";
+    SEAT_ORDER.push(s.id);
+    for(const t of s.terr) SEAT_PIECES.push({id:t.id, states:t.states, seat:s.id});
+  }
+}
+function seatFor(r){
+  if(!r.mterr || r.mterr==="fed") return "";
+  if(r.segment==="Local SMG") return SEAT_AE[r.person]||"";
+  const mine=SEAT_PIECES.filter(p=>p.id===r.mterr || p.id.startsWith(r.mterr+"~"));
+  if(!mine.length) return "";
+  if(r.state){
+    const hit=mine.find(p=>Object.prototype.hasOwnProperty.call(p.states, r.state));
+    if(hit) return hit.seat;
+  }
+  const ids=[...new Set(mine.map(p=>p.seat))];
+  return ids.length===1 ? ids[0] : "";
+}
+function xpOf(r){
+  if(scn==="room" && bookView==="adj") return seatFor(r);
+  return scn==="model" ? r.mterr : scn==="pod" ? r.podseat : (scn==="new" || scn==="numbers") ? r.newxp : r.cur;
+}
 function xpPerson(x){ return scn==="pod" && PAGE.podXp && PAGE.podXp[x] ? PAGE.podXp[x] : x; }
 function seatTitle(x){
+  if(bookView==="adj" && SEAT_LABEL[x]) return SEAT_LABEL[x];
   if(scn==="model" && PAGE.modelLabel && PAGE.modelLabel[x]) return PAGE.modelLabel[x];
   if(scn!=="pod" || !PAGE.podLabel || !PAGE.podLabel[x]) return x;
   const person=xpPerson(x);
@@ -562,17 +639,18 @@ function segMatch(r){
   return seg==="all" || (seg==="ent" ? r.ent : seg==="smg" ? r.segment==="Local SMG" : !r.ent && r.segment!=="Local SMG");
 }
 function recompute(){
-ROWS = ROWS_ALL.filter(r => segMatch(r) && !(scn==="cur" && r.pipe) && terrMatch(r));
+ROWS = ROWS_ALL.filter(r => segMatch(r) && terrMatch(r) && !((scn==="cur" || (scn==="room" && bookView==="cur")) && r.pipe) && !(scn==="room" && bookView==="adj" && !seatFor(r)));
 ROWS = ROWS.map(r => (scn==="new" || scn==="pod") && r.fy27 ? {...r, arr: r.arr + r.fy27} : r);
 for (const r of ROWS) r.xp = xpOf(r);
 const podnote=document.getElementById("podnote");
 if(podnote) podnote.hidden = true;
 const findInput=document.getElementById("q");
-if(findInput) findInput.placeholder = scn==="model" ? "Find a territory" : "Find a person";
-const order = scn==="model" && PAGE.modelOrder ? PAGE.modelOrder : scn==="pod" && PAGE.podOrder ? PAGE.podOrder : ORDER_ALL;
+if(findInput) findInput.placeholder = scn==="model" ? "Find a territory" : (scn==="room" && bookView==="adj" ? "Find a seat" : "Find a person");
+const order = scn==="room" && bookView==="adj" ? SEAT_ORDER : scn==="model" && PAGE.modelOrder ? PAGE.modelOrder : scn==="pod" && PAGE.podOrder ? PAGE.podOrder : ORDER_ALL;
 XP_ORDER = order.filter(x=>ROWS.some(r=>r.xp===x));
 const links = {};
 for (const r of ROWS){
+  if(!r.xp) continue;
   const k = r.xp+"|"+r.person+"|"+r.side;
   (links[k] ||= {xp:r.xp, person:r.person, side:r.side, terr:r.terr, dir:"", n:0, arr:0, rows:[]});
   if(!r.alloc) links[k].n++;
@@ -643,12 +721,13 @@ function bookInfo(x){
   const rows=bookRows(x);
   const person=xpPerson(x);
   const open=String(person).startsWith("Open");
-  const label=scn==="model" && PAGE.modelLabel && PAGE.modelLabel[x] ? PAGE.modelLabel[x] : scn==="pod" && PAGE.podLabel && PAGE.podLabel[x] ? PAGE.podLabel[x] : x;
+  const label=bookView==="adj" && SEAT_LABEL[x] ? SEAT_LABEL[x] : scn==="model" && PAGE.modelLabel && PAGE.modelLabel[x] ? PAGE.modelLabel[x] : scn==="pod" && PAGE.podLabel && PAGE.podLabel[x] ? PAGE.podLabel[x] : x;
   const who=scn==="pod" ? (open ? "Open seat" : person) : "";
   const codes=stateCodes(rows);
+  const where=bookView==="adj" && SEAT_WHERE[x] ? SEAT_WHERE[x] : whereLine(codes);
   const terr=scn==="model" ? ((PAGE.modelSeg && PAGE.modelSeg[x]) || "") : scn==="pod" ? (ROWS.find(r=>r.xp===x)?.podterr || "") : "";
-  const hay=[label, who, person, terr, ...codes, ...codes.map(c=>STATE_NAME[c]||"")].join(" ").toLowerCase();
-  return {x, title:label, who, n:rows.length, arr:rows.reduce((a,r)=>a+r.arr,0), codes, terr, hay, over: (capFor(x)!=null && rows.length>capFor(x))};
+  const hay=[label, where, who, person, terr, ...codes, ...codes.map(c=>STATE_NAME[c]||"")].join(" ").toLowerCase();
+  return {x, title:label, who, where, n:rows.length, arr:rows.reduce((a,r)=>a+r.arr,0), codes, terr, hay, over: (capFor(x)!=null && rows.length>capFor(x))};
 }
 function seatsInState(st){
   const by={};
@@ -668,10 +747,15 @@ function renderMap(){
   for(const st of Object.keys(US)){
     const [d,cx,cy,label]=US[st];
     const seats=seatsInState(st);
+    if(bookView==="adj" && ROOM_PACK){
+      for(const s of ROOM_PACK.seats){
+        if(Object.prototype.hasOwnProperty.call(s.states, st) && !seats.some(a=>a.id===s.id)) seats.push({id:s.id, n:0, arr:0, aes:[], fed:false});
+      }
+    }
     const n=seats.reduce((a,s)=>a+s.n,0);
-    const who=seats.slice(0,2).map(s=>seatTitle(s.id)).join(", ");
+    const who=[...new Set(seats.map(s=>seatTitle(s.id)))].slice(0,2).join(", ");
     const name=STATE_NAME[st]||st;
-    tips[st]=n ? `${name} · ${n} account${n===1?"":"s"}${who?" · "+who:""}` : `${name} · no accounts`;
+    tips[st]=n ? `${name} · ${n} account${n===1?"":"s"}${who?" · "+who:""}` : (who ? `${name} · ${who}` : `${name} · no accounts`);
     const seatIds=seats.map(s=>s.id).join("|");
     shapes+=`<path class="st${n?"":" empty"}" data-st="${st}" data-seats="${esc(seatIds)}" d="${d}" tabindex="${n?0:-1}" role="${n?"button":"presentation"}" aria-label="${esc(tips[st])}"><title>${esc(tips[st])}</title></path>`;
     if(label) labels+=`<text class="stlabel" data-st="${st}" x="${cx}" y="${cy+4}" hidden>${st}</text>`;
@@ -703,7 +787,7 @@ function rowButton(b){
   if(b.who && b.who!==b.title) bits.push(b.who);
   if(b.over) bits.push("Over the limit");
   else if(scn==="pod") bits.push(fmt$(b.arr));
-  else bits.push(`${whereLine(b.codes)} · ${fmt$(b.arr)}`);
+  else bits.push(`${b.where || whereLine(b.codes)} · ${fmt$(b.arr)}`);
   return `<button type="button" class="row" data-xp="${esc(b.x)}">
     <span><span class="nm">${esc(b.title)}</span><span class="sub">${esc(bits.join(" · "))}</span></span>
     <span class="num${b.over?" over":""}">${b.n}</span>
@@ -719,7 +803,7 @@ function renderSide(){
   let books=XP_ORDER.map(bookInfo).filter(b=>!query || b.hay.includes(query));
   books.sort((a,b)=>b.n-a.n || a.title.localeCompare(b.title));
   const grouped=scn==="pod" || scn==="model";
-  const head=`<div class="listhead"><span>${scn==="model"?"Territory":scn==="pod"?"Seat":"Person"}</span><span>Accounts</span></div>`;
+  const head=`<div class="listhead"><span>${scn==="model"?"Territory":(scn==="pod"||bookView==="adj")?"Seat":"Person"}</span><span>Accounts</span></div>`;
   if(!books.length){ list.innerHTML=head+`<p class="blank">No one matches.</p>`; return; }
   if(!grouped){ list.innerHTML=head+books.map(rowButton).join(""); wireSide(); return; }
   const order=scn==="model" ? ["Local enterprise","State","Midmarket","Federal"] : [...TERRITORIES];
@@ -753,7 +837,7 @@ function bookPane(x){
     <h2>${esc(b.title)}</h2>
     ${b.who?`<p class="places">${esc(b.who)}</p>`:""}
     <p class="big">${b.n} accounts · ${fmt$(b.arr)}</p>
-    <p class="places">${esc(whereFull(b.codes))}</p>
+    <p class="places">${esc(b.where || whereFull(b.codes))}</p>
     ${b.over?`<p class="cap over">Over the ${cap}-account limit</p>`:""}
     ${mgr?`<p class="mgr">Reports to ${esc(mgr)}</p>`:""}
     <h3>Account executives</h3>
@@ -782,7 +866,7 @@ function wireSide(){
 function renderLinks(){
   const board=document.getElementById("board");
   board.className="board";
-  xpW = scn==="model" ? 460 : scn==="pod" ? 500 : 280;
+  xpW = scn==="model" ? 460 : scn==="pod" ? 500 : (bookView==="adj" ? 480 : 280);
   H = TOP + Math.max(leftN.length,rightN.length,XP_ORDER.length)*ROW + 20;
   const maxN = Math.max(...L.map(l=>l.n), 1), maxA = Math.max(...L.map(l=>l.arr), 1);
   const wOf = l => weight==="n" ? 1.5+13*(l.n/maxN) : 1.5+14*Math.sqrt(l.arr/maxA);
@@ -790,9 +874,10 @@ function renderLinks(){
   leftN.forEach((n,i)=>pos["L|"+n.person]=yFor(leftN,i));
   rightN.forEach((n,i)=>pos["R|"+n.person]=yFor(rightN,i));
   XP_ORDER.forEach((x,i)=>pos["X|"+x]=yFor(XP_ORDER,i));
-  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Links between Experience Partners and account executives">`;
+  const centerHead = scn==="model" ? "Territories" : (bookView==="adj" ? "Seats" : "Experience Partners");
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Links between ${bookView==="adj"?"seats":"Experience Partners"} and account executives">`;
   s += `<text class="colhead" x="${xL}" y="28" text-anchor="end">State and federal</text>`;
-  s += `<text class="colhead" x="${xC}" y="28" text-anchor="middle">${scn==="model"?"Territories":"Experience Partners"}</text>`;
+  s += `<text class="colhead" x="${xC}" y="28" text-anchor="middle">${centerHead}</text>`;
   s += `<text class="colhead" x="${xR}" y="28">Local, SAM and vertical AEs</text>`;
   s += `<g id="links">`;
   for(const l of L){
@@ -827,13 +912,19 @@ function renderLinks(){
     const people=new Set(mine.map(l=>l.person)).size;
     const n=mine.reduce((a,l)=>a+l.n,0);
     const cap = capFor(x);
-    const shown=scn==="pod" && PAGE.podLabel && PAGE.podLabel[x] ? PAGE.podLabel[x] : x;
+    const shown=bookView==="adj" && SEAT_LABEL[x] ? SEAT_LABEL[x] : scn==="pod" && PAGE.podLabel && PAGE.podLabel[x] ? PAGE.podLabel[x] : x;
+    const where=bookView==="adj" && SEAT_WHERE[x] ? SEAT_WHERE[x] : "";
     const person=xpPerson(x);
-    const who=scn==="pod" ? (String(person).startsWith("Open") ? "Open" : person) : (XPMETA[x] && XPMETA[x][1]!=="n/a" ? XPMETA[x][1] : "");
-    s+=`<g class="node xp" tabindex="0" role="button" data-xp="${esc(x)}" aria-label="${esc(shown)}">
+    const who=bookView==="adj" ? "" : scn==="pod" ? (String(person).startsWith("Open") ? "Open" : person) : (XPMETA[x] && XPMETA[x][1]!=="n/a" ? XPMETA[x][1] : "");
+    const aside=`${who?who+" · ":""}${people} AEs · ${n}${cap!=null && n>cap?" ⚠":""}`;
+    const room=Math.max(12, Math.floor((xpW-28-aside.length*6.2)/6.6));
+    const display=shown.length>room ? shown.slice(0, room-1)+"…" : shown;
+    const tip=where ? shown+" · "+where : shown;
+    s+=`<g class="node xp" tabindex="0" role="button" data-xp="${esc(x)}" aria-label="${esc(tip)}">
+      <title>${esc(tip)}</title>
       <rect class="xpbox" x="${xC-xpW/2}" y="${y-15}" width="${xpW}" height="30" rx="4"/>
-      <text x="${xC-xpW/2+10}" y="${y+5}">${esc(shown)}</text>
-      <text class="sub" x="${xC+xpW/2-10}" y="${y+4}" text-anchor="end">${esc(who?who+" · ":"")}${people} AEs · ${n}${cap!=null && n>cap?" ⚠":""}</text>
+      <text x="${xC-xpW/2+10}" y="${y+5}">${esc(display)}</text>
+      <text class="sub" x="${xC+xpW/2-10}" y="${y+4}" text-anchor="end">${esc(aside)}</text>
     </g>`;
   }
   s+=`</svg>`;
@@ -1331,6 +1422,24 @@ function roomPack(items, band){
   }
   return bins.filter(bn=>bn.terr.length).sort((a,b)=>b.n-a.n || a.terr[0].id.localeCompare(b.terr[0].id));
 }
+function roomFoldAlaska(seats, byTerr){
+  const pacific = s => s.band==="smg" && Object.keys(s.states).length && Object.keys(s.states).every(st => st==="AK" || st==="HI");
+  const ak = seats.find(pacific);
+  const west = seats.find(s => s.band==="smg" && (Object.prototype.hasOwnProperty.call(s.states,"OR") || Object.prototype.hasOwnProperty.call(s.states,"WA")));
+  if(!ak || !west || ak===west) return;
+  west.n += ak.n;
+  west.terr = west.terr.concat(ak.terr);
+  for(const [st,c] of Object.entries(ak.states)) west.states[st]=(west.states[st]||0)+c;
+  for(const t of ak.terr) byTerr[t.id]=west;
+  seats.splice(seats.indexOf(ak),1);
+}
+function roomNameMidmarket(seats){
+  for(const s of seats){
+    if(s.band!=="smg") continue;
+    s.label="Midmarket";
+    s.where=roomStateLabel(Object.keys(s.states));
+  }
+}
 function roomSeats(terrs){
   const seats = [];
   const byTerr = {};
@@ -1351,6 +1460,8 @@ function roomSeats(terrs){
       for(const t of ordered) byTerr[t.id] = seat;
     });
   }
+  roomFoldAlaska(seats, byTerr);
+  roomNameMidmarket(seats);
   return {seats, byTerr};
 }
 function roomLevel(xp){
@@ -1360,7 +1471,10 @@ function roomXpName(xp){
   return String(xp).startsWith("Open") ? "Open seat" : xp;
 }
 function roomLinks(t, byTerr){
-  if(bookView==="adj") return [byTerr[t.id].id];
+  if(bookView==="adj"){
+    if(t.band==="smg") return [...new Set(Object.keys(t.aes).map(ae=>SEAT_AE[ae]).filter(Boolean))];
+    return [byTerr[t.id].id];
+  }
   return Object.entries(t.xps).sort((a,b)=>b[1]-a[1] || a[0].localeCompare(b[0])).map(([xp])=>xp);
 }
 function roomStats(terrs, byTerr, mode){
@@ -1376,8 +1490,9 @@ function roomStats(terrs, byTerr, mode){
         (partnerTo[p] ||= new Set()).add(ae);
       }
     } else {
-      const p = byTerr[t.id].id;
       for(const ae of Object.keys(t.aes)){
+        const p=t.band==="smg" ? SEAT_AE[ae] : byTerr[t.id].id;
+        if(!p) continue;
         (aeTo[ae] ||= new Set()).add(p);
         (partnerTo[p] ||= new Set()).add(ae);
       }
@@ -1516,15 +1631,15 @@ function renderRoom(){
     document.getElementById("roomnote").textContent = "Territory lines are not on this page yet.";
     return;
   }
-  const modelTerrs = roomWithCoverage(roomTerritories());
+  const modelTerrs = ROOM_PACK.modelTerrs;
   const curTerrs = roomCurrentTerritories();
-  const {seats, byTerr} = roomSeats(modelTerrs);
+  const {seats, byTerr} = ROOM_PACK;
   const cur = roomStats(curTerrs, byTerr, "cur");
   const adj = roomStats(modelTerrs, byTerr, "adj");
   const active = bookView==="adj" ? adj : cur;
   const other = bookView==="adj" ? cur : adj;
   const otherName = bookView==="adj" ? "2026" : "2027";
-  const entSeats = seats.filter(s=>s.band==="ent");
+  const entSeats = seats.filter(s=>s.band==="ent" && s.n);
   const smgSeats = seats.filter(s=>s.band==="smg");
   const levelRule = "XP1 partners hold midmarket, and XP2, XP3, and XP4 partners hold local enterprise and state. Federal stays one book.";
   document.querySelector(".lede").textContent = bookView==="cur"
@@ -1532,28 +1647,30 @@ function renderRoom(){
     : `I would recommend ${entSeats.length} seats for local enterprise and state, and ${smgSeats.length} seats for midmarket. An enterprise seat aims at ${ROOM_AIM.ent} and stops at ${ROOM_CAP.ent}. A midmarket seat stops at ${ROOM_CAP.smg}.`;
   document.getElementById("roomnote").textContent = bookView==="cur"
     ? "An XP1 on local enterprise or state is marked."
-    : levelRule + " A seat stays within an hour of every state on it.";
+    : levelRule + " An enterprise seat stays within an hour of every state on it.";
   const compare = (value, max, label, otherValue, hot)=>{
     const many = Math.round(max*10)!==Math.round(value*10) ? `As many as ${roomNum(max)}. ` : "";
     return `<div class="figure"><b class="${hot?"hot":""}">${roomNum(value)}</b><span>${esc(label)}</span><em>${many}${esc(otherName)} is ${roomNum(otherValue)}.</em></div>`;
   };
+  const mmTerr = (PAGE.modelOrder||[]).filter(id => PAGE.modelSeg[id]==="Midmarket").length;
+  const mmHave = 12, entHave = 8, entOpen = 1;
+  const entAdd = entSeats.length - entHave - entOpen;
+  const mmAdd = smgSeats.length - mmHave;
+  const mmText = mmAdd>0
+    ? `${mmTerr} midmarket territories need ${smgSeats.length} partners, so that ask is ${mmAdd} more than the ${mmHave} on the team.`
+    : `${mmTerr} midmarket territories need ${smgSeats.length} partners, and ${mmHave} are on the team.`;
+  const entText = `${entHave} on the team and one open backfill, so the ask is ${entAdd} more.`;
+  const ask = `<div class="figure"><b>${entAdd}</b><span>More enterprise partners</span><em>${esc(entText)} ${esc(mmText)}</em></div>`;
   document.getElementById("stats").innerHTML = [
     compare(active.perTerr, active.perTerrMax, "Partners on a territory", other.perTerr, false),
     compare(active.perPartner, active.perPartnerMax, "Account executives per partner", other.perPartner, false),
-    compare(active.xp1, active.xp1, "XP1 partners on enterprise", other.xp1, bookView==="cur" && active.xp1>0)
+    ask
   ].join("");
-  document.getElementById("maplegend").textContent = bookView==="cur"
+  const legend=document.getElementById("maplegend");
+  if(legend) legend.textContent = bookView==="cur"
     ? "Shading shows how many partners hold a territory in that state."
     : "Shading shows how many seats hold a territory in that state.";
-  const showTerrs = bookView==="adj" ? modelTerrs : curTerrs;
-  document.getElementById("mapcard").hidden = roomPane!=="map";
-  document.getElementById("diagram").hidden = roomPane!=="lines";
-  document.getElementById("roomtable").hidden = roomPane!=="table";
-  document.getElementById("roomstage").hidden = roomPane==="table";
-  renderRoomMap(showTerrs, byTerr);
-  renderRoomDiagram(showTerrs, seats, byTerr);
-  renderRoomTable(showTerrs, seats);
-  applyRoomSel();
+  ROOM_VIEW = {modelTerrs, curTerrs, seats, byTerr};
 }
 function renderRoomTable(terrs, seats){
   const bands = [
@@ -1577,10 +1694,11 @@ function renderRoomTable(terrs, seats){
         const bi = Math.min(...b.terr.map(t=>order[t.id] ?? 9999));
         return ai-bi;
       });
-      body = `<thead><tr><th>Seat</th><th class="n">Accounts</th><th>Territories</th></tr></thead><tbody>${bandSeats.map(s=>`<tr>
+      const place = s => band.id==="smg" ? (s.where || roomStateLabel(Object.keys(s.states))) : s.terr.map(t=>t.label).join("; ");
+      body = `<thead><tr><th>Seat</th><th class="n">Accounts</th><th>${band.id==="smg"?"States":"Territories"}</th></tr></thead><tbody>${bandSeats.map(s=>`<tr>
         <td>${esc(s.label)}</td>
         <td class="n">${s.n}</td>
-        <td>${s.terr.map(t=>esc(t.label)).join("; ")}</td>
+        <td>${esc(place(s))}</td>
       </tr>`).join("")}</tbody>`;
     } else {
       const mine = sortTerr(terrs.filter(t=>band.segs.includes(t.seg)));
@@ -1789,15 +1907,73 @@ function pageLede(){
   if(scn==="pod") return "These are the recommended seats. One person may hold more than one. Choose a seat. Its states light up, and its accounts are listed beside the map.";
   return "Choose a person. Their states light up, and their accounts are listed beside the map.";
 }
+let ROOM_VIEW=null;
+function bookBand(x){
+  if(bookView==="adj"){
+    const s=(ROOM_PACK&&ROOM_PACK.seats||[]).find(s=>s.id===x);
+    return s?s.band:"ent";
+  }
+  const rows=bookRows(x);
+  if(rows.some(r=>r.segment==="State"||r.segment==="Local ENT")) return "ent";
+  if(rows.some(r=>r.segment==="Local SMG")) return "smg";
+  return "ent";
+}
+function bookCard(x){
+  const rows=bookRows(x);
+  const band=bookBand(x);
+  const links=L.filter(l=>l.xp===x);
+  const stateAes=links.filter(l=>l.side==="State").sort((a,b)=>b.n-a.n||a.person.localeCompare(b.person));
+  const localAes=links.filter(l=>l.side!=="State").sort((a,b)=>b.n-a.n||a.person.localeCompare(b.person));
+  const n=rows.length;
+  const arr=rows.reduce((a,r)=>a+r.arr,0);
+  const aes=new Set(links.map(l=>l.person));
+  const hasEnt=rows.some(r=>r.segment==="State"||r.segment==="Local ENT"||r.segment==="Federal");
+  const hasSmg=rows.some(r=>r.segment==="Local SMG");
+  const cls=hasEnt&&hasSmg?"mixed":hasSmg?"local":"state";
+  const meta=XPMETA[xpPerson(x)];
+  const level=bookView==="adj"?(band==="smg"?"XP1":"XP2–4"):(meta&&meta[2]&&meta[2]!=="—"&&meta[2]!=="n/a"?meta[2]:"");
+  const xp1ent=bookView!=="adj"&&level==="XP1"&&hasEnt;
+  const cap=band==="smg"?ROOM_CAP.smg:ROOM_CAP.ent;
+  const over=n>cap;
+  const title=bookView==="adj"?seatTitle(x):x;
+  const where=bookView==="adj"&&SEAT_WHERE[x]?SEAT_WHERE[x]:(stateText(rows)||"No state listed");
+  const role=xp1ent?"XP1 on enterprise":level;
+  const aeLine=l=>`<div class="flowae${isGapName(l.person)?" gapname":""}" title="${esc(l.n+" accounts, "+fmt$(l.arr))}"><span>${esc(l.person)}</span><b>${l.n}</b></div>`;
+  const sides=band==="smg"
+    ? `<div><div class="flowh">Account executives</div>${localAes.concat(stateAes).map(aeLine).join("")||"<div class=\"flowae quiet\">None</div>"}</div>`
+    : `<div><div class="flowh">State and federal</div>${stateAes.map(aeLine).join("")||"<div class=\"flowae quiet\">None</div>"}</div><div><div class="flowh">Local</div>${localAes.map(aeLine).join("")||"<div class=\"flowae quiet\">None</div>"}</div>`;
+  return `<button type="button" class="bookcard ${cls}${sel&&sel.xp===x?" on":""}" data-xp="${esc(x)}">
+    <div class="bookhead"><span class="bookname">${esc(title)}</span><span class="bookrole${xp1ent?" mark":""}">${esc(role)}</span></div>
+    <div class="bookstats">
+      <span class="bookstat"><strong class="${over?"mark":""}">${n}</strong><span>Accounts</span></span>
+      <span class="bookstat"><strong>${fmt$(arr)}</strong><span>ARR</span></span>
+      <span class="bookstat"><strong>${aes.size}</strong><span>${aes.size===1?"AE":"AEs"}</span></span>
+    </div>
+    <div class="bookstates">${esc(where)}</div>
+    <div class="bookflow">${sides}</div>
+  </button>`;
+}
+function renderBookCards(){
+  const board=document.getElementById("board");
+  board.className="cards";
+  const bands=[{id:"ent", title:"Local enterprise and state"},{id:"smg", title:"Midmarket"}];
+  board.innerHTML=bands.map(band=>{
+    const ids=XP_ORDER.filter(x=>bookBand(x)===band.id).slice().sort((a,b)=>bookRows(b).length-bookRows(a).length||seatTitle(a).localeCompare(seatTitle(b)));
+    if(!ids.length) return "";
+    const head=bookView==="adj"?`<h2 class="bookband">${esc(band.title)}</h2>`:"";
+    return `${head}<div class="bookgrid">${ids.map(bookCard).join("")}</div>`;
+  }).join("");
+  board.querySelectorAll(".bookcard").forEach(el=>el.addEventListener("click",()=>select({xp:el.dataset.xp})));
+}
 function render(){
+  assignSeats();
+  recompute();
   document.getElementById("theory").hidden=true;
   document.getElementById("numbers").hidden=true;
   document.getElementById("room").hidden=false;
-  document.getElementById("stage").hidden=true;
   document.getElementById("filters").hidden=true;
-  document.getElementById("linkbar").hidden=true;
   document.getElementById("tables").hidden=true;
-  document.getElementById("detail").hidden=true;
+  document.getElementById("roomstage").hidden=true;
   document.body.dataset.view="room";
   document.querySelector("h1").textContent = bookView==="adj" ? "2027" : "2026";
   document.title = document.querySelector("h1").textContent;
@@ -1807,8 +1983,27 @@ function render(){
   });
   document.getElementById("viewmap").setAttribute("aria-selected", roomPane==="map" ? "true" : "false");
   document.getElementById("viewlines").setAttribute("aria-selected", roomPane==="lines" ? "true" : "false");
+  document.getElementById("viewbooks").setAttribute("aria-selected", roomPane==="books" ? "true" : "false");
   document.getElementById("viewtable").setAttribute("aria-selected", roomPane==="table" ? "true" : "false");
   renderRoom();
+  const lines=roomPane==="lines", books=roomPane==="books", table=roomPane==="table";
+  const stage=document.getElementById("stage");
+  stage.hidden=table;
+  stage.classList.toggle("links", lines);
+  stage.classList.toggle("books", books);
+  document.getElementById("linkbar").hidden=!lines;
+  document.getElementById("roomtable").hidden=!table;
+  layout = lines ? "links" : books ? "cards" : "map";
+  if(table){
+    document.getElementById("detail").hidden=true;
+    const showTerrs=bookView==="adj" ? ROOM_VIEW.modelTerrs : ROOM_VIEW.curTerrs;
+    renderRoomTable(showTerrs, ROOM_VIEW.seats);
+    return;
+  }
+  if(lines) renderLinks();
+  else if(books) renderBookCards();
+  else renderMap();
+  applySel();
 }
 function select(t){
   const same = sel && ((t.xp && sel.xp===t.xp)||(t.ae && sel.ae===t.ae)||(t.state && sel.state===t.state));
@@ -1817,12 +2012,29 @@ function select(t){
 }
 function applySel(){
   const detail=document.getElementById("detail");
+  if(layout==="cards"){
+    document.querySelectorAll(".bookcard.on").forEach(el=>el.classList.remove("on"));
+    if(!sel || !sel.xp){ detail.hidden=true; detail.innerHTML=""; return; }
+    const card=document.querySelector(`.bookcard[data-xp="${CSS.escape(sel.xp)}"]`);
+    if(card) card.classList.add("on");
+    const mine=L.filter(l=>l.xp===sel.xp).sort((a,b)=>b.arr-a.arr);
+    const st=mine.filter(l=>l.side==="State"), lo=mine.filter(l=>l.side!=="State");
+    const n=mine.reduce((a,l)=>a+l.n,0), arr=mine.reduce((a,l)=>a+l.arr,0);
+    const heading=bookView==="adj"?seatTitle(sel.xp):sel.xp;
+    const band=bookBand(sel.xp);
+    detail.hidden=false;
+    detail.innerHTML=band==="smg"
+      ? `<div class="card full"><h3>${esc(heading)}</h3><p class="stat">${n} accounts, ${fmt$(arr)}</p>${lo.concat(st).map(l=>partnerBlock(l,false)).join("")||'<p class="stat">None.</p>'}</div>`
+      : `<div class="card"><h3>${esc(heading)}</h3><p class="stat">State and federal · ${st.length}</p>${st.map(l=>partnerBlock(l,false)).join("")||'<p class="stat">None.</p>'}</div>
+      <div class="card"><h3>Local</h3><p class="stat">${lo.length} · ${n} accounts, ${fmt$(arr)}</p>${lo.map(l=>partnerBlock(l,false)).join("")||'<p class="stat">None.</p>'}</div>`;
+    return;
+  }
   if(layout!=="links"){
     detail.hidden=true;
     document.querySelectorAll("#board .st").forEach(el=>{
       const seats=(el.dataset.seats||"").split("|").filter(Boolean);
       const on=!!sel && ((sel.state && el.dataset.st===sel.state) || (sel.xp && seats.includes(sel.xp)));
-      el.classList.toggle("on", !!on && !el.classList.contains("empty"));
+      el.classList.toggle("on", !!on && (!el.classList.contains("empty") || !!(sel && sel.xp && seats.includes(sel.xp))));
       el.classList.toggle("dim", !!sel && !on && !el.classList.contains("empty"));
     });
     document.querySelectorAll("#board .stlabel").forEach(el=>{
@@ -1852,7 +2064,7 @@ function applySel(){
     const mine=L.filter(l=>l.xp===sel.xp).sort((a,b)=>b.arr-a.arr);
     const st=mine.filter(l=>l.side==="State"), lo=mine.filter(l=>l.side==="Local");
     const n=mine.reduce((a,l)=>a+l.n,0), arr=mine.reduce((a,l)=>a+l.arr,0);
-    const heading=scn==="pod" ? seatTitle(sel.xp) : sel.xp;
+    const heading=bookView==="adj" || scn==="pod" ? seatTitle(sel.xp) : sel.xp;
     detail.innerHTML=`<div class="card"><h3>${esc(heading)}</h3><p class="stat">State and federal · ${st.length}</p>${st.map(l=>partnerBlock(l,false)).join("")||'<p class="stat">None.</p>'}</div>
       <div class="card"><h3>Local and vertical</h3><p class="stat">${lo.length} · ${n} accounts, ${fmt$(arr)} in total</p>${lo.map(l=>partnerBlock(l,false)).join("")||'<p class="stat">None.</p>'}</div>`;
   } else {
@@ -1896,11 +2108,13 @@ document.querySelector(".jump").addEventListener("click", e=>{
   if(!btn || bookView===btn.dataset.book) return;
   bookView=btn.dataset.book;
   roomSel=null;
+  sel=null;
   render();
   window.scrollTo(0,0);
 });
 document.getElementById("viewmap").addEventListener("click", ()=>setLayout("map"));
 document.getElementById("viewlines").addEventListener("click", ()=>setLayout("links"));
+document.getElementById("viewbooks").addEventListener("click", ()=>setLayout("books"));
 document.getElementById("viewtable").addEventListener("click", ()=>setLayout("table"));
 document.getElementById("diagram").addEventListener("click", e=>{
   const btn=e.target.closest("[data-kind]");
@@ -1978,6 +2192,7 @@ function summary(){
     const ae=new Set(mine.map(r=>r.person)).size;
     const ent=c.filter(r=>r.ent).length;
     const person=xpPerson(x);
+    if(!XPMETA[person]) return "";
     const cur=new Set(ROWS.filter(r=>r.cur===person).map(r=>r.person)).size;
     const cx=c.filter(r=>r.ncap>7).length;
     const moved=c.filter(r=>r.newxp!==r.cur).length;
