@@ -294,7 +294,8 @@ td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
     </nav>
     <div class="switch" role="tablist" aria-label="View">
       <button type="button" id="viewmap" role="tab" aria-selected="true">Map</button>
-      <button type="button" id="viewlines" role="tab" aria-selected="false">Books</button>
+      <button type="button" id="viewlines" role="tab" aria-selected="false">Lines</button>
+      <button type="button" id="viewbooks" role="tab" aria-selected="false">Books</button>
       <button type="button" id="viewtable" role="tab" aria-selected="false">Table</button>
     </div>
   </div>
@@ -1954,23 +1955,25 @@ function render(){
   });
   document.getElementById("viewmap").setAttribute("aria-selected", roomPane==="map" ? "true" : "false");
   document.getElementById("viewlines").setAttribute("aria-selected", roomPane==="lines" ? "true" : "false");
+  document.getElementById("viewbooks").setAttribute("aria-selected", roomPane==="books" ? "true" : "false");
   document.getElementById("viewtable").setAttribute("aria-selected", roomPane==="table" ? "true" : "false");
   renderRoom();
-  const lines=roomPane==="lines", table=roomPane==="table";
+  const lines=roomPane==="lines", books=roomPane==="books", table=roomPane==="table";
   const stage=document.getElementById("stage");
   stage.hidden=table;
-  stage.classList.toggle("links", false);
-  stage.classList.toggle("books", lines);
-  document.getElementById("linkbar").hidden=true;
+  stage.classList.toggle("links", lines);
+  stage.classList.toggle("books", books);
+  document.getElementById("linkbar").hidden=!lines;
   document.getElementById("roomtable").hidden=!table;
-  layout = lines ? "cards" : "map";
+  layout = lines ? "links" : books ? "cards" : "map";
   if(table){
     document.getElementById("detail").hidden=true;
     const showTerrs=bookView==="adj" ? ROOM_VIEW.modelTerrs : ROOM_VIEW.curTerrs;
     renderRoomTable(showTerrs, ROOM_VIEW.seats);
     return;
   }
-  if(lines) renderBookCards();
+  if(lines) renderLinks();
+  else if(books) renderBookCards();
   else renderMap();
   applySel();
 }
@@ -2083,6 +2086,7 @@ document.querySelector(".jump").addEventListener("click", e=>{
 });
 document.getElementById("viewmap").addEventListener("click", ()=>setLayout("map"));
 document.getElementById("viewlines").addEventListener("click", ()=>setLayout("links"));
+document.getElementById("viewbooks").addEventListener("click", ()=>setLayout("books"));
 document.getElementById("viewtable").addEventListener("click", ()=>setLayout("table"));
 document.getElementById("diagram").addEventListener("click", e=>{
   const btn=e.target.closest("[data-kind]");
