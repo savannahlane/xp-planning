@@ -1086,17 +1086,6 @@ function roomCurrentTerritories(){
     return t;
   }).sort((a,b)=>b.n-a.n || a.label.localeCompare(b.label));
 }
-function roomCurrentTerritories(){
-  const by = {};
-  const segOf = {"Local ENT":"Local enterprise", "State":"State", "Local SMG":"Midmarket"};
-  for(const r of ROWS_ALL){
-    if(r.alloc || !r.terr) continue;
-    const seg = segOf[r.segment];
-    if(!seg) continue;
-    roomAccumulate(by, r.segment+"::"+r.terr, r.terr, seg, r);
-  }
-  return Object.values(by).sort((a,b)=>a.label.localeCompare(b.label) || a.seg.localeCompare(b.seg));
-}
 function roomBundles(terrs, band){
   const cap = ROOM_AIM[band];
   const groups = {};
@@ -1286,7 +1275,7 @@ function renderRoomDiagram(terrs, seats, byTerr){
       if(ai!=null && bi!=null) return ai-bi;
       if(ai!=null) return -1;
       if(bi!=null) return 1;
-      return a.label.localeCompare(b.label) || a.seg.localeCompare(b.seg);
+      return b.n-a.n || a.label.localeCompare(b.label);
     });
     let body, aside;
     if(bookView==="adj"){
