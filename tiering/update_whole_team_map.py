@@ -25,8 +25,8 @@ that landed on main and changes only the proposed assignment (`newxp`):
 * `podxp` is a third view. It staffs pods from the account's state and segment
   and does not change `cur` or `newxp`.
 * `mterr` is the territory model: 16 local enterprise territories, 20 state
-  territories, and 37 local midmarket territories. It does not change who
-  holds a seat.
+  territories, and 37 local midmarket territories. Federal stays one book. It
+  does not change who holds a seat.
 
 Per-account moves live in account_overrides.csv, which is the file to edit when
 an XP changes. It also carries segment changes and removals.
