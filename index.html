@@ -37,18 +37,26 @@
 body{margin:0;background:var(--bg);color:var(--ink);font:400 15px/1.45 Barlow,"Segoe UI",Helvetica,Arial,sans-serif}
 button,select,input{font:inherit;color:inherit}
 button:focus-visible,select:focus-visible,input:focus-visible,.st:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.page{max-width:1120px;margin:0 auto;padding:28px 24px 72px}
-h1{font:600 26px/1.2 Barlow,sans-serif;margin:0}
-.lede{margin:6px 0 0;color:var(--muted);max-width:46rem}
+.page{max-width:1240px;margin:0 auto;padding:0 24px 72px}
+h1{font-family:Fraunces,Georgia,serif;font-weight:500;font-size:42px;letter-spacing:-.03em;line-height:1.1;margin:18px 0 0}
+.lede{margin:8px 0 0;color:var(--muted);max-width:44rem;font-size:16px;line-height:1.5}
 #podnote{margin:4px 0 0}
-.bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;margin-top:18px}
-.showing{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:14px}
+.jump{
+  position:sticky;top:0;z-index:30;
+  display:flex;flex-wrap:wrap;gap:4px;
+  margin:0 -24px 6px;padding:12px 24px;
+  background:var(--bg);border-bottom:1px solid var(--line);
+}
+.jump button{
+  border:0;background:transparent;border-radius:999px;
+  padding:7px 12px;cursor:pointer;color:var(--muted);font-size:14.5px;
+}
+.jump button[aria-current="page"]{background:var(--ink);color:var(--bg);font-weight:600}
+.tools{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;margin-top:16px}
+.tools .switch{margin-top:0}
 select,.pick>button,input[type="search"]{
   background:var(--card);border:1px solid var(--line);border-radius:8px;padding:7px 10px;
 }
-.showing select{color:var(--ink);font-weight:600}
-.textbtn{background:none;border:0;padding:7px 2px;color:var(--accent);cursor:pointer}
-.textbtn.on{font-weight:600}
 .glance{margin:0 0 0 auto;color:var(--muted);font-size:14px}
 .filters{display:flex;flex-wrap:wrap;gap:14px 18px;align-items:end;margin-top:10px}
 .fld{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted)}
@@ -82,9 +90,9 @@ select,.pick>button,input[type="search"]{
   position:fixed;z-index:8;max-width:280px;background:var(--ink);color:var(--bg);
   border-radius:6px;padding:6px 8px;font-size:13px;pointer-events:none;
 }
-.side{background:var(--card);border:1px solid var(--line);border-radius:12px;max-height:min(540px,calc(100vh - 180px));display:flex;flex-direction:column;overflow:hidden;position:sticky;top:12px}
-.find{padding:10px 10px 0}
-.find input{width:100%;border-radius:8px}
+.side{background:var(--card);border:1px solid var(--line);border-radius:12px;max-height:min(540px,calc(100vh - 180px));display:flex;flex-direction:column;overflow:hidden;position:sticky;top:68px}
+.filters .find{padding:0;min-width:14rem}
+.find input{width:100%;border-radius:8px;min-width:14rem}
 #list{overflow:auto;flex:1 1 auto;min-height:0;padding:4px 6px 10px}
 .listhead,.row{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
 .listhead{position:sticky;top:0;background:var(--card);padding:8px 8px 6px;color:var(--muted);font-size:12px}
@@ -160,11 +168,7 @@ td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
 .link.state{stroke:var(--state)} .link.local{stroke:var(--local)} .link.none{stroke:var(--gap);stroke-dasharray:5 4}
 .dim .link{opacity:.08} .dim .node{opacity:.35}
 .dim .link.on{opacity:.9} .dim .node.on{opacity:1}
-body[data-view="room"] .page{max-width:1240px;padding-top:36px;position:relative}
-body[data-view="room"] .bar{position:absolute;top:40px;right:24px;margin:0}
-body[data-view="room"] h1{font-family:Fraunces,Georgia,serif;font-weight:500;font-size:42px;letter-spacing:-.03em}
-body[data-view="room"] .lede{max-width:44rem;font-size:16px;line-height:1.5}
-.switch{display:inline-flex;gap:2px;margin-top:22px;padding:3px;background:var(--card);border:1px solid var(--line);border-radius:999px}
+.switch{display:inline-flex;gap:2px;padding:3px;background:var(--card);border:1px solid var(--line);border-radius:999px}
 .switch button{border:0;background:transparent;border-radius:999px;padding:8px 18px;cursor:pointer;color:var(--muted)}
 .switch button[aria-selected="true"]{background:var(--ink);color:var(--bg);font-weight:600}
 .roomnote{margin:14px 0 0;max-width:46rem;color:var(--muted)}
@@ -175,7 +179,7 @@ body[data-view="room"] .lede{max-width:44rem;font-size:16px;line-height:1.5}
 .figure span{display:block;margin-top:8px;font-size:13.5px}
 .figure em{display:block;margin-top:8px;font-style:normal;color:var(--muted);font-size:12.5px;line-height:1.35}
 .roomstage{display:grid;grid-template-columns:minmax(280px,.86fr) minmax(0,1.14fr);gap:28px;align-items:start;margin-top:26px}
-.mapcard{position:sticky;top:16px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 16px 12px}
+.mapcard{position:sticky;top:68px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 16px 12px}
 .maphead h2,.bandhead h2{font-family:Fraunces,Georgia,serif;font-weight:500;font-size:22px;letter-spacing:-.02em;margin:0}
 .maphead p,#maplegend{margin:4px 0 8px;color:var(--muted);font-size:13px;line-height:1.4}
 #roommap svg{display:block;width:100%;height:auto}
@@ -219,12 +223,13 @@ body[data-view="room"] .lede{max-width:44rem;font-size:16px;line-height:1.5}
 .align.on .rrow,.seatgroup.on .rrow,.seatgroup.on .seatcard{background:color-mix(in srgb, var(--accent) 7%, transparent)}
 .chip.on{border-color:var(--accent);background:color-mix(in srgb, var(--accent) 8%, var(--card))}
 @media (max-width:800px){
+  .page{padding-left:16px;padding-right:16px}
+  .jump{margin-left:-16px;margin-right:-16px;padding-left:16px;padding-right:16px}
   .stage,.tiergrid,.detail{grid-template-columns:1fr}
   .tiergrid .card:last-child{grid-column:auto}
   .glance{margin-left:0}
-  .side{max-height:420px}
-  body[data-view="room"] h1{font-size:32px}
-  body[data-view="room"] .bar{position:static;margin-top:18px}
+  .side{max-height:420px;top:108px}
+  h1{font-size:32px}
   .figure b{font-size:30px}
   .figures{gap:8px}
   .figure{padding:12px}
@@ -239,24 +244,27 @@ body[data-view="room"] .lede{max-width:44rem;font-size:16px;line-height:1.5}
 </head>
 <body>
 <div class="page">
-  <h1>Who covers the US</h1>
-  <p class="lede">Choose a person. Their states light up, and their accounts are listed beside the map.</p>
+  <nav class="jump" aria-label="Pages">
+    <button type="button" data-go="room" data-book="cur" aria-current="page">2026</button>
+    <button type="button" data-go="room" data-book="adj">2027</button>
+    <button type="button" data-go="cur">Who holds them today</button>
+    <button type="button" data-go="new">Proposed plan</button>
+    <button type="button" data-go="pod">Recommended seats</button>
+    <button type="button" data-go="model">Territory model</button>
+    <button type="button" data-go="numbers">Account numbers</button>
+    <button type="button" data-go="theory">The approach</button>
+  </nav>
+
+  <h1>2026</h1>
+  <p class="lede">XP1 partners hold midmarket, and XP2, XP3, and XP4 partners hold local enterprise and state. Federal stays one book.</p>
   <p class="lede" id="podnote" hidden>These are the recommended seats. One person may hold more than one.</p>
 
-  <div class="bar">
-    <label class="showing">Showing
-      <select id="plan">
-        <option value="room" selected>The book</option>
-        <option value="numbers">Account numbers</option>
-        <option value="new">Proposed plan</option>
-        <option value="cur">Who holds them today</option>
-        <option value="pod">Recommended seats</option>
-        <option value="model">Territory model</option>
-        <option value="theory">The approach</option>
-      </select>
-    </label>
-    <button type="button" class="textbtn" id="filterbtn" aria-expanded="false" aria-controls="filters">Filter</button>
-    <button type="button" class="textbtn" id="modebtn">Who works with whom</button>
+  <div class="tools" id="tools" hidden>
+    <div class="switch" role="tablist" aria-label="View">
+      <button type="button" id="viewmap" role="tab" aria-selected="true">Map</button>
+      <button type="button" id="viewlines" role="tab" aria-selected="false">Lines</button>
+      <button type="button" id="viewtable" role="tab" aria-selected="false">Table</button>
+    </div>
     <p class="glance" id="glance"></p>
   </div>
   <div class="filters" id="filters" hidden>
@@ -277,6 +285,9 @@ body[data-view="room"] .lede{max-width:44rem;font-size:16px;line-height:1.5}
         </div>
       </div>
     </div>
+    <label class="fld find">Find
+      <input id="q" type="search" placeholder="Find a person" aria-label="Find a person">
+    </label>
   </div>
   <div class="filters" id="linkbar" hidden>
     <label class="fld">Line thickness
@@ -293,20 +304,15 @@ body[data-view="room"] .lede{max-width:44rem;font-size:16px;line-height:1.5}
     </label>
   </div>
 
-  <div class="stage" id="stage">
+  <div class="stage" id="stage" hidden>
     <div id="board"></div>
     <aside class="side">
-      <div class="find"><input id="q" type="search" placeholder="Find a person" aria-label="Find a person"></div>
       <div id="list"></div>
     </aside>
   </div>
   <div class="detail" id="detail" hidden></div>
 
-  <article id="room" class="room" hidden>
-    <div class="switch" role="tablist" aria-label="Book">
-      <button type="button" id="bookcur" role="tab" aria-selected="true" aria-controls="roomstage">Current book</button>
-      <button type="button" id="bookadj" role="tab" aria-selected="false" aria-controls="roomstage">Adjusted book</button>
-    </div>
+  <article id="room" class="room">
     <p class="roomnote" id="roomnote"></p>
     <div class="figures" id="counts"></div>
     <div class="figures" id="stats"></div>
@@ -388,8 +394,7 @@ body[data-view="room"] .lede{max-width:44rem;font-size:16px;line-height:1.5}
     <p class="hint" id="theoryfit"></p>
   </article>
 
-  <details class="more">
-    <summary>Tables, tiers, and sources</summary>
+  <div class="more" id="tables" hidden>
   <section>
     <h2>Book check</h2>
     <p class="hint" style="margin-bottom:10px">Counts exclude allocated child records. "AEs today" is the same count under current assignments. Complex means more than 7 capabilities. The proposed view removes account books from Jake Sager, Savannah Lane, Kristen Murphy and Ashley Hill; the current view remains historical. Nathan Williamson has left the team, and his federal accounts sit with Jr Wycinsky. The proposed view adds the US state logos and expansion ARR from the visible Q3 FY2027 pipeline extract. UK pipeline stays off this map.</p>
@@ -416,7 +421,7 @@ body[data-view="room"] .lede{max-width:44rem;font-size:16px;line-height:1.5}
   </section>
 
     <p class="hint">Sources: Account Team export 9/21/26, State map 6/12/26, Local ENT and Local SMG maps 6/30/26, vertical maps 7/2/26.</p>
-  </details>
+  </div>
 </div>
 
 <script>
@@ -554,11 +559,7 @@ ROWS = ROWS_ALL.filter(r => segMatch(r) && !(scn==="cur" && r.pipe) && terrMatch
 ROWS = ROWS.map(r => (scn==="new" || scn==="pod") && r.fy27 ? {...r, arr: r.arr + r.fy27} : r);
 for (const r of ROWS) r.xp = xpOf(r);
 const podnote=document.getElementById("podnote");
-if(podnote){
-  podnote.hidden = scn!=="pod" && scn!=="model";
-  if(scn==="pod") podnote.textContent="These are the recommended seats. One person may hold more than one.";
-  if(scn==="model") podnote.textContent="16 local enterprise territories, 20 state, and 37 midmarket. Federal stays one book.";
-}
+if(podnote) podnote.hidden = true;
 const findInput=document.getElementById("q");
 if(findInput) findInput.placeholder = scn==="model" ? "Find a territory" : "Find a person";
 const order = scn==="model" && PAGE.modelOrder ? PAGE.modelOrder : scn==="pod" && PAGE.podOrder ? PAGE.podOrder : ORDER_ALL;
@@ -945,13 +946,14 @@ function glance(){
     : "No accounts in this view";
 }
 function filterLabel(){
+  const btn=document.getElementById("filterbtn");
+  if(!btn) return;
   const parts=[];
   if(seg==="ent") parts.push("Enterprise");
   else if(seg==="smg") parts.push("Local SMG");
   else if(seg==="oth") parts.push("Federal");
   if(terrOn.size===1) parts.push([...terrOn][0]);
   else if(terrOn.size>1) parts.push(terrOn.size+" territories");
-  const btn=document.getElementById("filterbtn");
   btn.textContent=parts.length ? parts.join(" · ") : "Filter";
   btn.classList.toggle("on", parts.length>0);
 }
@@ -1407,7 +1409,7 @@ function renderRoom(){
   const adj = roomStats(modelTerrs, byTerr, "adj");
   const active = bookView==="adj" ? adj : cur;
   const other = bookView==="adj" ? cur : adj;
-  const otherName = bookView==="adj" ? "Current book" : "Adjusted book";
+  const otherName = bookView==="adj" ? "2026" : "2027";
   const countTerrs = bookView==="adj" ? modelTerrs : curTerrs;
   const nLent = countTerrs.filter(t=>t.seg==="Local enterprise").length;
   const nState = countTerrs.filter(t=>t.seg==="State").length;
@@ -1418,8 +1420,6 @@ function renderRoom(){
   document.querySelector(".lede").textContent = bookView==="cur"
     ? levelRule
     : `I would recommend ${entSeats.length} seats for local enterprise and state, and ${smgSeats.length} seats for midmarket. An enterprise seat aims at ${ROOM_AIM.ent} and stops at ${ROOM_CAP.ent}. A midmarket seat stops at ${ROOM_CAP.smg}.`;
-  document.getElementById("bookcur").setAttribute("aria-selected", bookView==="cur" ? "true" : "false");
-  document.getElementById("bookadj").setAttribute("aria-selected", bookView==="adj" ? "true" : "false");
   document.getElementById("roomnote").textContent = bookView==="cur"
     ? "An XP1 on local enterprise or state is marked."
     : levelRule + " A seat stays within an hour of every state on it.";
@@ -1613,49 +1613,66 @@ function drawRoomLines(){
     svg.innerHTML = paths;
   });
 }
-function setBook(v){
-  if(bookView===v) return;
-  bookView = v;
-  roomSel = null;
-  renderRoom();
+function pageTitle(){
+  if(scn==="room") return bookView==="adj" ? "2027" : "2026";
+  if(scn==="numbers") return "Account numbers";
+  if(scn==="theory") return "The approach";
+  if(scn==="model") return "Territory model";
+  if(scn==="pod") return "Recommended seats";
+  if(scn==="new") return "Proposed plan";
+  return "Who holds them today";
 }
-
-
+function pageLede(){
+  if(scn==="numbers") return "Enterprise is every state account and every local enterprise account. Midmarket is local SMG. Each row is the places in one book. Federal accounts stay on the federal book.";
+  if(scn==="theory") return "The rules, the bands, and the seats. A person is named only for a carve-out.";
+  if(scn==="room") return "";
+  if(layout==="table") return "Book check, tiers, and the load on each account executive.";
+  if(layout==="links") return "Each line joins an account executive to the partner on that book.";
+  if(scn==="model") return "16 local enterprise territories, 20 state, and 37 midmarket. Federal stays one book. Choose a territory. Its states light up, and its accounts are listed beside the map.";
+  if(scn==="pod") return "These are the recommended seats. One person may hold more than one. Choose a seat. Its states light up, and its accounts are listed beside the map.";
+  return "Choose a person. Their states light up, and their accounts are listed beside the map.";
+}
 function render(){
   const theory=scn==="theory";
   const numbers=scn==="numbers";
   const room=scn==="room";
-  const quiet=theory || numbers || room;
-  const links=!quiet && layout==="links";
+  const work=!theory && !numbers && !room;
+  const links=work && layout==="links";
+  const table=work && layout==="table";
   document.getElementById("theory").hidden=!theory;
   document.getElementById("numbers").hidden=!numbers;
   document.getElementById("room").hidden=!room;
   document.body.dataset.view=room?"room":"";
-  document.getElementById("stage").hidden=quiet;
-  document.querySelector("h1").textContent=room?"The book":numbers?"Account numbers":theory?"How the coverage is designed":"Who covers the US";
-  document.querySelector(".lede").textContent=numbers
-    ? "Enterprise is every state account and every local enterprise account. Midmarket is local SMG. Each row is the places in one book. Federal accounts stay on the federal book."
-    : theory
-    ? "The rules, the bands, and the seats. A person is named only for a carve-out."
-    : scn==="model"
-      ? "Choose a territory. Its states light up, and its accounts are listed beside the map."
-      : "Choose a person. Their states light up, and their accounts are listed beside the map.";
-  document.querySelector(".more").hidden=quiet;
-  document.getElementById("modebtn").hidden=quiet;
-  document.getElementById("filterbtn").hidden=numbers || room;
-  if(numbers || room){
-    document.getElementById("filters").hidden=true;
-    document.getElementById("filterbtn").setAttribute("aria-expanded","false");
-  }
+  document.getElementById("stage").hidden=!work || table;
+  document.getElementById("tools").hidden=!work;
+  document.getElementById("tables").hidden=!table;
+  document.getElementById("filters").hidden=room || numbers;
+  document.querySelector(".find").hidden=!work || layout!=="map";
+  document.querySelector("h1").textContent=pageTitle();
+  document.title=pageTitle();
+  const lede=pageLede();
+  if(lede) document.querySelector(".lede").textContent=lede;
+  document.querySelectorAll(".jump button").forEach(btn=>{
+    const on=btn.dataset.go==="room" ? room && bookView===(btn.dataset.book||"cur") : btn.dataset.go===scn;
+    if(on) btn.setAttribute("aria-current","page");
+    else btn.removeAttribute("aria-current");
+  });
+  document.getElementById("viewmap").setAttribute("aria-selected", work && !links && !table ? "true" : "false");
+  document.getElementById("viewlines").setAttribute("aria-selected", links ? "true" : "false");
+  document.getElementById("viewtable").setAttribute("aria-selected", table ? "true" : "false");
   document.getElementById("stage").classList.toggle("links", links);
-  document.getElementById("modebtn").textContent=links?"Back to the map":"Who works with whom";
   document.getElementById("linkbar").hidden=!links;
-  document.getElementById("glance").hidden=links || room;
+  document.getElementById("glance").hidden=links;
   if(room){ document.getElementById("detail").hidden=true; renderRoom(); return; }
   if(numbers){ document.getElementById("detail").hidden=true; renderNumbers(); glance(); return; }
   if(theory){ document.getElementById("detail").hidden=true; renderTheory(); glance(); filterLabel(); return; }
+  if(table){
+    document.getElementById("detail").hidden=true;
+    glance(); filterLabel();
+    return;
+  }
   if(!XP_ORDER.length){
-    document.getElementById("board").innerHTML=`<p class="blank">Nothing to show. Try another plan or clear the filter.</p>`;
+    document.getElementById("board").innerHTML=`<p class="blank">Nothing to show. Clear the filter.</p>`;
     document.getElementById("list").innerHTML="";
     document.getElementById("detail").hidden=true;
     glance(); filterLabel();
@@ -1740,11 +1757,40 @@ function partnerBlock(l, showXp){
   </div>`;
 }
 
+function go(next, book){
+  if(next==="room"){
+    const view=book||"cur";
+    if(scn==="room" && bookView===view) return;
+    scn="room";
+    bookView=view;
+    roomSel=null;
+  } else {
+    if(scn===next && layout==="map") return;
+    scn=next;
+    sel=null;
+    layout="map";
+  }
+  refresh();
+  window.scrollTo(0,0);
+}
+function setLayout(next){
+  if(!document.getElementById("tools") || document.getElementById("tools").hidden) return;
+  if(layout===next) return;
+  layout=next;
+  sel=null;
+  render();
+  window.scrollTo(0,0);
+}
 function refresh(){ sel=null; recompute(); render(); tables(); summary(); tiers(); }
 renderTerr();
-document.getElementById("plan").addEventListener("change", e=>{ scn=e.target.value; roomSel=null; refresh(); });
-document.getElementById("bookcur").addEventListener("click", ()=>setBook("cur"));
-document.getElementById("bookadj").addEventListener("click", ()=>setBook("adj"));
+document.querySelector(".jump").addEventListener("click", e=>{
+  const btn=e.target.closest("button[data-go]");
+  if(!btn) return;
+  go(btn.dataset.go, btn.dataset.book);
+});
+document.getElementById("viewmap").addEventListener("click", ()=>setLayout("map"));
+document.getElementById("viewlines").addEventListener("click", ()=>setLayout("links"));
+document.getElementById("viewtable").addEventListener("click", ()=>setLayout("table"));
 document.getElementById("diagram").addEventListener("click", e=>{
   const btn=e.target.closest("[data-kind]");
   if(!btn) return;
@@ -1773,17 +1819,6 @@ document.getElementById("segment").addEventListener("change", e=>{ seg=e.target.
 document.getElementById("q").addEventListener("input", e=>{ q=e.target.value; if(layout==="map") renderSide(); });
 document.getElementById("weight").addEventListener("change", e=>{ weight=e.target.value; if(layout==="links") render(); });
 document.getElementById("labelby").addEventListener("change", e=>{ lbl=e.target.value; if(layout==="links") render(); });
-document.getElementById("modebtn").addEventListener("click", ()=>{
-  layout = layout==="map" ? "links" : "map";
-  sel=null;
-  render();
-});
-document.getElementById("filterbtn").addEventListener("click", e=>{
-  e.stopPropagation();
-  const panel=document.getElementById("filters");
-  panel.hidden=!panel.hidden;
-  document.getElementById("filterbtn").setAttribute("aria-expanded", String(!panel.hidden));
-});
 document.getElementById("filters").addEventListener("click", e=>e.stopPropagation());
 document.getElementById("terrbtn").addEventListener("click", e=>{
   e.stopPropagation();
@@ -1805,8 +1840,6 @@ document.getElementById("terropts").addEventListener("change", ()=>{
 document.addEventListener("click", ()=>{
   const terr=document.getElementById("terrpanel");
   if(terr && !terr.hidden){ terr.hidden=true; document.getElementById("terrbtn").setAttribute("aria-expanded","false"); }
-  const filters=document.getElementById("filters");
-  if(filters && !filters.hidden){ filters.hidden=true; document.getElementById("filterbtn").setAttribute("aria-expanded","false"); }
 });
 document.addEventListener("keydown", e=>{
   if(e.key!=="Escape") return;
