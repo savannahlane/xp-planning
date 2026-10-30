@@ -91,6 +91,7 @@ select,.pick>button,input[type="search"]{
 .hyporesult{margin:0 0 16px;max-width:44rem;font-size:16px;line-height:1.45}
 .hypogrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px}
 .hypogrid h2{font:500 20px/1.2 Fraunces,Georgia,serif;margin:0 0 8px}
+.hyponote{margin:-4px 0 8px;color:var(--muted);font-size:13px}
 .hypolist{display:flex;flex-direction:column;gap:6px}
 .hypoitem{display:flex;justify-content:space-between;gap:12px;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 12px;cursor:pointer}
 .hypoitem.on{border-color:var(--accent);box-shadow:inset 3px 0 0 var(--accent)}
@@ -1654,10 +1655,17 @@ function roomHypothesis(){
   const rows=ROWS_ALL.filter(r=>!r.alloc);
   const ent=rows.filter(r=>r.segment==="State"||r.segment==="Local ENT");
   const smg=rows.filter(r=>r.segment==="Local SMG");
-  const terrs=(PAGE.modelOrder||[]).map(id=>({
-    id, label:PAGE.modelLabel[id], seg:PAGE.modelSeg[id],
-    n:rows.filter(r=>r.mterr===id).length
-  })).filter(t=>t.seg==="Local enterprise"||t.seg==="State"||t.seg==="Midmarket");
+  let mmN=0;
+  const terrs=(PAGE.modelOrder||[]).flatMap(id=>{
+    const seg=PAGE.modelSeg[id];
+    if(seg!=="Local enterprise" && seg!=="State" && seg!=="Midmarket") return [];
+    const n=rows.filter(r=>r.mterr===id).length;
+    if(seg==="Midmarket"){
+      mmN+=1;
+      return [{id, seg, n, label:String(mmN), numbered:true}];
+    }
+    return [{id, seg, n, label:PAGE.modelLabel[id], numbered:false}];
+  });
   const entHave=8, entOpen=1, mmHave=12;
   const aim=ROOM_AIM.ent, stop=ROOM_CAP.ent, mmStop=ROOM_CAP.smg;
   const need=(n,cap)=>Math.ceil(n/cap);
@@ -1678,17 +1686,18 @@ function renderHypothesis(){
   const mmP=picked.filter(t=>t.seg==="Midmarket");
   const line=(list,cap,band)=>{
     if(!list.length) return "";
+    const kind=band==="ent"?"enterprise":"midmarket";
+    const word=`${list.length} ${kind} territor${list.length===1?"y":"ies"}`;
+    if(band==="smg") return `${word}.`;
     const n=list.reduce((a,t)=>a+t.n,0);
     const partners=Math.ceil(n/cap);
-    const rule=band==="ent"?`an aim of ${cap}`:`a stop of ${cap}`;
-    const kind=band==="ent"?"enterprise":"midmarket";
-    return `${list.length} ${kind} territor${list.length===1?"y":"ies"}, ${n} account${n===1?"":"s"}. Those accounts fit in ${partners} partner${partners===1?"":"s"} at ${rule}.`;
+    return `${word}, ${n} account${n===1?"":"s"}. Those accounts fit in ${partners} partner${partners===1?"":"s"} at an aim of ${cap}.`;
   };
   const result=picked.length
     ? [line(entP,h.aim,"ent"), line(mmP,h.mmStop,"smg")].filter(Boolean).join(" ")
     : "Select the territories in the conversation.";
-  const col=(title,seg)=>`<section><h2>${esc(title)}</h2><div class="hypolist">${h.terrs.filter(t=>t.seg===seg).map(t=>`<button type="button" class="hypoitem${hypoOn.has(t.id)?" on":""}" data-terr="${esc(t.id)}" aria-pressed="${hypoOn.has(t.id)?"true":"false"}"><span>${esc(t.label)}</span><b>${t.n}</b></button>`).join("")}</div></section>`;
-  board.innerHTML=`<p class="hyporesult">${esc(result)}</p><div class="hypogrid">${col("State","State")}${col("Local enterprise","Local enterprise")}${col("Midmarket","Midmarket")}</div>`;
+  const col=(title,seg,note)=>`<section><h2>${esc(title)}</h2>${note?`<p class="hyponote">${esc(note)}</p>`:""}<div class="hypolist">${h.terrs.filter(t=>t.seg===seg).map(t=>`<button type="button" class="hypoitem${hypoOn.has(t.id)?" on":""}" data-terr="${esc(t.id)}" aria-pressed="${hypoOn.has(t.id)?"true":"false"}"><span>${esc(t.label)}</span>${t.numbered?"":`<b>${t.n}</b>`}</button>`).join("")}</div></section>`;
+  board.innerHTML=`<p class="hyporesult">${esc(result)}</p><div class="hypogrid">${col("State","State")}${col("Local enterprise","Local enterprise")}${col("Midmarket","Midmarket","Special districts and SMG")}</div>`;
   board.querySelectorAll(".hypoitem").forEach(btn=>btn.addEventListener("click",()=>{
     if(hypoOn.has(btn.dataset.terr)) hypoOn.delete(btn.dataset.terr);
     else hypoOn.add(btn.dataset.terr);
