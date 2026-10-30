@@ -732,32 +732,55 @@ function renderLinks(){
   });
 }
 
+function placeList(counts){
+  const names=Object.entries(counts).sort((a,b)=>b[1]-a[1] || a[0].localeCompare(b[0])).map(([code])=>STATE_NAME[code]||code);
+  if(names.length<=1) return names[0]||"No state";
+  if(names.length===2) return `${names[0]} and ${names[1]}`;
+  return `${names.slice(0,-1).join(", ")}, and ${names[names.length-1]}`;
+}
+function bookPlaces(accts){
+  const counts={};
+  for(const r of accts) if(r.state) counts[r.state]=(counts[r.state]||0)+1;
+  const codes=Object.keys(counts);
+  if(codes.length===1 && codes[0]==="FL" && accts.every(r=>r.segment==="Local SMG")){
+    const south=/Aventura|Boca Raton|Coral Gables|Delray|Doral|Hallandale|Miramar|Palmetto Bay|Pembroke|Pinecrest|Sunrise|Tamarac|West Palm|Weston/;
+    if(accts.every(r=>south.test(r.acct))) return "South Florida";
+  }
+  if(codes.length===1 && codes[0]==="CA" && accts.every(r=>r.segment==="Local SMG")){
+    const north=/Napa|Cupertino|Sacramento|Mendocino|Santa Cruz|Belmont|Livermore|Dublin|Mountain View|Rohnert|Salinas|Merced|Pismo|Bear Valley|SMART/;
+    return accts.some(r=>north.test(r.acct))
+      ? "California, the Bay Area and the north, with accounts in the south"
+      : "California, Los Angeles, Orange County, inland, and San Diego";
+  }
+  return placeList(counts);
+}
 function renderNumbers(){
   const rows=ROWS_ALL.filter(r=>!r.alloc);
   const ent={}, smg={};
   for(const r of rows){
-    if(r.segment==="State" || r.segment==="Local ENT"){
-      const b=ent[r.newxp] ||= {state:0, local:0};
-      if(r.segment==="State") b.state++; else b.local++;
-    } else if(r.segment==="Local SMG"){
-      smg[r.newxp]=(smg[r.newxp]||0)+1;
-    }
+    if(r.segment==="State" || r.segment==="Local ENT") (ent[r.newxp] ||= []).push(r);
+    else if(r.segment==="Local SMG") (smg[r.newxp] ||= []).push(r);
   }
-  const entRows=Object.entries(ent).map(([xp,b])=>({xp, state:b.state, local:b.local, n:b.state+b.local}))
-    .sort((a,b)=>b.n-a.n || a.xp.localeCompare(b.xp));
-  const smgRows=Object.entries(smg).map(([xp,n])=>({xp, n}))
-    .sort((a,b)=>b.n-a.n || a.xp.localeCompare(b.xp));
+  const entRows=Object.values(ent).map(accts=>({
+    place:bookPlaces(accts),
+    state:accts.filter(r=>r.segment==="State").length,
+    local:accts.filter(r=>r.segment==="Local ENT").length,
+    n:accts.length,
+  })).sort((a,b)=>b.n-a.n || a.place.localeCompare(b.place));
+  const smgRows=Object.values(smg).map(accts=>({
+    place:bookPlaces(accts), n:accts.length,
+  })).sort((a,b)=>b.n-a.n || a.place.localeCompare(b.place));
   const entState=entRows.reduce((a,r)=>a+r.state,0);
   const entLocal=entRows.reduce((a,r)=>a+r.local,0);
-  const label=xp=>String(xp).startsWith("Open") ? "Open seat" : xp;
-  document.getElementById("entnums").innerHTML=`<thead><tr><th>XP</th><th class="n">State</th><th class="n">Local enterprise</th><th class="n">Accounts</th></tr></thead><tbody>${
-    entRows.map(r=>`<tr><td>${esc(label(r.xp))}</td><td class="n">${r.state}</td><td class="n">${r.local}</td><td class="n${r.n>20?" over":""}">${r.n}</td></tr>`).join("")
+  const smgN=smgRows.reduce((a,r)=>a+r.n,0);
+  document.getElementById("entnums").innerHTML=`<thead><tr><th>Places</th><th class="n">State</th><th class="n">Local enterprise</th><th class="n">Accounts</th></tr></thead><tbody>${
+    entRows.map(r=>`<tr><td>${esc(r.place)}</td><td class="n">${r.state}</td><td class="n">${r.local}</td><td class="n${r.n>20?" over":""}">${r.n}</td></tr>`).join("")
   }</tbody><tfoot><tr><td>Total</td><td class="n">${entState}</td><td class="n">${entLocal}</td><td class="n">${entState+entLocal}</td></tr></tfoot>`;
-  document.getElementById("smgnums").innerHTML=`<thead><tr><th>XP</th><th class="n">Accounts</th></tr></thead><tbody>${
-    smgRows.map(r=>`<tr><td>${esc(label(r.xp))}</td><td class="n${r.n>30?" over":""}">${r.n}</td></tr>`).join("")
-  }</tbody><tfoot><tr><td>Total</td><td class="n">${smgRows.reduce((a,r)=>a+r.n,0)}</td></tr></tfoot>`;
-  document.getElementById("entlede").textContent=`${entState+entLocal} accounts on ${entRows.length} partners. ${entState} are state agencies and ${entLocal} are local enterprise. A book stops at 20.`;
-  document.getElementById("smglede").textContent=`${smgRows.reduce((a,r)=>a+r.n,0)} accounts on the ${smgRows.length} current midmarket partners. A book stops at 30.`;
+  document.getElementById("smgnums").innerHTML=`<thead><tr><th>Places</th><th class="n">Accounts</th></tr></thead><tbody>${
+    smgRows.map(r=>`<tr><td>${esc(r.place)}</td><td class="n${r.n>30?" over":""}">${r.n}</td></tr>`).join("")
+  }</tbody><tfoot><tr><td>Total</td><td class="n">${smgN}</td></tr></tfoot>`;
+  document.getElementById("entlede").textContent=`${entState+entLocal} accounts in ${entRows.length} books. ${entState} are state agencies and ${entLocal} are local enterprise. A book stops at 20.`;
+  document.getElementById("smglede").textContent=`${smgN} accounts in ${smgRows.length} books. A book stops at 30.`;
 }
 function glance(){
   if(scn==="numbers"){
@@ -856,7 +879,7 @@ function render(){
   document.getElementById("stage").hidden=theory || numbers;
   document.querySelector("h1").textContent=numbers?"Account numbers":theory?"How the coverage is designed":"Who covers the US";
   document.querySelector(".lede").textContent=numbers
-    ? "Enterprise is every state account and every local enterprise account, on the partners who hold them in the proposed plan. Midmarket is local SMG, on the current midmarket partners. Federal accounts are in neither number."
+    ? "Enterprise is every state account and every local enterprise account. Midmarket is local SMG. Each row is the places in one book. Federal accounts stay on the federal book."
     : theory
     ? "The rules, the bands, and the seats. A person is named only for a carve-out."
     : "Choose a person. Their states light up, and their accounts are listed beside the map.";
