@@ -117,7 +117,13 @@ select,.pick>button,input[type="search"]{
 .detailpane li span{color:var(--muted)}
 .blank{padding:16px;color:var(--muted)}
 .theory,.numbers{margin-top:22px}
-.theory h2,.numbers h2{font:600 18px/1.25 Barlow,sans-serif;margin:26px 0 8px}
+.theory h2,.numbers h2,.y2028 h2{font:600 18px/1.25 Barlow,sans-serif;margin:26px 0 8px}
+.y2028 h2,.xpbooks h2{font-family:Fraunces,Georgia,serif;font-weight:500;font-size:22px;letter-spacing:-.02em}
+.xpbooks{margin-top:28px}
+.xpbooks h2{margin:0}
+.xpbooks .bandhead{margin-bottom:10px}
+td.mark{color:var(--over);font-weight:600}
+.y2028{margin-top:4px}
 .theory h2:first-child,.numbers h2:first-child{margin-top:0}
 .theory h3{font:600 16px/1.3 Barlow,sans-serif;margin:16px 0 4px}
 .theory p,.numbers p{margin:0 0 10px;max-width:66ch}
@@ -247,6 +253,7 @@ td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
   <nav class="jump" aria-label="Pages">
     <button type="button" data-go="room" data-book="cur" aria-current="page">2026</button>
     <button type="button" data-go="room" data-book="adj">2027</button>
+    <button type="button" data-go="y2028">2028</button>
     <button type="button" data-go="cur">Who holds them today</button>
     <button type="button" data-go="new">Proposed plan</button>
     <button type="button" data-go="pod">Recommended seats</button>
@@ -316,6 +323,7 @@ td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
     <p class="roomnote" id="roomnote"></p>
     <div class="figures" id="counts"></div>
     <div class="figures" id="stats"></div>
+    <div class="xpbooks" id="xpbooks"></div>
     <div class="roomstage" id="roomstage">
       <div class="mapcard">
         <div class="maphead"><h2>Territories</h2><p id="maplegend"></p></div>
@@ -323,6 +331,17 @@ td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
       </div>
       <div id="diagram"></div>
     </div>
+  </article>
+
+  <article id="y2028" class="y2028" hidden>
+    <div class="figures" id="teamfigures"></div>
+    <p class="roomnote" id="teamnote"></p>
+    <h2>Where 2027 puts both on one seat</h2>
+    <div class="card tscroll"><table id="mixedseats"></table></div>
+    <h2>State</h2>
+    <div class="card tscroll"><table id="stateseats"></table></div>
+    <h2>Local enterprise</h2>
+    <div class="card tscroll"><table id="localseats"></table></div>
   </article>
 
   <article id="numbers" class="numbers">
@@ -1397,6 +1416,117 @@ function roomOrder(terrs, partners, linkOf){
     return mean(a)-mean(b) || a.label.localeCompare(b.label);
   });
 }
+function roomSeatMotion(seat){
+  const ids = new Set(seat.terr.map(t=>t.id));
+  let state=0, local=0, complex=0, stateArr=0, localArr=0;
+  for(const r of ROWS_ALL){
+    if(r.alloc || !ids.has(r.mterr)) continue;
+    if(r.segment==="State"){ state++; stateArr += r.arr; }
+    else if(r.segment==="Local ENT"){ local++; localArr += r.arr; }
+    else continue;
+    if(r.ncap>7) complex++;
+  }
+  return {state, local, complex, stateArr, localArr, arr: stateArr+localArr};
+}
+function roomSeatMeta(seat){
+  const m = roomSeatMotion(seat);
+  const parts = [seat.level, `${seat.n} account${seat.n===1?"":"s"}`, `${seat.terr.length} territor${seat.terr.length===1?"y":"ies"}`];
+  if(m.state && m.local) parts.push(`State ${m.state}`, `Local ${m.local}`);
+  if(m.complex) parts.push(`${m.complex} complex`);
+  return parts.join(" · ");
+}
+function roomTeamPack(seg){
+  const model = roomWithCoverage(roomTerritories());
+  const terrs = model.filter(t=>t.seg===seg);
+  return roomPack(roomBundles(terrs, "ent"), "ent").map(bn=>{
+    const ordered = bn.terr.slice().sort((a,b)=>b.n-a.n || a.label.localeCompare(b.label));
+    const seat = {id: ordered[0].id, label: ordered[0].label, n: bn.n, terr: ordered, level: "XP2–4", states: bn.states};
+    return Object.assign(seat, roomSeatMotion(seat));
+  }).sort((a,b)=>b.n-a.n || b.arr-a.arr || a.label.localeCompare(b.label));
+}
+function renderBooks(){
+  const box = document.getElementById("xpbooks");
+  if(bookView!=="cur"){ box.hidden=true; box.innerHTML=""; return; }
+  const by = {};
+  for(const r of ROWS_ALL){
+    if(r.alloc) continue;
+    if(r.segment!=="State" && r.segment!=="Local ENT" && r.segment!=="Local SMG") continue;
+    const b = by[r.cur] ||= {state:0, local:0, smg:0, complex:0, arr:0, regions:{}};
+    if(r.segment==="State") b.state++;
+    else if(r.segment==="Local ENT") b.local++;
+    else b.smg++;
+    if(r.ncap>7) b.complex++;
+    b.arr += r.arr;
+    const reg = r.state && HOME_REGION[r.state];
+    if(reg && (r.segment==="State" || r.segment==="Local ENT")){
+      const cell = b.regions[reg] ||= {state:0, local:0};
+      if(r.segment==="State") cell.state++;
+      else cell.local++;
+    }
+  }
+  const rows = Object.entries(by).map(([name,b])=>({
+    name, level: roomLevel(name) || "Partner",
+    n: b.state+b.local+b.smg, ...b,
+    mixed: Object.entries(b.regions).filter(([,v])=>v.state && v.local).map(([k])=>k)
+  })).sort((a,b)=>b.complex-a.complex || (b.mixed.length-a.mixed.length) || (b.state+b.local)-(a.state+a.local) || a.name.localeCompare(b.name));
+  box.hidden=false;
+  box.innerHTML = `<h2>Each book</h2><p class="roomnote">Complex means more than seven products. The last column is a region where that book holds state and local enterprise together.</p>
+    <div class="card tscroll"><table>
+      <thead><tr><th>Partner</th><th>Level</th><th class="n">State</th><th class="n">Local enterprise</th><th class="n">Midmarket</th><th class="n">Complex</th><th class="n">ARR</th><th>State and local in one region</th></tr></thead>
+      <tbody>${rows.map(b=>`<tr>
+        <td>${esc(roomXpName(b.name))}</td>
+        <td class="${b.level==="XP1" && (b.state||b.local) ? "mark" : ""}">${esc(b.level)}</td>
+        <td class="n">${b.state||"–"}</td>
+        <td class="n">${b.local||"–"}</td>
+        <td class="n">${b.smg||"–"}</td>
+        <td class="n${b.complex?" over":""}">${b.complex||"–"}</td>
+        <td class="n">${b.arr ? fmt$(b.arr) : "–"}</td>
+        <td>${b.mixed.length ? esc(b.mixed.join("; ")) : "–"}</td>
+      </tr>`).join("")}</tbody>
+    </table></div>`;
+}
+function renderTeam(){
+  const stateAll = roomTeamPack("State");
+  const localAll = roomTeamPack("Local enterprise");
+  const stateSeats = stateAll.filter(s=>s.n>0);
+  const localSeats = localAll.filter(s=>s.n>0);
+  const model = roomWithCoverage(roomTerritories());
+  const combined = roomSeats(model).seats.filter(s=>s.band==="ent" && s.n>0);
+  const mixed = combined.map(s=>Object.assign({label:s.label, n:s.n}, roomSeatMotion(s))).filter(s=>s.state && s.local)
+    .sort((a,b)=>b.complex-a.complex || (b.localArr+b.stateArr)-(a.localArr+a.stateArr) || a.label.localeCompare(b.label));
+  const thin = (list)=>list.filter(s=>s.n<5).length;
+  const entCx = localSeats.reduce((a,s)=>a+s.complex,0);
+  const stateArr = stateSeats.reduce((a,s)=>a+s.arr,0);
+  const localArr = localSeats.reduce((a,s)=>a+s.arr,0);
+  const extra = stateSeats.length + localSeats.length - combined.length;
+  const open = [...new Set([...stateAll, ...localAll].filter(s=>!s.n).map(s=>s.label))];
+  const openText = open.length===1 && stateAll.some(s=>!s.n && s.label===open[0]) && localAll.some(s=>!s.n && s.label===open[0])
+    ? `${open[0]} is open territory on both teams and is not in the count.`
+    : "";
+  document.querySelector(".lede").textContent = `I would recommend ${stateSeats.length} seats for state and ${localSeats.length} seats for local enterprise. A seat holds one of those. 2027 holds the same accounts on ${combined.length} seats.`;
+  document.getElementById("teamnote").textContent = `Complex means more than seven products. All ${roomNum(entCx)} of them are local enterprise, and state has none. ${roomNum(thin(localSeats))} local seats and ${roomNum(thin(stateSeats))} state seats hold fewer than five accounts. They stay separate; the hour rule will not join them, and a local seat does not take the state book next to it. ${openText}`.trim();
+  const fig = (n, label, em)=>`<div class="figure"><b>${n}</b><span>${esc(label)}</span><em>${esc(em)}</em></div>`;
+  document.getElementById("teamfigures").innerHTML = [
+    fig(stateSeats.length, "State seats", `${stateSeats.reduce((a,s)=>a+s.n,0)} accounts · ${fmt$(stateArr)}`),
+    fig(localSeats.length, "Local enterprise seats", `${localSeats.reduce((a,s)=>a+s.n,0)} accounts · ${fmt$(localArr)} · ${entCx} complex`),
+    fig(extra, "More seats than 2027", `2027 holds these accounts on ${combined.length} seats`)
+  ].join("");
+  const head = `<thead><tr><th>Seat</th><th class="n">State</th><th class="n">State ARR</th><th class="n">Local enterprise</th><th class="n">Local ARR</th><th class="n">Complex</th></tr></thead>`;
+  document.getElementById("mixedseats").innerHTML = head + `<tbody>${mixed.map(s=>`<tr>
+    <td>${esc(s.label)}</td>
+    <td class="n">${s.state}</td><td class="n">${fmt$(s.stateArr)}</td>
+    <td class="n">${s.local}</td><td class="n">${fmt$(s.localArr)}</td>
+    <td class="n${s.complex?" over":""}">${s.complex||"–"}</td>
+  </tr>`).join("")}</tbody>`;
+  const teamTable = (list, kind)=>`<thead><tr><th>Seat</th><th class="n">Accounts</th><th class="n">ARR</th><th class="n">Complex</th></tr></thead><tbody>${list.map(s=>`<tr>
+    <td>${esc(s.label)}</td>
+    <td class="n">${s.n}</td>
+    <td class="n">${fmt$(kind==="state"?s.stateArr:s.localArr)}</td>
+    <td class="n${s.complex?" over":""}">${s.complex||"–"}</td>
+  </tr>`).join("")}</tbody>`;
+  document.getElementById("stateseats").innerHTML = teamTable(stateSeats, "state");
+  document.getElementById("localseats").innerHTML = teamTable(localSeats, "local");
+}
 function renderRoom(){
   if(!PAGE.modelOrder || !PAGE.modelLabel){
     document.getElementById("roomnote").textContent = "Territory lines are not on this page yet.";
@@ -1437,6 +1567,7 @@ function renderRoom(){
     compare(active.perPartner, active.perPartnerMax, "Account executives per partner", other.perPartner, false),
     compare(active.xp1, active.xp1, "XP1 partners on enterprise", other.xp1, bookView==="cur" && active.xp1>0)
   ].join("");
+  renderBooks();
   document.getElementById("maplegend").textContent = bookView==="cur"
     ? "Shading shows how many partners hold a territory in that state."
     : "Shading shows how many seats hold a territory in that state.";
@@ -1478,7 +1609,7 @@ function renderRoomDiagram(terrs, seats, byTerr){
           <div class="fangap"><svg class="fan" aria-hidden="true"></svg></div>
           <button type="button" class="seatcard" data-kind="seat" data-id="${esc(s.id)}" title="${esc(s.terr.map(t=>t.label).join(", "))}">
             <span class="rnm">${esc(s.label)}</span>
-            <span class="rmeta">${esc(s.level)} · ${s.n} accounts · ${s.terr.length} territor${s.terr.length===1?"y":"ies"}</span>
+            <span class="rmeta">${esc(roomSeatMeta(s))}</span>
           </button>
         </div>`;
       }).join("");
@@ -1615,6 +1746,7 @@ function drawRoomLines(){
 }
 function pageTitle(){
   if(scn==="room") return bookView==="adj" ? "2027" : "2026";
+  if(scn==="y2028") return "2028";
   if(scn==="numbers") return "Account numbers";
   if(scn==="theory") return "The approach";
   if(scn==="model") return "Territory model";
@@ -1625,7 +1757,7 @@ function pageTitle(){
 function pageLede(){
   if(scn==="numbers") return "Enterprise is every state account and every local enterprise account. Midmarket is local SMG. Each row is the places in one book. Federal accounts stay on the federal book.";
   if(scn==="theory") return "The rules, the bands, and the seats. A person is named only for a carve-out.";
-  if(scn==="room") return "";
+  if(scn==="room" || scn==="y2028") return "";
   if(layout==="table") return "Book check, tiers, and the load on each account executive.";
   if(layout==="links") return "Each line joins an account executive to the partner on that book.";
   if(scn==="model") return "16 local enterprise territories, 20 state, and 37 midmarket. Federal stays one book. Choose a territory. Its states light up, and its accounts are listed beside the map.";
@@ -1636,17 +1768,19 @@ function render(){
   const theory=scn==="theory";
   const numbers=scn==="numbers";
   const room=scn==="room";
-  const work=!theory && !numbers && !room;
+  const team=scn==="y2028";
+  const work=!theory && !numbers && !room && !team;
   const links=work && layout==="links";
   const table=work && layout==="table";
   document.getElementById("theory").hidden=!theory;
   document.getElementById("numbers").hidden=!numbers;
   document.getElementById("room").hidden=!room;
+  document.getElementById("y2028").hidden=!team;
   document.body.dataset.view=room?"room":"";
   document.getElementById("stage").hidden=!work || table;
   document.getElementById("tools").hidden=!work;
   document.getElementById("tables").hidden=!table;
-  document.getElementById("filters").hidden=room || numbers;
+  document.getElementById("filters").hidden=room || numbers || team;
   document.querySelector(".find").hidden=!work || layout!=="map";
   document.querySelector("h1").textContent=pageTitle();
   document.title=pageTitle();
@@ -1664,6 +1798,7 @@ function render(){
   document.getElementById("linkbar").hidden=!links;
   document.getElementById("glance").hidden=links;
   if(room){ document.getElementById("detail").hidden=true; renderRoom(); return; }
+  if(team){ document.getElementById("detail").hidden=true; renderTeam(); return; }
   if(numbers){ document.getElementById("detail").hidden=true; renderNumbers(); glance(); return; }
   if(theory){ document.getElementById("detail").hidden=true; renderTheory(); glance(); filterLabel(); return; }
   if(table){
