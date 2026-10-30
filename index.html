@@ -1018,6 +1018,14 @@ function renderTheory(){
 const ROOM_CAP = {ent:20, smg:30};
 const ROOM_AIM = {ent:17, smg:30};
 const ROOM_SEATS = {ent:12, smg:9};
+const TZ_OFFSET = {AKT:-9, PT:-8, MT:-7, CT:-6, ET:-5, HT:-10};
+const STATE_TZ = {
+  CT:"ET", DE:"ET", DC:"ET", FL:"ET", GA:"ET", IN:"ET", KY:"ET", ME:"ET", MD:"ET", MA:"ET", MI:"ET", NH:"ET", NJ:"ET", NY:"ET", NC:"ET", OH:"ET", PA:"ET", RI:"ET", SC:"ET", VT:"ET", VA:"ET", WV:"ET",
+  AL:"CT", AR:"CT", IL:"CT", IA:"CT", KS:"CT", LA:"CT", MN:"CT", MS:"CT", MO:"CT", NE:"CT", ND:"CT", OK:"CT", SD:"CT", TN:"CT", TX:"CT", WI:"CT",
+  AZ:"MT", CO:"MT", ID:"MT", MT:"MT", NM:"MT", UT:"MT", WY:"MT",
+  CA:"PT", NV:"PT", OR:"PT", WA:"PT",
+  AK:"AKT", HI:"HT"
+};
 
 function roomNum(n){
   const r = Math.round(n*10)/10;
@@ -1026,6 +1034,180 @@ function roomNum(n){
 function roomAvg(xs){ return xs.reduce((a,b)=>a+b,0) / (xs.length || 1); }
 function roomPrimary(t){
   return Object.entries(t.aes).sort((a,b)=>b[1]-a[1] || a[0].localeCompare(b[0]))[0][0];
+}
+function roomOff(st){
+  const tz = STATE_TZ[st];
+  return tz ? TZ_OFFSET[tz] : null;
+}
+function roomTzSpan(states){
+  let lo = 99, hi = -99, any = false;
+  for(const st of Object.keys(states)){
+    const off = roomOff(st);
+    if(off==null) continue;
+    any = true;
+    lo = Math.min(lo, off);
+    hi = Math.max(hi, off);
+  }
+  return any ? hi-lo : 0;
+}
+function roomTzOk(states){ return roomTzSpan(states) <= 1; }
+function roomUnion(a, b){
+  const s = {...a};
+  for(const st of Object.keys(b)) s[st] = (s[st]||0) + (b[st]||0);
+  return s;
+}
+const STATE_BORDERS = [
+  ["AL","MS"],["AL","FL"],["AL","GA"],["AL","TN"],
+  ["AR","MO"],["AR","TN"],["AR","MS"],["AR","LA"],["AR","TX"],["AR","OK"],
+  ["AZ","CA"],["AZ","NV"],["AZ","UT"],["AZ","CO"],["AZ","NM"],
+  ["CA","OR"],["CA","NV"],
+  ["CO","WY"],["CO","NE"],["CO","KS"],["CO","OK"],["CO","NM"],["CO","UT"],
+  ["CT","NY"],["CT","MA"],["CT","RI"],
+  ["DE","MD"],["DE","PA"],["DE","NJ"],
+  ["DC","MD"],["DC","VA"],
+  ["FL","GA"],
+  ["GA","TN"],["GA","NC"],["GA","SC"],
+  ["ID","MT"],["ID","WY"],["ID","UT"],["ID","NV"],["ID","OR"],["ID","WA"],
+  ["IL","WI"],["IL","IN"],["IL","KY"],["IL","MO"],["IL","IA"],
+  ["IN","MI"],["IN","OH"],["IN","KY"],
+  ["IA","MN"],["IA","WI"],["IA","MO"],["IA","NE"],["IA","SD"],
+  ["KS","NE"],["KS","MO"],["KS","OK"],
+  ["KY","WV"],["KY","VA"],["KY","TN"],["KY","MO"],["KY","OH"],
+  ["LA","MS"],["LA","TX"],
+  ["ME","NH"],
+  ["MD","PA"],["MD","WV"],["MD","VA"],
+  ["MA","NH"],["MA","VT"],["MA","NY"],["MA","RI"],
+  ["MI","OH"],["MI","WI"],
+  ["MN","WI"],["MN","SD"],["MN","ND"],
+  ["MS","TN"],
+  ["MO","TN"],["MO","NE"],
+  ["MT","ND"],["MT","SD"],["MT","WY"],
+  ["NE","SD"],["NE","WY"],
+  ["NV","UT"],["NV","OR"],
+  ["NH","VT"],
+  ["NJ","NY"],["NJ","PA"],
+  ["NM","UT"],["NM","OK"],["NM","TX"],
+  ["NY","PA"],["NY","VT"],
+  ["NC","VA"],["NC","TN"],["NC","SC"],
+  ["ND","SD"],
+  ["OH","PA"],["OH","WV"],
+  ["OK","TX"],["OK","CO"],["OK","MO"],
+  ["OR","WA"],["OR","NV"],
+  ["PA","WV"],
+  ["SD","WY"],
+  ["TN","VA"],["TN","NC"],
+  ["UT","WY"],["UT","NV"],
+  ["VA","WV"],
+  ["WA","ID"],
+  ["WI","MI"]
+];
+const STATE_TOUCH = {};
+for(const [a,b] of STATE_BORDERS){
+  (STATE_TOUCH[a] ||= []).push(b);
+  (STATE_TOUCH[b] ||= []).push(a);
+}
+function roomHas(states, st){
+  return Object.prototype.hasOwnProperty.call(states, st);
+}
+function roomTouches(a, b){
+  const left = Object.keys(a), right = Object.keys(b);
+  if(!left.length || !right.length) return true;
+  if(left.some(s=>roomHas(b, s))) return true;
+  return left.some(s=>(STATE_TOUCH[s]||[]).some(n=>roomHas(b, n)));
+}
+function roomReallyTouches(a, b){
+  const left = Object.keys(a), right = Object.keys(b);
+  if(!left.length || !right.length) return false;
+  if(left.some(s=>roomHas(b, s))) return true;
+  return left.some(s=>(STATE_TOUCH[s]||[]).some(n=>roomHas(b, n)));
+}
+function roomRegionOk(a, b){
+  const A = new Set(), B = new Set();
+  for(const st of Object.keys(a)) if(HOME_REGION[st]) A.add(HOME_REGION[st]);
+  for(const st of Object.keys(b)) if(HOME_REGION[st]) B.add(HOME_REGION[st]);
+  if(A.size && B.size && ![...A].some(r=>B.has(r))) return false;
+  return new Set([...A, ...B]).size <= 2;
+}
+function roomStateLabel(sts){
+  const names = sts.map(s=>STATE_NAME[s]||s).sort((a,b)=>a.localeCompare(b));
+  if(names.length<=1) return names[0] || "Open territory";
+  if(names.length===2) return `${names[0]} and ${names[1]}`;
+  return `${names.slice(0,-1).join(", ")}, and ${names[names.length-1]}`;
+}
+function roomSplitTz(t){
+  const sts = Object.keys(t.states).filter(s=>roomOff(s)!=null);
+  if(sts.length<2 || roomTzOk(t.states)) return [t];
+  const ordered = sts.slice().sort((a,b)=>roomOff(a)-roomOff(b) || a.localeCompare(b));
+  const clusters = [];
+  for(const st of ordered){
+    const off = roomOff(st);
+    const last = clusters[clusters.length-1];
+    if(last && Math.max(last.hi, off)-Math.min(last.lo, off)<=1){
+      last.sts.push(st);
+      last.lo = Math.min(last.lo, off);
+      last.hi = Math.max(last.hi, off);
+    } else clusters.push({sts:[st], lo:off, hi:off});
+  }
+  if(clusters.length<=1) return [t];
+  return clusters.map(cl=>{
+    const states = {};
+    let n = 0;
+    for(const st of cl.sts){ states[st] = t.states[st]||0; n += states[st]; }
+    return {
+      id: t.id+"~"+cl.lo, label: roomStateLabel(cl.sts), seg: t.seg,
+      band: t.band, n, aes:{...t.aes}, states, xps:{...t.xps}, pairs:(t.pairs||[]).slice()
+    };
+  });
+}
+function roomWithCoverage(terrs){
+  const list = terrs.flatMap(roomSplitTz);
+  const byPerson = {};
+  for(const t of list) for(const ae of Object.keys(t.aes)) (byPerson[ae] ||= []).push(t);
+  const ghosts = [];
+  for(const [ae, meta] of Object.entries(AE_TERRITORY)){
+    const note = (meta && meta.note) || "";
+    if(/Federal/i.test(note)) continue;
+    const states = (meta && meta.states) || [];
+    if(!states.length) continue;
+    const mine = byPerson[ae] || [];
+    if(!mine.length){
+      if(/vertical/i.test(note)) continue;
+      const seg = /Local ENT/i.test(note) ? "Local enterprise" : /Local SMG/i.test(ae) ? "Midmarket" : "State";
+      const shell = {
+        id:"cov-"+ae, label:ae, seg, band: seg==="Midmarket" ? "smg" : "ent",
+        n:0, aes:{[ae]:0}, states:{}, xps:{}, pairs:[]
+      };
+      for(const st of states) shell.states[st] = 0;
+      roomSplitTz(shell).forEach((p,i)=>{
+        p.id = "cov-"+i+"-"+ae;
+        p.label = roomStateLabel(Object.keys(p.states));
+        ghosts.push(p);
+      });
+      continue;
+    }
+    const bySeg = {};
+    for(const t of mine) (bySeg[t.seg] ||= []).push(t);
+    for(const group of Object.values(bySeg)){
+      for(const st of states){
+        if(roomOff(st)==null || group.some(t=>Object.prototype.hasOwnProperty.call(t.states, st))) continue;
+        const cands = group.filter(t=>roomTzOk({...t.states, [st]:0}));
+        if(!cands.length){
+          const seg = group[0].seg;
+          const t = {
+            id:"cov-"+st+"-"+ae, label:STATE_NAME[st]||st, seg,
+            band: seg==="Midmarket" ? "smg" : "ent",
+            n:0, aes:{[ae]:0}, states:{[st]:0}, xps:{}, pairs:[]
+          };
+          ghosts.push(t);
+          group.push(t);
+          continue;
+        }
+        cands.sort((a,b)=>(b.aes[ae]||0)-(a.aes[ae]||0) || a.n-b.n || a.id.localeCompare(b.id));
+        cands[0].states[st] = cands[0].states[st] || 0;
+      }
+    }
+  }
+  return list.concat(ghosts);
 }
 function roomAccumulate(by, id, label, seg, r){
   const t = by[id] ||= {
@@ -1099,7 +1281,7 @@ function roomBundles(terrs, band){
     const ts = groups[ae].slice().sort((a,b)=>b.n-a.n || a.id.localeCompare(b.id));
     const bins = [];
     for(const t of ts){
-      const cands = bins.filter(b=>b.n+t.n<=cap);
+      const cands = bins.filter(b=>b.n+t.n<=cap && roomTzOk(roomUnion(b.states, t.states)) && roomTouches(b.states, t.states) && roomRegionOk(b.states, t.states));
       let b;
       if(!cands.length){ b = {ae, n:0, terr:[], states:{}}; bins.push(b); }
       else b = cands.slice().sort((a,c)=>a.n-c.n || a.terr.length-c.terr.length)[0];
@@ -1121,15 +1303,16 @@ function roomPack(items, band){
   const sorted = items.slice().sort((a,b)=>b.n-a.n || a.terr[0].id.localeCompare(b.terr[0].id));
   const bins = Array.from({length:ROOM_SEATS[band]}, ()=>({n:0, aes:[], terr:[], states:{}}));
   for(const b of sorted){
-    let cands = bins.map((bn,i)=>({bn,i})).filter(x=>x.bn.n+b.n<=cap);
+    let cands = bins.map((bn,i)=>({bn,i})).filter(x=>x.bn.n+b.n<=cap && roomTzOk(roomUnion(x.bn.states, b.states)) && roomTouches(x.bn.states, b.states) && roomRegionOk(x.bn.states, b.states));
     if(!cands.length){
       bins.push({n:0, aes:[], terr:[], states:{}});
       cands = [{bn:bins[bins.length-1], i:bins.length-1}];
     }
     cands.sort((a,c)=>{
-      const share = bn => Object.keys(b.states).filter(s=>bn.states[s]).length;
+      const share = bn => Object.keys(b.states).filter(s=>roomHas(bn.states, s)).length;
       const reg = bn => [...roomRegions(b.states)].filter(r=>roomRegions(bn.states).has(r)).length;
-      return a.bn.aes.length-c.bn.aes.length || share(c.bn)-share(a.bn) || reg(c.bn)-reg(a.bn) || a.bn.n-c.bn.n || a.i-c.i;
+      const real = bn => roomReallyTouches(bn.states, b.states) ? 0 : 1;
+      return share(c.bn)-share(a.bn) || a.bn.aes.length-c.bn.aes.length || reg(c.bn)-reg(a.bn) || real(a.bn)-real(c.bn) || a.bn.n-c.bn.n || a.i-c.i;
     });
     const bn = cands[0].bn;
     bn.n += b.n;
@@ -1137,7 +1320,7 @@ function roomPack(items, band){
     bn.terr.push(...b.terr);
     for(const [s,c] of Object.entries(b.states)) bn.states[s] = (bn.states[s]||0)+c;
   }
-  return bins.filter(bn=>bn.n).sort((a,b)=>b.n-a.n || a.terr[0].id.localeCompare(b.terr[0].id));
+  return bins.filter(bn=>bn.terr.length).sort((a,b)=>b.n-a.n || a.terr[0].id.localeCompare(b.terr[0].id));
 }
 function roomSeats(terrs){
   const seats = [];
@@ -1217,7 +1400,7 @@ function renderRoom(){
     document.getElementById("roomnote").textContent = "Territory lines are not on this page yet.";
     return;
   }
-  const modelTerrs = roomTerritories();
+  const modelTerrs = roomWithCoverage(roomTerritories());
   const curTerrs = roomCurrentTerritories();
   const {seats, byTerr} = roomSeats(modelTerrs);
   const cur = roomStats(curTerrs, byTerr, "cur");
@@ -1239,7 +1422,7 @@ function renderRoom(){
   document.getElementById("bookadj").setAttribute("aria-selected", bookView==="adj" ? "true" : "false");
   document.getElementById("roomnote").textContent = bookView==="cur"
     ? "An XP1 on local enterprise or state is marked."
-    : levelRule;
+    : levelRule + " A seat stays within an hour of every state on it.";
   document.getElementById("counts").innerHTML = [
     [nLent, "Local enterprise"],
     [nState, "State"],
